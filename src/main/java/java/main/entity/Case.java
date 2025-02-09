@@ -1,8 +1,6 @@
 package java.main.entity;
 
-import java.main.enums.CauseOfVehicleDamage;
-import java.main.enums.VehicleBrand;
-import java.main.enums.VehicleDamageType;
+import java.main.enums.CaseState;
 import java.util.ArrayList;
 
 // case, needs info about client, their vehicle, total number of people who need assistance,
@@ -12,68 +10,37 @@ import java.util.ArrayList;
 //this class has required fields(Long id, Location location, Driver assignedDriver, Operator firstOperator, Vehicle clientVehicle, String damageDescription, CauseOfVehicleDamage causeOfDamage, VehicleDamageType damageType) and optional ones (caseNotes, lastEditedOperator)
 public class Case extends Entity {
     private Location location;
-    private Driver assignedDriver;
     private Operator firstOperator;
     private Operator lastEditedOperator;
     private Vehicle clientVehicle;
-    private ArrayList<String> caseNotes;
+    private ArrayList<String> caseNotes = new ArrayList<>();
     private String damageDescription;
-    private CauseOfVehicleDamage causeOfDamage;
-    private VehicleDamageType damageType;
+    private ArrayList<Service> services = new ArrayList<>();
+    private CaseState caseState;
 
-    public Case(Long id, Location location, Driver assignedDriver, Operator firstOperator, Operator lastEditedOperator, Vehicle clientVehicle, ArrayList<String> caseNotes, String damageDescription, CauseOfVehicleDamage causeOfDamage, VehicleDamageType damageType) {
+    public Case(Long id, Location location, Operator firstOperator, Vehicle clientVehicle, String damageDescription, CaseState caseState) {
         super(id);
         this.location = location;
-        this.assignedDriver = assignedDriver;
-        this.firstOperator = firstOperator;
-        this.lastEditedOperator = lastEditedOperator;
-        this.clientVehicle = clientVehicle;
-        this.caseNotes = caseNotes;
-        this.damageDescription = damageDescription;
-        this.causeOfDamage = causeOfDamage;
-        this.damageType = damageType;
-    }
-
-    public Case(Long id, Location location, Driver assignedDriver, Operator firstOperator, Vehicle clientVehicle, String damageDescription, CauseOfVehicleDamage causeOfDamage, VehicleDamageType damageType) {
-        super(id);
-        this.location = location;
-        this.assignedDriver = assignedDriver;
         this.firstOperator = firstOperator;
         this.clientVehicle = clientVehicle;
         this.damageDescription = damageDescription;
-        this.causeOfDamage = causeOfDamage;
-        this.damageType = damageType;
+        this.caseState = caseState;
     }
 
-    public static class Builder {
-        private Location location;
-        private Driver assignedDriver;
-        private Operator firstOperator;
-        private Operator lastEditedOperator;
-        private Vehicle clientVehicle;
-        private ArrayList<String> caseNotes = new ArrayList<>();
-        private String damageDescription;
-        private CauseOfVehicleDamage causeOfDamage;
-        private VehicleDamageType damageType;
-        public Builder() {}
-
-        public Builder location(Location location) {}
+    public void addCaseNote(String note) {
+        caseNotes.add(note);
     }
 
-    public void setLastEditedOperator(Operator lastEditedOperator) {
-        this.lastEditedOperator = lastEditedOperator;
+    public ArrayList<Service> getServices() {
+        return services;
     }
 
-    public void setCaseNotes(ArrayList<String> caseNotes) {
-        this.caseNotes = caseNotes;
+    public CaseState getCaseState() {
+        return caseState;
     }
 
     public Location getLocation() {
         return location;
-    }
-
-    public Driver getAssignedDriver() {
-        return assignedDriver;
     }
 
     public Operator getFirstOperator() {
@@ -94,13 +61,5 @@ public class Case extends Entity {
 
     public String getDamageDescription() {
         return damageDescription;
-    }
-
-    public CauseOfVehicleDamage getCauseOfDamage() {
-        return causeOfDamage;
-    }
-
-    public VehicleDamageType getDamageType() {
-        return damageType;
     }
 }

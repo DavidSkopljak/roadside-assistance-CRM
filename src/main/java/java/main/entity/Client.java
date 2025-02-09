@@ -8,4 +8,12 @@ public class Client extends Person {
         super(id, firstName, lastName);
         this.contactNumber = contactNumber;
     }
+
+    public String getContactNumber() {
+        return contactNumber;
+    }
+
+    public void setContactNumber(String contactNumber) {
+        this.contactNumber = contactNumber;
+    }
 }

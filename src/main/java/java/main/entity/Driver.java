@@ -10,4 +10,22 @@ public class Driver {
     private String contactNumber;
     private Location currentLocation;
     private Vehicle vehicle;
+
+    public Driver(String contactNumber, Location currentLocation, Vehicle vehicle) {
+        this.contactNumber = contactNumber;
+        this.currentLocation = currentLocation;
+        this.vehicle = vehicle;
+    }
+
+    public String getContactNumber() {
+        return contactNumber;
+    }
+
+    public Location getCurrentLocation() {
+        return currentLocation;
+    }
+
+    public Vehicle getVehicle() {
+        return vehicle;
+    }
 }
