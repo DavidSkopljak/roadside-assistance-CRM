@@ -4,10 +4,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>java.main</groupId>
-    <artifactId>SkopljakProjektni</artifactId>
+    <groupId>com.davidskopljak</groupId>
+    <artifactId>Skopljak-zavrsni</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <name>SkopljakProjektni</name>
+    <name>Skopljak-zavrsni</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -38,6 +38,11 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-graphics</artifactId>
+            <version>17.0.6</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -47,8 +52,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.13.0</version>
                 <configuration>
-                    <source>8</source>
-                    <target>8</target>
+                    <source>23</source>
+                    <target>23</target>
                 </configuration>
             </plugin>
             <plugin>
@@ -60,7 +65,8 @@
                         <!-- Default configuration for running with: mvn clean javafx:run -->
                         <id>default-cli</id>
                         <configuration>
-                            <mainClass>java.main.skopljakprojektni/java.main.controller.HelloApplication
+                            <mainClass>
+                                com.davidskopljak.skopljakzavrsni/com.davidskopljak.skopljakzavrsni.HelloApplication
                             </mainClass>
                             <launcher>app</launcher>
                             <jlinkZipName>app</jlinkZipName>
