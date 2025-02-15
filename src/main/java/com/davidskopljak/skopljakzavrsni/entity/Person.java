@@ -17,4 +17,10 @@ public abstract class Person extends Entity {
         this.firstName = firstName;
         this.lastName = lastName;
     }
+
+    protected Person(String firstName, String lastName) {
+        super();
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
 }

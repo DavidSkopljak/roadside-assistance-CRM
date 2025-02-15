@@ -6,13 +6,20 @@ package com.davidskopljak.skopljakzavrsni.entity;
 // also needs to have status field - available, en route to case(new case can be queued), unavailable
 // needs current location - this can update every X minutes
 // needs field for current vehicle
-public class Driver extends Person{
+public class Driver extends Person {
     private String contactNumber;
     private Location currentLocation;
     private Vehicle vehicle;
 
     public Driver(Long id, String firstName, String lastName, String contactNumber, Location currentLocation, Vehicle vehicle) {
         super(id, firstName, lastName);
+        this.contactNumber = contactNumber;
+        this.currentLocation = currentLocation;
+        this.vehicle = vehicle;
+    }
+
+    public Driver(String firstName, String lastName, String contactNumber, Location currentLocation, Vehicle vehicle) {
+        super(firstName, lastName);
         this.contactNumber = contactNumber;
         this.currentLocation = currentLocation;
         this.vehicle = vehicle;

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+
+<MenuBar prefHeight="30.0" prefWidth="1080.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.davidskopljak.skopljakzavrsni.controller.CaseMenuController">
+  <menus>
+      <Menu mnemonicParsing="false" text="Save case">
+         <items>
+            <MenuItem mnemonicParsing="false" onAction="#handleSaveCase" text="Save" />
+         </items>
+      </Menu>
+    <Menu mnemonicParsing="false" text="Case information">
+         <items>
+            <MenuItem mnemonicParsing="false" onAction="#handleViewCaseInfo" text="View case information" />
+         </items>
+    </Menu>
+    <Menu mnemonicParsing="false" text="Location">
+         <items>
+            <MenuItem mnemonicParsing="false" onAction="#handleViewLocationInfo" text="View case location" />
+         </items>
+    </Menu>
+    <Menu mnemonicParsing="false" text="Services">
+         <items>
+            <MenuItem mnemonicParsing="false" onAction="#handleViewServices" text="View services" />
+            <MenuItem mnemonicParsing="false" onAction="#handleNewService" text="New service" />
+         </items>
+    </Menu>
+      <Menu mnemonicParsing="false" text="Resolve case">
+         <items>
+            <MenuItem mnemonicParsing="false" onAction="#handleResolveCase" text="Resolve" />
+            <MenuItem mnemonicParsing="false" onAction="#handleCancelCase" text="Cancel" />
+         </items>
+      </Menu>
+  </menus>
+</MenuBar>

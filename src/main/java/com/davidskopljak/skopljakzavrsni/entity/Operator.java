@@ -4,4 +4,8 @@ public class Operator extends Person{
     public Operator(Long id, String firstName, String lastName) {
         super(id, firstName, lastName);
     }
+
+    public Operator(String firstName, String lastName) {
+        super(firstName, lastName);
+    }
 }

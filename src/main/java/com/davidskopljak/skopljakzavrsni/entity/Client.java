@@ -9,11 +9,12 @@ public class Client extends Person {
         this.contactNumber = contactNumber;
     }
 
-    public String getContactNumber() {
-        return contactNumber;
+    public Client(String firstName, String lastName, String contactNumber) {
+        super(firstName, lastName);
+        this.contactNumber = contactNumber;
     }
 
-    public void setContactNumber(String contactNumber) {
-        this.contactNumber = contactNumber;
+    public String getContactNumber() {
+        return contactNumber;
     }
 }

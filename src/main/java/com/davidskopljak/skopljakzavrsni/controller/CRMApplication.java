@@ -10,17 +10,21 @@ import java.io.IOException;
 
 
 public class CRMApplication extends Application {
-    private static Logger log = LoggerFactory.getLogger(CRMApplication.class);
+    public static final Logger log = LoggerFactory.getLogger(CRMApplication.class);
     private static Stage primaryStage;
     @Override
-    public void start(Stage stage) throws IOException {
-        setPrimaryStage(stage);
-        FXMLLoader fxmlLoader = new FXMLLoader(CRMApplication.class.getResource("first-view.fxml"));
-        Scene scene = new Scene(fxmlLoader.load());
-        stage.setTitle("CRM boii");
-        stage.setScene(scene);
-        stage.show();
-        log.info("First view started");
+    public void start(Stage stage){
+        try{
+            CRMApplication.setPrimaryStage(stage);
+            FXMLLoader fxmlLoader = new FXMLLoader(CRMApplication.class.getResource("main-view.fxml"));
+            Scene scene = new Scene(fxmlLoader.load());
+            stage.setTitle("CRM Application");
+            stage.setScene(scene);
+            stage.setResizable(false);
+            stage.show();
+        }catch(IOException e){
+            log.error(e.getMessage());
+        }
     }
 
     public static void main(String[] args) {

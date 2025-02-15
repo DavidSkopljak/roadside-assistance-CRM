@@ -1,6 +1,7 @@
 package com.davidskopljak.skopljakzavrsni.entity;
 
 import com.davidskopljak.skopljakzavrsni.enums.CaseState;
+import com.davidskopljak.skopljakzavrsni.enums.VehicleDamageType;
 import com.davidskopljak.skopljakzavrsni.interfaces.Noteable;
 import com.davidskopljak.skopljakzavrsni.interfaces.Trackable;
 
@@ -21,8 +22,9 @@ public non-sealed class Case extends Entity implements Trackable<CaseState>, Not
     private String damageDescription;
     private List<Service> services = new ArrayList<>();
     private CaseState caseState;
+    private VehicleDamageType damageType;
 
-    public Case(Long id, Location location, Operator firstOperator, Vehicle clientVehicle, String damageDescription) {
+    public Case(Long id, Location location, Operator firstOperator, Vehicle clientVehicle, String damageDescription, VehicleDamageType damageType) {
         super(id);
         this.location = location;
         this.firstOperator = firstOperator;
@@ -30,6 +32,45 @@ public non-sealed class Case extends Entity implements Trackable<CaseState>, Not
         this.clientVehicle = clientVehicle;
         this.damageDescription = damageDescription;
         this.caseState = CaseState.ACTIVE;
+        this.damageType = damageType;
+    }
+
+    public Case(Location location, Operator firstOperator, Vehicle clientVehicle, String damageDescription, VehicleDamageType damageType) {
+        this.location = location;
+        this.firstOperator = firstOperator;
+        this.lastEditedOperator = firstOperator;
+        this.clientVehicle = clientVehicle;
+        this.damageDescription = damageDescription;
+        this.caseState = CaseState.ACTIVE;
+        this.damageType = damageType;
+    }
+
+    public VehicleDamageType getDamageType() {
+        return damageType;
+    }
+
+    public void setLastEditedOperator(Operator lastEditedOperator) {
+        this.lastEditedOperator = lastEditedOperator;
+    }
+
+    @Override
+    public CaseState getState() {
+        return caseState;
+    }
+
+    @Override
+    public void updateState(CaseState state) {
+        caseState = state;
+    }
+
+    @Override
+    public List<String> getNotes() {
+        return caseNotes;
+    }
+
+    @Override
+    public void setNotes(List<String> notes) {
+        caseNotes.addAll(notes);
     }
 
     public class Builder{
@@ -38,6 +79,7 @@ public non-sealed class Case extends Entity implements Trackable<CaseState>, Not
         private Operator firstOperator;
         private Vehicle clientVehicle;
         private String damageDescription;
+        private VehicleDamageType damageType;
 
         public Builder setId(Long id) {
             this.id = id;
@@ -60,8 +102,13 @@ public non-sealed class Case extends Entity implements Trackable<CaseState>, Not
             return this;
         }
 
+        public Builder setDamageType (VehicleDamageType damageType) {
+            this.damageType = damageType;
+            return this;
+        }
+
         public Case build() {
-            return new Case(id, location, firstOperator, clientVehicle, damageDescription);
+            return new Case(id, location, firstOperator, clientVehicle, damageDescription, damageType);
         }
     }
 
@@ -87,29 +134,5 @@ public non-sealed class Case extends Entity implements Trackable<CaseState>, Not
 
     public String getDamageDescription() {
         return damageDescription;
-    }
-
-    public void setLastEditedOperator(Operator lastEditedOperator) {
-        this.lastEditedOperator = lastEditedOperator;
-    }
-
-    @Override
-    public CaseState getState() {
-        return caseState;
-    }
-
-    @Override
-    public void updateState(CaseState state) {
-        caseState = state;
-    }
-
-    @Override
-    public List<String> getNotes() {
-        return caseNotes;
-    }
-
-    @Override
-    public void setNotes(List<String> notes) {
-        caseNotes.addAll(notes);
     }
 }
