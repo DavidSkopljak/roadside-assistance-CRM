@@ -7,11 +7,11 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane id="anchorPane" xmlns="http://javafx.com/javafx/17.0.6" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.davidskopljak.skopljakzavrsni.controller.FirstViewController">
+<AnchorPane id="anchorPane" minHeight="540.0" minWidth="960.0" prefHeight="540.0" prefWidth="960.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.davidskopljak.skopljakzavrsni.controller.FirstViewController">
     <children>
-        <MenuBar id="menuBar" layoutY="0.0" prefHeight="28.0" prefWidth="1325.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <MenuBar id="menuBar" layoutY="0.0" prefHeight="30.0" prefWidth="1920.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <menus>
-                <Menu id="newCaseMenu" mnemonicParsing="false" text="New case" onAction="#handleNewCase"/>
+                <Menu id="newCaseMenu" mnemonicParsing="false" onAction="#handleNewCase" text="New case" />
                 <Menu id="filterCasesMenu" mnemonicParsing="false" text="Filter cases">
                     <items>
                         <MenuItem mnemonicParsing="false" text="Delete" />
@@ -19,7 +19,7 @@
                 </Menu>
             </menus>
         </MenuBar>
-          <TableView id="caseTableView" layoutY="28.0" prefHeight="407.0" prefWidth="1325.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="28.0">
+          <TableView id="caseTableView" layoutY="28.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="1920.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="28.0">
               <columns>
                   <TableColumn id="caseIDTableColumn" minWidth="-Infinity" prefWidth="188.0" text="Case ID" />
                   <TableColumn id="lastNameTableColumn" minWidth="-Infinity" prefWidth="188.0" text="Last name" />

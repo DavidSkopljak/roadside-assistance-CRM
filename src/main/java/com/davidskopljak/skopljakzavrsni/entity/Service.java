@@ -29,10 +29,6 @@ public non-sealed class Service extends Entity implements Trackable<ServiceState
         return serviceType;
     }
 
-    public ServiceState getServiceState() {
-        return serviceState;
-    }
-
     @Override
     public ServiceState getState() {
         return serviceState;

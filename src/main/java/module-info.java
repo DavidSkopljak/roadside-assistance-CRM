@@ -2,6 +2,8 @@ module com.davidskopljak.skopljakzavrsni {
     requires javafx.controls;
     requires javafx.fxml;
     requires java.desktop;
+    requires java.logging;
+    requires org.slf4j;
 
 
     opens com.davidskopljak.skopljakzavrsni to javafx.fxml;

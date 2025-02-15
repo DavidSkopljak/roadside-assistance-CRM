@@ -3,7 +3,7 @@ package com.davidskopljak.skopljakzavrsni.entity;
 public abstract class Entity {
     private Long id;
 
-    public Entity(Long id) {
+    protected Entity(Long id) {
         this.id = id;
     }
 

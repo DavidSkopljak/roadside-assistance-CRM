@@ -12,7 +12,7 @@ public abstract class Person extends Entity {
         return lastName;
     }
 
-    public Person(Long id, String firstName, String lastName) {
+    protected Person(Long id, String firstName, String lastName) {
         super(id);
         this.firstName = firstName;
         this.lastName = lastName;

@@ -39,23 +39,23 @@ public non-sealed class Case extends Entity implements Trackable<CaseState>, Not
         private Vehicle clientVehicle;
         private String damageDescription;
 
-        public Builder id(Long id) {
+        public Builder setId(Long id) {
             this.id = id;
             return this;
         }
-        public Builder location(Location location) {
+        public Builder setLocation(Location location) {
             this.location = location;
             return this;
         }
-        public Builder firstOperator(Operator firstOperator) {
+        public Builder setFirstOperator(Operator firstOperator) {
             this.firstOperator = firstOperator;
             return this;
         }
-        public Builder clientVehicle(Vehicle clientVehicle) {
+        public Builder setClientVehicle(Vehicle clientVehicle) {
             this.clientVehicle = clientVehicle;
             return this;
         }
-        public Builder damageDescription(String damageDescription) {
+        public Builder setDamageDescription(String damageDescription) {
             this.damageDescription = damageDescription;
             return this;
         }
