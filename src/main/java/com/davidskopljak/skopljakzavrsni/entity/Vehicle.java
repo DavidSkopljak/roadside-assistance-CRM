@@ -1,8 +1,6 @@
 package com.davidskopljak.skopljakzavrsni.entity;
 
 import com.davidskopljak.skopljakzavrsni.enums.VehicleModel;
-
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 // vehicle, either for clients or tow truck drivers
@@ -11,9 +9,9 @@ public class Vehicle extends Entity {
    private String licensePlate;
    private VehicleModel brand;
    private LocalDate firstRegistrationDate;
-   private BigDecimal vin;
+   private String vin;
 
-   public Vehicle(Long id, String licensePlate, VehicleModel brand, LocalDate firstRegistrationDate, BigDecimal vin) {
+   public Vehicle(Long id, String licensePlate, VehicleModel brand, LocalDate firstRegistrationDate, String vin) {
       super(id);
       this.licensePlate = licensePlate;
       this.brand = brand;
@@ -21,7 +19,7 @@ public class Vehicle extends Entity {
       this.vin = vin;
    }
 
-   public Vehicle(String licensePlate, VehicleModel brand, LocalDate firstRegistrationDate, BigDecimal vin) {
+   public Vehicle(String licensePlate, VehicleModel brand, LocalDate firstRegistrationDate, String vin) {
       this.licensePlate = licensePlate;
       this.brand = brand;
       this.firstRegistrationDate = firstRegistrationDate;
@@ -40,5 +38,5 @@ public class Vehicle extends Entity {
       return firstRegistrationDate;
    }
 
-   public BigDecimal getVIN() {return vin;}
+   public String getVIN() {return vin;}
 }

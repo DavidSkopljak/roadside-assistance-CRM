@@ -1,5 +1,6 @@
 package com.davidskopljak.skopljakzavrsni.controller;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 
@@ -48,4 +49,15 @@ public class CaseMenuController {
     public void handleSaveCase() {
 
     }
+
+    public void handleNewService(ActionEvent actionEvent) {
+    }
+
+    public void handleResolveCase(ActionEvent actionEvent) {
+    }
+
+    public void handleCancelCase(ActionEvent actionEvent) {
+    }
+
+
 }

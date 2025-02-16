@@ -1,5 +1,7 @@
 package com.davidskopljak.skopljakzavrsni.validation;
 
+import com.davidskopljak.skopljakzavrsni.entity.Client;
+import com.davidskopljak.skopljakzavrsni.entity.Driver;
 import com.davidskopljak.skopljakzavrsni.entity.Location;
 
 import java.util.ArrayList;
@@ -12,6 +14,22 @@ public class UserInputValidation {
         Boolean validContactNumber = Validators.isValidCROPhoneNumber(contactNumber);
         return (validFirstName && validLastName && validContactNumber);
     }
+
+    public static Boolean validateClient(Client client) {
+        Boolean validFirstName = Validators.isValidString(client.getFirstName());
+        Boolean validLastName = Validators.isValidString(client.getLastName());
+        Boolean validContactNumber = Validators.isValidCROPhoneNumber(client.getContactNumber());
+        return (validFirstName && validLastName && validContactNumber);
+    }
+
+    public static Boolean validateDriver(Driver driver) {
+        Boolean validFirstName = Validators.isValidString(driver.getFirstName());
+        Boolean validLastName = Validators.isValidString(driver.getLastName());
+        Boolean validContactNumber = Validators.isValidCROPhoneNumber(driver.getContactNumber());
+        return (validFirstName && validLastName && validContactNumber);
+    }
+
+
 
     public static Boolean validatePerson(String firstName, String lastName) {
         Boolean validFirstName = Validators.isValidString(firstName);
