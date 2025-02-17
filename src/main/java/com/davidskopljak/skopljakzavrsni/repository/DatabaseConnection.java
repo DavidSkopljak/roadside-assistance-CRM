@@ -1,10 +1,8 @@
 package com.davidskopljak.skopljakzavrsni.repository;
 import com.davidskopljak.skopljakzavrsni.entity.Client;
 
-import java.io.FileReader;
 import java.io.IOException;
 import java.sql.*;
-import java.util.Properties;
 
 public class DatabaseConnection {
     public static void main(String[] args) throws IOException {
