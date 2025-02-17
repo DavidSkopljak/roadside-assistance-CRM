@@ -68,9 +68,9 @@ public class NewCaseController {
             a.setHeaderText(null);
             a.setContentText("Invalid case location. Please check the location details.");
         }
-        ClientRepository.addToDatabase(new Client(firstName, lastName, contactNumber));
-        VehicleRepository.addToDatabase(new Vehicle(Validators.removeSpecialCharacters(licensePlate), vehicleModel, firstRegLocalDate, vinText));
-        LocationRepository.addToDatabase(/*new Location(location data)*/);
+        //ClientRepository.addToDatabase(new Client(firstName, lastName, contactNumber));
+        //VehicleRepository.addToDatabase(new Vehicle(Validators.removeSpecialCharacters(licensePlate), vehicleModel, firstRegLocalDate, vinText));
+        //LocationRepository.addToDatabase(/*new Location(location data)*/);
     }
 
     public void setCaseInfo(){

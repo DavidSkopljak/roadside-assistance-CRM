@@ -11,21 +11,21 @@ public class UserInputValidation {
     public static Boolean validatePerson(String firstName, String lastName, String contactNumber) {
         Boolean validFirstName = Validators.isValidString(firstName);
         Boolean validLastName = Validators.isValidString(lastName);
-        Boolean validContactNumber = Validators.isValidCROPhoneNumber(contactNumber);
+        Boolean validContactNumber = Validators.isValidHRPhoneNumber(contactNumber);
         return (validFirstName && validLastName && validContactNumber);
     }
 
     public static Boolean validateClient(Client client) {
         Boolean validFirstName = Validators.isValidString(client.getFirstName());
         Boolean validLastName = Validators.isValidString(client.getLastName());
-        Boolean validContactNumber = Validators.isValidCROPhoneNumber(client.getContactNumber());
+        Boolean validContactNumber = Validators.isValidHRPhoneNumber(client.getContactNumber());
         return (validFirstName && validLastName && validContactNumber);
     }
 
     public static Boolean validateDriver(Driver driver) {
         Boolean validFirstName = Validators.isValidString(driver.getFirstName());
         Boolean validLastName = Validators.isValidString(driver.getLastName());
-        Boolean validContactNumber = Validators.isValidCROPhoneNumber(driver.getContactNumber());
+        Boolean validContactNumber = Validators.isValidHRPhoneNumber(driver.getContactNumber());
         return (validFirstName && validLastName && validContactNumber);
     }
 
