@@ -1,37 +1,36 @@
 package com.davidskopljak.skopljakzavrsni.entity;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Note extends Entity {
-    private String noteText;
-    private LocalDateTime noteDateTime;
+import java.time.Instant;
 
-    public Note(Long id, String noteText, LocalDateTime noteDateTime) {
-        super(id);
-        this.noteText = noteText;
-        this.noteDateTime = noteDateTime;
+public class Note {
+    private String message;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "UTC")
+    private Instant timestamp;
+
+    public Note(String message, Instant timestamp) {
+        this.message = message;
+        this.timestamp = timestamp;
     }
 
-    public Note(String noteText, LocalDateTime noteDateTime) {
-        this.noteText = noteText;
-        this.noteDateTime = noteDateTime;
+    @JsonProperty("message")
+    public String getMessage() {
+        return message;
     }
 
-    public String getNoteText() {
-        return noteText;
+    public void setMessage(String message) {
+        this.message = message;
     }
 
-    public void setNoteText(String noteText) {
-        this.noteText = noteText;
+    @JsonProperty("timestamp")
+    public Instant getTimestamp() {
+        return timestamp;
     }
 
-    public LocalDateTime getNoteDateTime() {
-        return noteDateTime;
-    }
-
-    public void setNoteDateTime(LocalDateTime noteDateTime) {
-        this.noteDateTime = noteDateTime;
+    public void setTimestamp(Instant timestamp) {
+        this.timestamp = timestamp;
     }
 }

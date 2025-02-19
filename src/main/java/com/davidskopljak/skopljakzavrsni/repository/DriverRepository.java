@@ -4,14 +4,13 @@ import com.davidskopljak.skopljakzavrsni.entity.Driver;
 import com.davidskopljak.skopljakzavrsni.entity.Location;
 import com.davidskopljak.skopljakzavrsni.entity.Vehicle;
 import com.davidskopljak.skopljakzavrsni.enums.DriverState;
-import com.davidskopljak.skopljakzavrsni.enums.VehicleModel;
 import com.davidskopljak.skopljakzavrsni.exceptions.EmptyResultSetException;
 import com.davidskopljak.skopljakzavrsni.exceptions.RepositoryAccessException;
+import com.davidskopljak.skopljakzavrsni.helpers.RepositoryHelper;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class DriverRepository extends AbstractRepository<Driver> {
@@ -35,7 +34,7 @@ public class DriverRepository extends AbstractRepository<Driver> {
                 if(rs.wasNull()){currentLocationId = null;}
                 Long driverStateId = rs.getLong(7);
 
-                DriverState driverState = queryDriverStateById(driverStateId, conn);
+                DriverState driverState = RepositoryHelper.queryDriverStateById(driverStateId, conn);
                 Location currentLocation = queryLocationById(currentLocationId);
                 Vehicle vehicle = queryVehicleById(vehicleId);
 
@@ -70,7 +69,7 @@ public class DriverRepository extends AbstractRepository<Driver> {
                 if(rs.wasNull()){currentLocationId = null;}
                 Long driverStateId = rs.getLong(7);
 
-                DriverState driverState = queryDriverStateById(driverStateId, conn);
+                DriverState driverState = RepositoryHelper.queryDriverStateById(driverStateId, conn);
                 Location currentLocation = queryLocationById(currentLocationId);
                 Vehicle vehicle = queryVehicleById(vehicleId);
 
@@ -97,9 +96,8 @@ public class DriverRepository extends AbstractRepository<Driver> {
             
             LocationRepository locationRepository = new LocationRepository();
             Long locationId = locationRepository.save(entity.getCurrentLocation());
-            System.out.println("LocationId: " + locationId);
-            
-            Long driverStateId = queryDriverStateByState(entity.getState(), conn);
+
+            Long driverStateId = RepositoryHelper.queryDriverStateByState(entity.getState(), conn);
 
 
             ps.setString(1, entity.getFirstName());
@@ -124,33 +122,6 @@ public class DriverRepository extends AbstractRepository<Driver> {
         }
     }
 
-    DriverState queryDriverStateById(Long driverStateId, Connection conn) throws SQLException {
-        String sql = "SELECT driver_state.state FROM driver_state WHERE id = ?";
-        try(PreparedStatement ps = conn.prepareStatement(sql)){
-            ps.setLong(1, driverStateId);
-            try(ResultSet rs = ps.executeQuery();){
-                if(rs.next()) {
-                    return DriverState.valueOf(rs.getString("state"));
-                }else{
-                    throw new EmptyResultSetException("No driver state retrieved, possible issue with database");
-                }
-            }
-        }
-    }
-
-    Long queryDriverStateByState(DriverState driverState, Connection conn) throws SQLException {
-        String sql = "SELECT driver_state.id FROM driver_state WHERE state = ?";
-        try(PreparedStatement ps = conn.prepareStatement(sql)){
-            ps.setString(1, driverState.toString());
-            try(ResultSet rs = ps.executeQuery();){
-                if(rs.next()) {
-                    return rs.getLong("id");
-                }else{
-                    throw new EmptyResultSetException("No driver state id retrieved, possible issue with database");
-                }
-            }
-        }
-    }
 
     Location queryLocationById(Long locationId) throws SQLException {
         LocationRepository locationRepository = new LocationRepository();

@@ -1,9 +1,7 @@
 package com.davidskopljak.skopljakzavrsni.repository;
 
 import com.davidskopljak.skopljakzavrsni.entity.Location;
-import com.davidskopljak.skopljakzavrsni.entity.Vehicle;
 import com.davidskopljak.skopljakzavrsni.entity.Workshop;
-import com.davidskopljak.skopljakzavrsni.enums.VehicleModel;
 import com.davidskopljak.skopljakzavrsni.exceptions.EmptyResultSetException;
 import com.davidskopljak.skopljakzavrsni.exceptions.RepositoryAccessException;
 
@@ -11,7 +9,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;

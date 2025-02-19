@@ -1,6 +1,5 @@
 package com.davidskopljak.skopljakzavrsni.controller;
 
-import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import java.io.IOException;

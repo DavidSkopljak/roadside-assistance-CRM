@@ -14,7 +14,7 @@ public class OperatorRepository extends AbstractRepository<Operator> {
     @Override
     public Operator findById(Long id) throws SQLException {
         LOCK.lock();
-        String sql = "SELECT operator.id, operator.first_name, operator.last_name, operator.contact_number FROM operator WHERE id = ?";
+        String sql = "SELECT operator.id, operator.first_name, operator.last_name FROM operator WHERE id = ?";
 
         try (Connection conn = DatabaseConnectionManager.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)){

@@ -11,7 +11,7 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 public class DatabaseConnectionManager {
-    private static DatabaseConnectionManager instance;
+    private static DatabaseConnectionManager INSTANCE;
     private static HikariDataSource dataSource;
 
     private DatabaseConnectionManager() {
@@ -37,10 +37,10 @@ public class DatabaseConnectionManager {
     }
 
     public static synchronized DatabaseConnectionManager getInstance() {
-        if (instance == null) {
-            instance = new DatabaseConnectionManager();
+        if (INSTANCE == null) {
+            INSTANCE = new DatabaseConnectionManager();
         }
-        return instance;
+        return INSTANCE;
     }
 
     // Get a connection from the pool

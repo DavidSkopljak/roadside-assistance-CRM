@@ -1,5 +1,6 @@
 package com.davidskopljak.skopljakzavrsni.controller;
 
+import com.davidskopljak.skopljakzavrsni.entity.Operator;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -12,6 +13,8 @@ import java.io.IOException;
 public class    CRMApplication extends Application {
     public static final Logger log = LoggerFactory.getLogger(CRMApplication.class);
     private static Stage primaryStage;
+    private static Operator currentOperator;
+
     @Override
     public void start(Stage stage){
         try{
@@ -33,4 +36,5 @@ public class    CRMApplication extends Application {
 
     public static Stage getPrimaryStage() {return primaryStage;}
     private static void setPrimaryStage(Stage primaryStage) {CRMApplication.primaryStage = primaryStage;}
+    public static Operator getCurrentOperator() {return currentOperator;}
 }

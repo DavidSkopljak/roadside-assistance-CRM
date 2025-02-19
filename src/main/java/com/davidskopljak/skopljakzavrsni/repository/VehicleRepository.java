@@ -4,6 +4,7 @@ import com.davidskopljak.skopljakzavrsni.entity.Vehicle;
 import com.davidskopljak.skopljakzavrsni.enums.VehicleModel;
 import com.davidskopljak.skopljakzavrsni.exceptions.EmptyResultSetException;
 import com.davidskopljak.skopljakzavrsni.exceptions.RepositoryAccessException;
+import com.davidskopljak.skopljakzavrsni.helpers.RepositoryHelper;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -33,7 +34,7 @@ public class VehicleRepository extends AbstractRepository<Vehicle> {
                 String vin = rs.getString("vin");
                 LocalDate firstRegDate = rs.getObject("first_registration_date", LocalDate.class);
 
-                VehicleModel vehicleModel = (vehicleModelId!=null) ? queryVehicleModelById(vehicleModelId, conn) : null;
+                VehicleModel vehicleModel = (vehicleModelId!=null) ? RepositoryHelper.queryVehicleModelById(vehicleModelId, conn) : null;
 
                 return new Vehicle(vehicleId, licensePlate, vehicleModel, firstRegDate, vin);
             }else{
@@ -64,7 +65,7 @@ public class VehicleRepository extends AbstractRepository<Vehicle> {
                 LocalDateTime ldt = rs.getObject("first_registration_date", LocalDateTime.class);
                 LocalDate firstRegDate = (ldt != null) ? ldt.toLocalDate() : null;
 
-                VehicleModel vehicleModel = (vehicleModelId!=null) ? queryVehicleModelById(vehicleModelId, conn) : null;
+                VehicleModel vehicleModel = (vehicleModelId!=null) ? RepositoryHelper.queryVehicleModelById(vehicleModelId, conn) : null;
 
                 vehicles.add(new Vehicle(vehicleId, licensePlate, vehicleModel, firstRegDate, vin));
             }
@@ -84,7 +85,7 @@ public class VehicleRepository extends AbstractRepository<Vehicle> {
 
         try (Connection conn = DatabaseConnectionManager.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(vehicleQuery)){
-            Long vehicleModelId = queryVehicleModelByModel(entity.getModel(), conn);
+            Long vehicleModelId = RepositoryHelper.queryVehicleModelByModel(entity.getModel(), conn);
                 ps.setString(1, entity.getLicensePlate());
                 ps.setString(2, entity.getVin());
                 ps.setLong(3, vehicleModelId);
@@ -105,31 +106,5 @@ public class VehicleRepository extends AbstractRepository<Vehicle> {
         }
     }
 
-    VehicleModel queryVehicleModelById(Long vehicleModelId, Connection conn) throws SQLException {
-        String vehicleModelQuery = "SELECT vehicle_model.model FROM vehicle_model WHERE id = ?";
-        try(PreparedStatement vmq = conn.prepareStatement(vehicleModelQuery)){
-            vmq.setLong(1, vehicleModelId);
-            try(ResultSet rs = vmq.executeQuery();){
-                if(rs.next()) {
-                    return VehicleModel.valueOf(rs.getString("model"));
-                }else{
-                    throw new EmptyResultSetException("No vehicle model retrieved, possible issue with database");
-                }
-            }
-        }
-    }
 
-    Long queryVehicleModelByModel(VehicleModel model, Connection conn) throws SQLException {
-        String vehicleModelQuery = "SELECT vehicle_model.id FROM vehicle_model WHERE model = ?";
-        try(PreparedStatement vmq = conn.prepareStatement(vehicleModelQuery)){
-            vmq.setString(1, model.toString());
-            try(ResultSet rs = vmq.executeQuery()){
-                if(rs.next()) {
-                    return rs.getLong("id");
-                }else{
-                    throw new EmptyResultSetException("No vehicle model id retrieved, possible issue with database");
-                }
-            }
-        }
-    }
 }

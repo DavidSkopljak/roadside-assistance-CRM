@@ -1,14 +1,18 @@
 package com.davidskopljak.skopljakzavrsni.entity;
 
+import com.davidskopljak.skopljakzavrsni.controller.CRMApplication;
 import com.davidskopljak.skopljakzavrsni.enums.CaseState;
 import com.davidskopljak.skopljakzavrsni.enums.VehicleDamageCause;
 import com.davidskopljak.skopljakzavrsni.enums.VehicleDamageType;
+import com.davidskopljak.skopljakzavrsni.helpers.JSONParser;
 import com.davidskopljak.skopljakzavrsni.interfaces.Noteable;
 import com.davidskopljak.skopljakzavrsni.interfaces.Trackable;
 
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 // case, needs info about client, their vehicle, total number of people who need assistance,
 // location of case, ability to assign driver, ability to add notes, cause of accident/vehicle damage, nature and description of
@@ -22,7 +26,7 @@ public non-sealed class Case extends Entity implements Trackable<CaseState>, Not
     private Vehicle clientVehicle;
     private List<Note> caseNotes = new ArrayList<>();
     private String damageDescription;
-    private List<Service> services = new ArrayList<>();
+    private Optional<Service> activeService;
     private CaseState caseState;
     private VehicleDamageType damageType;
     private VehicleDamageCause damageCause;
@@ -52,84 +56,100 @@ public non-sealed class Case extends Entity implements Trackable<CaseState>, Not
 
     @Override
     public void setNotes(String notes) {
-        //caseNotes.addAll(notes);
-        //process json and turn into Note objects, store in notes field
+        try{
+            caseNotes = JSONParser.parseCaseNotes(notes);
+            System.out.println("Case notes in Case.setNotes() - " + caseNotes.toString());
+        }catch (SQLException e){
+            System.out.println("SQLException in Case.setNotes() - " + e.getMessage());
+            CRMApplication.log.error(e.getMessage());
+        }
     }
 
     public Location getLocation() {
         return location;
     }
 
-    public void setLocation(Location location) {
+    public Case setLocation(Location location) {
         this.location = location;
+        return this;
     }
 
     public Operator getFirstOperator() {
         return firstOperator;
     }
 
-    public void setFirstOperator(Operator firstOperator) {
+    public Case setFirstOperator(Operator firstOperator) {
         this.firstOperator = firstOperator;
+        return this;
     }
 
     public Operator getLastEditedOperator() {
         return lastEditedOperator;
     }
 
-    public void setLastEditedOperator(Operator lastEditedOperator) {
+    public Case setLastEditedOperator(Operator lastEditedOperator) {
         this.lastEditedOperator = lastEditedOperator;
+        return this;
     }
 
     public Vehicle getClientVehicle() {
         return clientVehicle;
+
     }
 
-    public void setClientVehicle(Vehicle clientVehicle) {
+    public Case setClientVehicle(Vehicle clientVehicle) {
         this.clientVehicle = clientVehicle;
+        return this;
     }
 
     public String getDamageDescription() {
         return damageDescription;
     }
 
-    public void setDamageDescription(String damageDescription) {
+    public Case setDamageDescription(String damageDescription) {
         this.damageDescription = damageDescription;
+        return this;
     }
 
-    public List<Service> getServices() {
-        return services;
+    public Optional<Service> getActiveService() {
+        return activeService;
     }
 
-    public void setServices(List<Service> services) {
-        this.services = services;
+    public Case setActiveService(Optional<Service> activeService) {
+        this.activeService = activeService;
+        return this;
     }
 
-    public void setDamageType(VehicleDamageType damageType) {
+    public Case setDamageType(VehicleDamageType damageType) {
         this.damageType = damageType;
+        return this;
     }
 
     public VehicleDamageCause getDamageCause() {
         return damageCause;
     }
 
-    public void setDamageCause(VehicleDamageCause damageCause) {
+    public Case setDamageCause(VehicleDamageCause damageCause) {
         this.damageCause = damageCause;
+        return this;
     }
 
     public LocalDateTime getCreatedDateTime() {
         return createdDateTime;
     }
 
-    public void setCreatedDateTime(LocalDateTime createdDateTime) {
+    public Case setCreatedDateTime(LocalDateTime createdDateTime) {
         this.createdDateTime = createdDateTime;
+        return this;
     }
 
     public Client getClient() {
         return client;
     }
 
-    public void setClient(Client client) {
+    public Case setClient(Client client) {
         this.client = client;
+        return this;
     }
 
     public VehicleDamageType getDamageType() {

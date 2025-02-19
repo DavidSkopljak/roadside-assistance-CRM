@@ -29,11 +29,11 @@ public class ServiceRepository extends AbstractRepository<Service> {
 
             try(ResultSet rs = ps.executeQuery();){
                 if (rs.next()) {
-                    Long serviceId = rs.getLong("service.id");
-                    Long assignedDriverId = rs.getLong("service.assigned_driver_id");
-                    Long serviceTypeId = rs.getLong("service.service_type_id");
-                    Long serviceStateId = rs.getLong("service.service_state_id");
-                    String serviceNotes = rs.getString("service.service_notes");
+                    Long serviceId = rs.getLong("id");
+                    Long assignedDriverId = rs.getLong("assigned_driver_id");
+                    Long serviceTypeId = rs.getLong("service_type_id");
+                    Long serviceStateId = rs.getLong("service_state_id");
+                    String serviceNotes = rs.getString("service_notes");
 
                     Driver assignedDriver = queryAssignedDriverById(assignedDriverId);
                     ServiceType serviceType = queryServiceTypeById(serviceTypeId, conn);
