@@ -1,6 +1,16 @@
 package com.davidskopljak.skopljakzavrsni.entity;
 
-import com.davidskopljak.skopljakzavrsni.enums.VehicleModel;
+public record Workshop(Long id, String name, Location location) {
+    public Workshop(String name, Location location){
+        this(null, name, location);
+    }
 
-public record Workshop(Long id, String name, VehicleModel vehicleModel, Location location) {}
+    public String getName() {
+        return name;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+}
 

@@ -1,6 +1,5 @@
 package com.davidskopljak.skopljakzavrsni.repository;
 
-import com.davidskopljak.skopljakzavrsni.controller.CRMApplication;
 import com.davidskopljak.skopljakzavrsni.exceptions.RepositoryAccessException;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -8,8 +7,6 @@ import com.zaxxer.hikari.HikariDataSource;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLClientInfoException;
 import java.sql.SQLException;
 import java.util.Properties;
 

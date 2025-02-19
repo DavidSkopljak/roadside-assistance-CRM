@@ -1,10 +1,12 @@
 package com.davidskopljak.skopljakzavrsni.entity;
 
 import com.davidskopljak.skopljakzavrsni.enums.CaseState;
+import com.davidskopljak.skopljakzavrsni.enums.VehicleDamageCause;
 import com.davidskopljak.skopljakzavrsni.enums.VehicleDamageType;
 import com.davidskopljak.skopljakzavrsni.interfaces.Noteable;
 import com.davidskopljak.skopljakzavrsni.interfaces.Trackable;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,40 +20,20 @@ public non-sealed class Case extends Entity implements Trackable<CaseState>, Not
     private Operator firstOperator;
     private Operator lastEditedOperator;
     private Vehicle clientVehicle;
-    private List<String> caseNotes = new ArrayList<>();
+    private List<Note> caseNotes = new ArrayList<>();
     private String damageDescription;
     private List<Service> services = new ArrayList<>();
     private CaseState caseState;
     private VehicleDamageType damageType;
+    private VehicleDamageCause damageCause;
+    private LocalDateTime createdDateTime;
+    private Client client;
 
-    public Case(Long id, Location location, Operator firstOperator, Vehicle clientVehicle, String damageDescription, VehicleDamageType damageType) {
+    public Case(Long id) {
         super(id);
-        this.location = location;
-        this.firstOperator = firstOperator;
-        this.lastEditedOperator = firstOperator;
-        this.clientVehicle = clientVehicle;
-        this.damageDescription = damageDescription;
-        this.caseState = CaseState.ACTIVE;
-        this.damageType = damageType;
     }
 
-    public Case(Location location, Operator firstOperator, Vehicle clientVehicle, String damageDescription, VehicleDamageType damageType) {
-        this.location = location;
-        this.firstOperator = firstOperator;
-        this.lastEditedOperator = firstOperator;
-        this.clientVehicle = clientVehicle;
-        this.damageDescription = damageDescription;
-        this.caseState = CaseState.ACTIVE;
-        this.damageType = damageType;
-    }
-
-    public VehicleDamageType getDamageType() {
-        return damageType;
-    }
-
-    public void setLastEditedOperator(Operator lastEditedOperator) {
-        this.lastEditedOperator = lastEditedOperator;
-    }
+    public Case(){}
 
     @Override
     public CaseState getState() {
@@ -64,75 +46,93 @@ public non-sealed class Case extends Entity implements Trackable<CaseState>, Not
     }
 
     @Override
-    public List<String> getNotes() {
+    public List<Note> getNotes() {
         return caseNotes;
     }
 
     @Override
-    public void setNotes(List<String> notes) {
-        caseNotes.addAll(notes);
-    }
-
-    public class Builder{
-        private Long id;
-        private Location location;
-        private Operator firstOperator;
-        private Vehicle clientVehicle;
-        private String damageDescription;
-        private VehicleDamageType damageType;
-
-        public Builder setId(Long id) {
-            this.id = id;
-            return this;
-        }
-        public Builder setLocation(Location location) {
-            this.location = location;
-            return this;
-        }
-        public Builder setFirstOperator(Operator firstOperator) {
-            this.firstOperator = firstOperator;
-            return this;
-        }
-        public Builder setClientVehicle(Vehicle clientVehicle) {
-            this.clientVehicle = clientVehicle;
-            return this;
-        }
-        public Builder setDamageDescription(String damageDescription) {
-            this.damageDescription = damageDescription;
-            return this;
-        }
-
-        public Builder setDamageType (VehicleDamageType damageType) {
-            this.damageType = damageType;
-            return this;
-        }
-
-        public Case build() {
-            return new Case(id, location, firstOperator, clientVehicle, damageDescription, damageType);
-        }
-    }
-
-    public List<Service> getServices() {
-        return services;
+    public void setNotes(String notes) {
+        //caseNotes.addAll(notes);
+        //process json and turn into Note objects, store in notes field
     }
 
     public Location getLocation() {
         return location;
     }
 
+    public void setLocation(Location location) {
+        this.location = location;
+    }
+
     public Operator getFirstOperator() {
         return firstOperator;
+    }
+
+    public void setFirstOperator(Operator firstOperator) {
+        this.firstOperator = firstOperator;
     }
 
     public Operator getLastEditedOperator() {
         return lastEditedOperator;
     }
 
+    public void setLastEditedOperator(Operator lastEditedOperator) {
+        this.lastEditedOperator = lastEditedOperator;
+    }
+
     public Vehicle getClientVehicle() {
         return clientVehicle;
     }
 
+    public void setClientVehicle(Vehicle clientVehicle) {
+        this.clientVehicle = clientVehicle;
+    }
+
     public String getDamageDescription() {
         return damageDescription;
+    }
+
+    public void setDamageDescription(String damageDescription) {
+        this.damageDescription = damageDescription;
+    }
+
+    public List<Service> getServices() {
+        return services;
+    }
+
+    public void setServices(List<Service> services) {
+        this.services = services;
+    }
+
+    public void setDamageType(VehicleDamageType damageType) {
+        this.damageType = damageType;
+    }
+
+    public VehicleDamageCause getDamageCause() {
+        return damageCause;
+    }
+
+    public void setDamageCause(VehicleDamageCause damageCause) {
+        this.damageCause = damageCause;
+    }
+
+    public LocalDateTime getCreatedDateTime() {
+        return createdDateTime;
+    }
+
+    public void setCreatedDateTime(LocalDateTime createdDateTime) {
+        this.createdDateTime = createdDateTime;
+    }
+
+    public Client getClient() {
+        return client;
+    }
+
+    public void setClient(Client client) {
+        this.client = client;
+    }
+
+    public VehicleDamageType getDamageType() {
+        return damageType;
     }
 }

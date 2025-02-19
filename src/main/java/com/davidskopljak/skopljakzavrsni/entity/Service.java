@@ -12,19 +12,19 @@ public non-sealed class Service extends Entity implements Trackable<ServiceState
     private Driver assignedDriver;
     private ServiceType serviceType;
     private ServiceState serviceState;
-    private List<String> serviceNotes = new ArrayList<>();
+    private List<Note> serviceNotes = new ArrayList<>();
 
-    public Service(Long id, Driver assignedDriver, ServiceType serviceType){
+    public Service(Long id, Driver assignedDriver, ServiceType serviceType, ServiceState serviceState){
         super(id);
         this.assignedDriver = assignedDriver;
         this.serviceType = serviceType;
-        this.serviceState = ServiceState.ASSIGNED;
+        this.serviceState = serviceState;
     }
 
     public Service(Driver assignedDriver, ServiceType serviceType, ServiceState serviceState) {
         this.assignedDriver = assignedDriver;
         this.serviceType = serviceType;
-        this.serviceState = ServiceState.ASSIGNED;
+        this.serviceState = serviceState;
     }
 
     public Driver getAssignedDriver() {
@@ -46,12 +46,13 @@ public non-sealed class Service extends Entity implements Trackable<ServiceState
     }
 
     @Override
-    public List<String> getNotes() {
+    public List<Note> getNotes() {
         return serviceNotes;
     }
 
     @Override
-    public void setNotes(List<String> notes) {
-        serviceNotes.addAll(notes);
+    public void setNotes(String notes) {
+        //serviceNotes.addAll(notes);
+        //process json data from db and turn into Note objects
     }
 }

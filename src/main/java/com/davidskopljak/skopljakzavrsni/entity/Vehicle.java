@@ -7,21 +7,21 @@ import java.time.LocalDate;
 // needs license plate, mileage(optional), date of first registration(necessary to decide if car is under warranty, optional), VehicleBrand, VehicleType
 public class Vehicle extends Entity {
    private String licensePlate;
-   private VehicleModel brand;
+   private VehicleModel model;
    private LocalDate firstRegistrationDate;
    private String vin;
 
-   public Vehicle(Long id, String licensePlate, VehicleModel brand, LocalDate firstRegistrationDate, String vin) {
+   public Vehicle(Long id, String licensePlate, VehicleModel model, LocalDate firstRegistrationDate, String vin) {
       super(id);
       this.licensePlate = licensePlate;
-      this.brand = brand;
+      this.model = model;
       this.firstRegistrationDate = firstRegistrationDate;
       this.vin = vin;
    }
 
-   public Vehicle(String licensePlate, VehicleModel brand, LocalDate firstRegistrationDate, String vin) {
+   public Vehicle(String licensePlate, VehicleModel model, LocalDate firstRegistrationDate, String vin) {
       this.licensePlate = licensePlate;
-      this.brand = brand;
+      this.model = model;
       this.firstRegistrationDate = firstRegistrationDate;
       this.vin = vin;
    }
@@ -30,13 +30,13 @@ public class Vehicle extends Entity {
       return licensePlate;
    }
 
-   public VehicleModel getBrand() {
-      return brand;
+   public VehicleModel getModel() {
+      return model;
    }
 
    public LocalDate getFirstRegistrationDate() {
       return firstRegistrationDate;
    }
 
-   public String getVIN() {return vin;}
+   public String getVin() {return vin;}
 }

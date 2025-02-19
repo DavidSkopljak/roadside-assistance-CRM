@@ -5,3 +5,4 @@ public enum CaseState {
     RESOLVED,
     CANCELLED,
 }
+

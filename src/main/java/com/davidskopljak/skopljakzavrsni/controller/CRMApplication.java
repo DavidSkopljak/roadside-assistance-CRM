@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import java.io.IOException;
 
 
-public class CRMApplication extends Application {
+public class    CRMApplication extends Application {
     public static final Logger log = LoggerFactory.getLogger(CRMApplication.class);
     private static Stage primaryStage;
     @Override

@@ -1,52 +1,87 @@
 package com.davidskopljak.skopljakzavrsni.repository;
-import com.davidskopljak.skopljakzavrsni.entity.Client;
+import com.davidskopljak.skopljakzavrsni.entity.*;
+import com.davidskopljak.skopljakzavrsni.entity.Driver;
+import com.davidskopljak.skopljakzavrsni.enums.DriverState;
+import com.davidskopljak.skopljakzavrsni.enums.ServiceState;
+import com.davidskopljak.skopljakzavrsni.enums.ServiceType;
+import com.davidskopljak.skopljakzavrsni.enums.VehicleModel;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.sql.*;
+import java.util.List;
 
 public class DatabaseConnection {
-    public static void main(String[] args) throws IOException {
-    // Call the connect method
-
-    // Close the connection (optional in this example)
-        /*Properties props = new Properties();
-        props.load(new FileReader("database.properties"));
-        String url = props.getProperty("databaseUrl");
-        String user = props.getProperty("username");
-        String password = props.getProperty("password");
-        System.out.println(url + ":" + user + ":" + password);*/
-        ClientRepository clientRepository = new ClientRepository();
-        try{
-            Long clientId = clientRepository.save(new Client("test", "test", "123"));
-            System.out.println("client with id: " + clientId + " saved to database");
-        } catch (SQLException e) {
-            System.out.println("Error closing connection: " + e.getMessage());
-        }
-    }
-}/*
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.util.Properties;
-
-public class DatabaseConnection {
-    private static final String URL = "jdbc:postgresql://localhost:5432/crm";
-    private static final String USER = "crmadmin";
-    private static final String PASSWORD = "root";
-
     public static void main(String[] args) throws IOException, SQLException {
-        Properties props = new Properties();
-        props.load(new FileReader("database.properties"));
-        String url = props.getProperty("databaseUrl");
-        String user = props.getProperty("username");
-        String password = props.getProperty("password");
-        try (Connection connection = DriverManager.getConnection(url, user, password);) {
-            System.out.println("Connected to PostgreSQL successfully!");
-        } catch (SQLException e) {
+        /*VehicleRepository vehicleRepository = new VehicleRepository();
+        try{
+            Long vehicleId = vehicleRepository.save(new Vehicle("TESTPLATE2", VehicleModel.BMW, null, "11111111111111112"));
+        }catch (Exception e){
             e.printStackTrace();
         }
+
+        try{
+            List<Vehicle> vehicles = vehicleRepository.findAll();
+            for (Vehicle vehicle : vehicles) {
+
+            }
+        }catch (SQLException e){
+            e.printStackTrace();
+        }*/
+
+        /*OperatorRepository operatorRepository = new OperatorRepository();
+        Long id = operatorRepository.save(new Operator("marko", "marulic"));
+        System.out.println(id);*/
+
+        /*DriverRepository driverRepository = new DriverRepository();
+        Location location = new Location("address", "city", "country", "postalCode", new BigDecimal(45.8089772239981), new BigDecimal(15.716704654770382));
+        Vehicle vehicle = new Vehicle("licensePlate", VehicleModel.CHERY, null, "11111111111111111");
+        Long id = driverRepository.save(new Driver("vozko", "vojkovic", "192", location, vehicle, DriverState.AVAILABLE));
+
+        System.out.println("saved driver(id " + id + ")");
+
+        List<Driver> drivers = driverRepository.findAll();
+        for (Driver driver : drivers) {
+            System.out.println(driver.getState());
+            System.out.println(driver.getFirstName());
+            System.out.println(driver.getLastName());
+            System.out.println(driver.getVehicle().getModel());
+            System.out.println(driver.getContactNumber());
+            System.out.println(driver.getCurrentLocation().getCoordinatesX() + ", " + driver.getCurrentLocation().getCoordinatesY());
+            System.out.println();
+        }*/
+
+        /*
+        ServiceRepository serviceRepository = new ServiceRepository();
+        Location location = new Location("address", "city", "country", "postalCode", new BigDecimal(45.8089772239981), new BigDecimal(15.716704654770382));
+        Vehicle vehicle = new Vehicle("licensePlate", VehicleModel.CHERY, null, "11111111111111111");
+        Long id = serviceRepository.save(new Service(new Driver("vozko", "vojkovic", "192", location, vehicle, DriverState.AVAILABLE), ServiceType.TOWING, ServiceState.ASSIGNED));
+
+        System.out.println("saved service(id " + id + ")");
+
+        List<Service> services = serviceRepository.findAll();
+        for (Service service : services) {
+            System.out.println(service.getState());
+            System.out.println(service.getAssignedDriver().getFirstName() + " " + service.getAssignedDriver().getLastName());
+            System.out.println(service.getServiceType());
+            System.out.println();
+        }*/
+
+        WorkshopRepository workshopRepository = new WorkshopRepository();
+        Location location = new Location("address", "city", "country", "postalCode", new BigDecimal(45.8089772239981), new BigDecimal(15.716704654770382));
+
+        Long id = workshopRepository.save(new Workshop("workshop_test", location));
+
+        System.out.println("saved workshop record(id " + id + ")");
+
+        List<Workshop> workshops = workshopRepository.findAll();
+        for (Workshop workshop : workshops) {
+            System.out.println(workshop.getName());
+            System.out.println(workshop.getLocation().getAddress());
+            System.out.println(workshop.getLocation().getCity());
+            System.out.println(workshop.getLocation().getCountry());
+            System.out.println(workshop.getLocation().getPostalCode());
+            System.out.println();
+        }
     }
-}*/
+}
