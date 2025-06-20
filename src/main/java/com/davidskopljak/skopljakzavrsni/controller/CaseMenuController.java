@@ -9,7 +9,7 @@ import java.io.IOException;
 public class CaseMenuController {
     public void handleViewCaseInfo() throws IOException {
         try{
-            FXMLLoader fxmlLoader = new FXMLLoader(CRMApplication.class.getResource("view-case-info.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(CRMApplication.class.getResource("new-case.fxml"));
             Scene scene = new Scene(fxmlLoader.load());
             CRMApplication.getPrimaryStage().setTitle("View Case Info");
             CRMApplication.getPrimaryStage().setScene(scene);
@@ -35,9 +35,9 @@ public class CaseMenuController {
 
     public void handleViewLocationInfo() throws IOException {
         try{
-            FXMLLoader fxmlLoader = new FXMLLoader(CRMApplication.class.getResource("view-location-info.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(CRMApplication.class.getResource("view-location.fxml"));
             Scene scene = new Scene(fxmlLoader.load());
-            CRMApplication.getPrimaryStage().setTitle("View location Info");
+            CRMApplication.getPrimaryStage().setTitle("View location");
             CRMApplication.getPrimaryStage().setScene(scene);
             CRMApplication.getPrimaryStage().show();
         }catch(IOException e){

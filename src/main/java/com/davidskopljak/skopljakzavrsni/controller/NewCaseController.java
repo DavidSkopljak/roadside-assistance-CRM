@@ -1,18 +1,19 @@
 package com.davidskopljak.skopljakzavrsni.controller;
 
-import com.davidskopljak.skopljakzavrsni.entity.Case;
-import com.davidskopljak.skopljakzavrsni.entity.Client;
-import com.davidskopljak.skopljakzavrsni.entity.Location;
-import com.davidskopljak.skopljakzavrsni.entity.Vehicle;
+import com.davidskopljak.skopljakzavrsni.entity.*;
+import com.davidskopljak.skopljakzavrsni.enums.CaseState;
 import com.davidskopljak.skopljakzavrsni.enums.VehicleDamageCause;
 import com.davidskopljak.skopljakzavrsni.enums.VehicleDamageType;
 import com.davidskopljak.skopljakzavrsni.enums.VehicleModel;
 import com.davidskopljak.skopljakzavrsni.exceptions.InvalidCaseInfoException;
 import com.davidskopljak.skopljakzavrsni.exceptions.InvalidCaseLocationException;
-import com.davidskopljak.skopljakzavrsni.repository.CaseRepository;
-import com.davidskopljak.skopljakzavrsni.repository.ClientRepository;
-import com.davidskopljak.skopljakzavrsni.repository.LocationRepository;
+import com.davidskopljak.skopljakzavrsni.exceptions.RepositoryAccessException;
+import com.davidskopljak.skopljakzavrsni.helpers.RepositoryHelper;
+import com.davidskopljak.skopljakzavrsni.repository.*;
 import com.davidskopljak.skopljakzavrsni.validation.Validators;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
@@ -20,24 +21,27 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
 
 import java.math.BigDecimal;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Arrays;
+import java.util.Optional;
 
 public class NewCaseController {
     @FXML
-    private TextField firstNameField;
+    private TextField firstNameTextField;
     @FXML
-    private TextField lastNameField;
+    private TextField lastNameTextField;
     @FXML
-    private TextField contactNumberField;
+    private TextField contactNumberTextField;
     @FXML
-    private TextField licensePlateField;
+    private TextField licensePlateTextField;
     @FXML
     private TextField vinTextField;
     @FXML
-    private TextField damageDescriptionField;
+    private TextField damageDescriptionTextField;
     @FXML
     private DatePicker firstRegDateDatePicker;
     @FXML
@@ -48,20 +52,19 @@ public class NewCaseController {
     private ComboBox<VehicleDamageCause> damageCauseComboBox;
 
     @FXML
-    private TextField countryField;
+    private TextField countryTextField;
     @FXML
-    private TextField cityField;
+    private TextField cityTextField;
     @FXML
-    private TextField addressField;
+    private TextField addressTextField;
     @FXML
-    private TextField houseNumberField;
+    private TextField houseNumberTextField;
     @FXML
-    private TextField postalCodeField;
+    private TextField postalCodeTextField;
     @FXML
-    private TextField coordinatesXField;
+    private TextField coordinatesXTextField;
     @FXML
-    private TextField coordinatesYField;
-
+    private TextField coordinatesYTextField;
 
     String firstName;
     String lastName;
@@ -82,24 +85,73 @@ public class NewCaseController {
     String coordinatesX;
     String coordinatesY;
 
+    public void initialize() throws SQLException {
+        try (Connection conn = DatabaseConnectionManager.getInstance().getConnection();){
+                var models = RepositoryHelper.queryAllVehicleModels(conn);
+                ObservableList<VehicleModel> modelList = FXCollections.observableArrayList(models);
+                modelComboBox.setItems(modelList);
 
-    public void saveCase(){
+                var damageTypes = RepositoryHelper.queryAllVehicleDamageTypes(conn);
+                ObservableList<VehicleDamageType> typeList = FXCollections.observableArrayList(damageTypes);
+                damageTypeComboBox.setItems(typeList);
+
+                var damageCauses = RepositoryHelper.queryAllVehicleDamageCauses(conn);
+                ObservableList<VehicleDamageCause> causeList = FXCollections.observableArrayList(damageCauses);
+                damageCauseComboBox.setItems(causeList);
+        }catch(RepositoryAccessException e){
+            throw new RepositoryAccessException(e.getMessage(), e);
+        }
+    }
+
+    public void saveCase(ActionEvent event){
         try{
-            validateCaseInfo();
-            validateCaseLocation();
+            setCaseInfo();
+            //validateCaseLocation();
+            Location location = new Location("address", "city", "country", "postalCode", new BigDecimal(45.8089772239981), new BigDecimal(15.716704654770382));
+
+            ClientRepository clientRepository = new ClientRepository();
+            Client client = new Client(firstName, lastName, contactNumber);
+
+            VehicleRepository vehicleRepository = new VehicleRepository();
+            Vehicle clientVehicle = new Vehicle(licensePlate, vehicleModel, vinText);
+
+
+            OperatorRepository operatorRepository = new OperatorRepository();
+            Operator firstOperator = operatorRepository.findById(1L);
+
+            Operator lastEditedOperator = firstOperator;
+
+            CaseState caseState = CaseState.ACTIVE;
+
+            Case newCase = new Case();
+
+            newCase.setClient(client)
+                    .setClientVehicle(clientVehicle)
+                    .setClientVehicleFirstRegistrationDate(LocalDate.now().minusDays(10))
+                    .setDamageCause(damageCause)
+                    .setDamageType(damageType)
+                    .setFirstOperator(firstOperator)
+                    .setLastEditedOperator(lastEditedOperator)
+                    .setLocation(location)
+                    .setDamageDescription(damageDescription)
+                    .setCreatedDateTime(LocalDateTime.now().truncatedTo(java.time.temporal.ChronoUnit.SECONDS));
+
+            newCase.updateState(caseState);
+
+            CaseRepository caseRepository = new CaseRepository();
+            caseRepository.save(newCase);
+
         }catch (InvalidCaseInfoException e){
             CRMApplication.log.error(e.getMessage());
             Alert a = new Alert(Alert.AlertType.WARNING);
             a.setHeaderText(null);
             a.setContentText("Invalid case information. Please check the case details.");
-            return;
-        }catch (InvalidCaseLocationException e){
-            CRMApplication.log.error(e.getMessage());
-            Alert a = new Alert(Alert.AlertType.WARNING);
-            a.setHeaderText(null);
-            a.setContentText("Invalid case location. Please check the location details.");
+            a.show();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
 
+        /*
         try{
             Client client = new Client(firstName, lastName, contactNumber);
             Vehicle clientVehicle = new Vehicle(licensePlate, vehicleModel, firstRegLocalDate, vinText);
@@ -124,17 +176,18 @@ public class NewCaseController {
             a.setContentText("Something went wrong. Please try again.");
             a.show();
         }
+        */
 
         //VehicleRepository.addToDatabase(new Vehicle(Validators.removeSpecialCharacters(licensePlate), vehicleModel, firstRegLocalDate, vinText));
         //LocationRepository.addToDatabase(/*new Location(location data)*/);
     }
 
-    public void setCaseInfo(){
-        firstName = this.firstNameField.getText();
-        lastName = this.lastNameField.getText();
-        contactNumber = this.contactNumberField.getText();
-        licensePlate = this.licensePlateField.getText();
-        damageDescription = this.damageDescriptionField.getText();
+    public void setCaseInfo() throws InvalidCaseInfoException{
+        firstName = this.firstNameTextField.getText();
+        lastName = this.lastNameTextField.getText();
+        contactNumber = this.contactNumberTextField.getText();
+        licensePlate = this.licensePlateTextField.getText();
+        damageDescription = this.damageDescriptionTextField.getText();
         vehicleModel = this.modelComboBox.getValue();
         vinText = this.vinTextField.getText();
         firstRegLocalDate = this.firstRegDateDatePicker.getValue();
@@ -147,32 +200,57 @@ public class NewCaseController {
             Alert a = new Alert(Alert.AlertType.WARNING);
             a.setHeaderText(null);
             a.setContentText("Invalid case information. Please check the case details.");
+            throw new InvalidCaseInfoException(e.getMessage());
         }
     }
+
     public Boolean validateCaseInfo() throws InvalidCaseInfoException {
-        if(Boolean.FALSE.equals(Validators.isNotNull(Arrays.asList(vehicleModel, firstRegLocalDate, damageType, damageCause)))){
-            throw new InvalidCaseInfoException();
+        System.out.println("Validating not-null values...");
+        if (Boolean.FALSE.equals(Validators.isNotNull(Arrays.asList(vehicleModel, firstRegLocalDate, damageType, damageCause)))) {
+            System.out.println("❌ Not-null validation failed.");
+            throw new InvalidCaseInfoException("Some required fields are null.");
         }
 
-        //check if all strings have allowed characters and arent empty
-        if (Boolean.FALSE.equals(Validators.isValidString(Arrays.asList(firstName, lastName, licensePlate, vinText, damageDescription)))){
-            throw new InvalidCaseInfoException();
+        /*System.out.println("Validating strings...");
+        if (Boolean.FALSE.equals(Validators.isValidString(Arrays.asList(firstName, lastName, licensePlate, vinText, damageDescription)))) {
+            System.out.println("❌ String validation failed.");
+            throw new InvalidCaseInfoException("One or more string fields are invalid.");
+        }*/
+
+
+        if (!Validators.isValidString(firstName)) {
+            System.out.println("❌ Invalid first name: " + firstName);
+            throw new InvalidCaseInfoException("Invalid first name.");
         }
 
-        //check if contact number is formatted correctly
-        if (!Validators.isValidHRPhoneNumber(contactNumber)){
-            throw new InvalidCaseInfoException();
+        if (!Validators.isValidString(lastName)) {
+            System.out.println("❌ Invalid last name: " + lastName);
+            throw new InvalidCaseInfoException("Invalid last name.");
         }
 
-        //check if vin is formatted correctly
-        if(!Validators.isValidVIN(vinText)){
-            throw new InvalidCaseInfoException();
+        if (!Validators.isValidString(damageDescription)) {
+            System.out.println("❌ Invalid damage description: " + damageDescription);
+            throw new InvalidCaseInfoException("Invalid damage description.");
         }
 
-        //check if license plate is formatted correctly
-        if(!Validators.isValidHRLicensePlateNumber(licensePlate)){
-            throw new InvalidCaseInfoException();
+        System.out.println("Validating contact number...");
+        if (!Validators.isValidHRPhoneNumber(contactNumber)) {
+            System.out.println("❌ Phone number validation failed: " + contactNumber);
+            throw new InvalidCaseInfoException("Invalid phone number.");
         }
+
+        System.out.println("Validating VIN...");
+        if (!Validators.isValidVIN(vinText)) {
+            System.out.println("❌ VIN validation failed: " + vinText);
+            throw new InvalidCaseInfoException("Invalid VIN.");
+        }
+
+        System.out.println("Validating license plate...");
+        if (!Validators.isValidHRLicensePlateNumber(licensePlate)) {
+            System.out.println("❌ License plate validation failed: " + licensePlate);
+            throw new InvalidCaseInfoException("Invalid license plate number.");
+        }
+
         return true;
     }
 

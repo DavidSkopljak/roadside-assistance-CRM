@@ -104,4 +104,19 @@ public class LocationRepository extends AbstractRepository<Location> {
             LOCK.unlock();
         }
     }
+
+    @Override
+    public void update(Long id) throws SQLException {
+
+    }
+
+    @Override
+    public void deleteById(Long id) throws SQLException {
+
+    }
+
+    @Override
+    public void saveAll(List<Long> id) throws SQLException {
+
+    }
 }

@@ -3,10 +3,8 @@ package com.davidskopljak.skopljakzavrsni.helpers;
 import com.davidskopljak.skopljakzavrsni.enums.*;
 import com.davidskopljak.skopljakzavrsni.exceptions.EmptyResultSetException;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.ArrayList;
 
 public class RepositoryHelper {
     public static CaseState queryCaseStateById(Long caseStateId, Connection conn) throws SQLException {
@@ -147,4 +145,63 @@ public class RepositoryHelper {
             }
         }
     }
+
+    public static ArrayList<VehicleModel> queryAllVehicleModels(Connection conn) throws SQLException {
+        String vehicleModelQuery = "SELECT vehicle_model.model FROM vehicle_model";
+        ArrayList<VehicleModel> models = new ArrayList<>();
+        try(Statement stmt = conn.createStatement()){
+            try(ResultSet rs = stmt.executeQuery(vehicleModelQuery)){
+                while (rs.next()) {
+                    VehicleModel model = VehicleModel.valueOf(rs.getString("model"));
+                    models.add(model);
+                }
+
+                if (models.isEmpty()) {
+                    throw new EmptyResultSetException("No vehicle models retrieved from the database.");
+                }
+
+                return models;
+            }
+        }
+    }
+
+    public static ArrayList<VehicleDamageType> queryAllVehicleDamageTypes(Connection conn) throws SQLException {
+        String vehicleDamageTypeQuery = "SELECT vehicle_damage_type.damage_type FROM vehicle_damage_type";
+        ArrayList<VehicleDamageType> types = new ArrayList<>();
+        try(Statement stmt = conn.createStatement()){
+            try(ResultSet rs = stmt.executeQuery(vehicleDamageTypeQuery)){
+                while (rs.next()) {
+                    VehicleDamageType type = VehicleDamageType.valueOf(rs.getString("damage_type"));
+                    types.add(type);
+                }
+
+                if (types.isEmpty()) {
+                    throw new EmptyResultSetException("No vehicle models retrieved from the database.");
+                }
+
+                return types;
+            }
+        }
+    }
+
+    public static ArrayList<VehicleDamageCause> queryAllVehicleDamageCauses(Connection conn) throws SQLException {
+        String vehicleDamageCauseQuery = "SELECT vehicle_damage_cause.damage_cause FROM vehicle_damage_cause";
+        ArrayList<VehicleDamageCause> causes = new ArrayList<>();
+        try(Statement stmt = conn.createStatement()){
+            try(ResultSet rs = stmt.executeQuery(vehicleDamageCauseQuery)){
+                while (rs.next()) {
+                    VehicleDamageCause cause = VehicleDamageCause.valueOf(rs.getString("damage_cause"));
+                    causes.add(cause);
+                }
+
+                if (causes.isEmpty()) {
+                    throw new EmptyResultSetException("No vehicle models retrieved from the database.");
+                }
+
+                return causes;
+            }
+        }
+    }
+
+
 }

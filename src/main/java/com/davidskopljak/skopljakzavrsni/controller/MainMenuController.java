@@ -7,7 +7,7 @@ import java.io.IOException;
 public class MainMenuController {
     public void handleNewCase() throws IOException {
         try{
-            FXMLLoader fxmlLoader = new FXMLLoader(CRMApplication.class.getResource("view-case-info.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(CRMApplication.class.getResource("new-case.fxml"));
             Scene scene = new Scene(fxmlLoader.load());
             CRMApplication.getPrimaryStage().setTitle("New case");
             CRMApplication.getPrimaryStage().setScene(scene);

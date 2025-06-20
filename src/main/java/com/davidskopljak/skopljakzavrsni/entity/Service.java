@@ -51,8 +51,12 @@ public non-sealed class Service extends Entity implements Trackable<ServiceState
     }
 
     @Override
-    public void setNotes(String notes) {
-        //serviceNotes.addAll(notes);
-        //process json data from db and turn into Note objects
+    public void addNotes(List<Note> notes) {
+        serviceNotes.addAll(notes);
+    }
+
+    @Override
+    public void addNote(Note note) {
+        serviceNotes.add(note);
     }
 }

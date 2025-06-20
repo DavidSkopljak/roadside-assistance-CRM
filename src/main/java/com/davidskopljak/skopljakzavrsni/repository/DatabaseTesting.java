@@ -3,16 +3,12 @@ import com.davidskopljak.skopljakzavrsni.entity.*;
 import com.davidskopljak.skopljakzavrsni.enums.CaseState;
 import com.davidskopljak.skopljakzavrsni.enums.VehicleDamageCause;
 import com.davidskopljak.skopljakzavrsni.enums.VehicleDamageType;
-import com.davidskopljak.skopljakzavrsni.helpers.JSONParser;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.*;
-import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 public class DatabaseTesting {
@@ -99,6 +95,7 @@ public class DatabaseTesting {
 
         newCase.setClient(client)
                 .setClientVehicle(clientVehicle)
+                .setClientVehicleFirstRegistrationDate(LocalDate.now().minusDays(10))
                 .setDamageCause(damageCause)
                 .setDamageType(damageType)
                 .setFirstOperator(firstOperator)
@@ -110,7 +107,8 @@ public class DatabaseTesting {
 
         newCase.updateState(caseState);
         Long caseId = caseRepository.save(newCase);
-
+        System.out.println("saved case(id " + caseId + ")");
+        System.out.println(LocalDateTime.now().truncatedTo(java.time.temporal.ChronoUnit.SECONDS));
 
         /*
         Long id = workshopRepository.save(new Workshop("workshop_test" , location));

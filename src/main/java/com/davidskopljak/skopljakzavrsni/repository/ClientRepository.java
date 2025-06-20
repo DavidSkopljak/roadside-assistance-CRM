@@ -86,5 +86,20 @@ public class ClientRepository extends AbstractRepository<Client> {
        }
     }
 
+    @Override
+    public void update(Long id) throws SQLException {
+
+    }
+
+    @Override
+    public void deleteById(Long id) throws SQLException {
+
+    }
+
+    @Override
+    public void saveAll(List<Long> id) throws SQLException {
+
+    }
+
 
 }

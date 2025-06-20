@@ -2,8 +2,10 @@ package com.davidskopljak.skopljakzavrsni.repository;
 
 import com.davidskopljak.skopljakzavrsni.entity.Location;
 import com.davidskopljak.skopljakzavrsni.entity.Workshop;
+import com.davidskopljak.skopljakzavrsni.enums.VehicleModel;
 import com.davidskopljak.skopljakzavrsni.exceptions.EmptyResultSetException;
 import com.davidskopljak.skopljakzavrsni.exceptions.RepositoryAccessException;
+import com.davidskopljak.skopljakzavrsni.helpers.RepositoryHelper;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -19,7 +21,9 @@ public class WorkshopRepository extends AbstractRepository<Workshop> {
     public Workshop findById(Long id) throws SQLException {
         LOCK.lock();
 
-        String vehicleQuery = "SELECT workshop.id, workshop.name, workshop.locationId FROM workshop WHERE id = ?";
+        String vehicleQuery = "SELECT workshop.id, workshop.name, workshop.locationId, workshop.vehicle_model FROM workshop " +
+                "INNER JOIN vehicle_model ON vehicle_model.id = workshop.vehicle_model_id" +
+                "WHERE id = ?";
         try (Connection conn = DatabaseConnectionManager.getInstance().getConnection();
              final PreparedStatement vq = conn.prepareStatement(vehicleQuery);){
             vq.setLong(1, id);
@@ -29,10 +33,10 @@ public class WorkshopRepository extends AbstractRepository<Workshop> {
                 Long workshopId = rs.getLong("id");
                 String name = rs.getString("name");
                 Long locationId = rs.getLong("location_id");
-
                 Location location = queryLocationById(locationId);
+                VehicleModel vehicleModel = VehicleModel.valueOf(rs.getString("vehicle_model_id"));
 
-                return new Workshop(workshopId, name, location);
+                return new Workshop(workshopId, name, location, vehicleModel);
             }else{
                 throw new EmptyResultSetException("workshop with id " + id + " not found");
             }
@@ -48,7 +52,8 @@ public class WorkshopRepository extends AbstractRepository<Workshop> {
         List<Workshop> workshops = new ArrayList<>();
         LOCK.lock();
 
-        String vehicleQuery = "SELECT workshop.id, workshop.name, workshop.location_id FROM workshop WHERE 1 = 1";
+        String vehicleQuery = "SELECT workshop.id, workshop.name, workshop.locationId, workshop.vehicle_model FROM workshop " +
+                "INNER JOIN vehicle_model ON vehicle_model.id = workshop.vehicle_model_id";
         try (Connection conn = DatabaseConnectionManager.getInstance().getConnection();
              final PreparedStatement vq = conn.prepareStatement(vehicleQuery);
              ResultSet rs = vq.executeQuery()){
@@ -57,10 +62,10 @@ public class WorkshopRepository extends AbstractRepository<Workshop> {
                 Long workshopId = rs.getLong("id");
                 String name = rs.getString("name");
                 Long locationId = rs.getLong("location_id");
-
                 Location location = queryLocationById(locationId);
+                VehicleModel vehicleModel = VehicleModel.valueOf(rs.getString("vehicle_model"));
 
-                workshops.add(new Workshop(workshopId, name, location));
+                workshops.add(new Workshop(workshopId, name, location, vehicleModel));
             }
             return workshops;
         }catch(RepositoryAccessException e){
@@ -74,15 +79,17 @@ public class WorkshopRepository extends AbstractRepository<Workshop> {
     public Long save(Workshop entity) throws SQLException {
         LOCK.lock();
 
-        String sql = "INSERT INTO workshop (name, location_id) VALUES (?, ?) RETURNING id";
+        String sql = "INSERT INTO workshop (name, location_id, vehicle_model_id) VALUES (?, ?, ?) RETURNING id";
         try (Connection conn = DatabaseConnectionManager.getInstance().getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)){
+             PreparedStatement ps = conn.prepareStatement(sql);){
 
             LocationRepository locationRepository = new LocationRepository();
             Long locationId = locationRepository.save(entity.getLocation());
+            Long vehicleModelId = RepositoryHelper.queryVehicleModelByModel(entity.getPermittedVehicleModel(), conn);
 
             ps.setString(1, entity.getName());
             ps.setLong(2, locationId);
+            ps.setLong(3, vehicleModelId);
 
             try(ResultSet rs = ps.executeQuery();){
                 if (rs.next()) {
@@ -97,6 +104,21 @@ public class WorkshopRepository extends AbstractRepository<Workshop> {
         }finally {
             LOCK.unlock();
         }
+    }
+
+    @Override
+    public void update(Long id) throws SQLException {
+
+    }
+
+    @Override
+    public void deleteById(Long id) throws SQLException {
+
+    }
+
+    @Override
+    public void saveAll(List<Long> id) throws SQLException {
+
     }
 
     Location queryLocationById(Long locationId) throws SQLException {

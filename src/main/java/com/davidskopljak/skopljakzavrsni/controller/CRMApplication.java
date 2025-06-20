@@ -20,7 +20,7 @@ public class    CRMApplication extends Application {
         try{
             CRMApplication.setPrimaryStage(stage);
             FXMLLoader fxmlLoader = new FXMLLoader(CRMApplication.class.getResource("main-view.fxml"));
-            Scene scene = new Scene(fxmlLoader.load());
+            Scene scene = new Scene(fxmlLoader.load(), 1080, 600);
             stage.setTitle("CRM Application");
             stage.setScene(scene);
             stage.setResizable(false);

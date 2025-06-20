@@ -41,7 +41,7 @@ public class ServiceRepository extends AbstractRepository<Service> {
 
                     Service service = new Service(serviceId, assignedDriver, serviceType, serviceState);
                     if(!"[]".equals(serviceNotes)) {
-                        service.setNotes(serviceNotes);
+                        //service.addNotes(serviceNotes);
                     }
 
                     return service;
@@ -79,7 +79,7 @@ public class ServiceRepository extends AbstractRepository<Service> {
 
                     Service service = new Service(serviceId, assignedDriver, serviceType, serviceState);
                     if(!"[]".equals(serviceNotes)) {
-                        service.setNotes(serviceNotes);
+                        //service.addNotes(serviceNotes);
                     }
 
                     services.add(service);
@@ -123,6 +123,21 @@ public class ServiceRepository extends AbstractRepository<Service> {
         }finally {
             LOCK.unlock();
         }
+    }
+
+    @Override
+    public void update(Long id) throws SQLException {
+
+    }
+
+    @Override
+    public void deleteById(Long id) throws SQLException {
+
+    }
+
+    @Override
+    public void saveAll(List<Long> id) throws SQLException {
+
     }
 
     private Driver queryAssignedDriverById(Long id) throws SQLException {

@@ -1,14 +1,12 @@
 package com.davidskopljak.skopljakzavrsni.entity;
 
-import com.davidskopljak.skopljakzavrsni.controller.CRMApplication;
 import com.davidskopljak.skopljakzavrsni.enums.CaseState;
 import com.davidskopljak.skopljakzavrsni.enums.VehicleDamageCause;
 import com.davidskopljak.skopljakzavrsni.enums.VehicleDamageType;
-import com.davidskopljak.skopljakzavrsni.helpers.JSONParser;
 import com.davidskopljak.skopljakzavrsni.interfaces.Noteable;
 import com.davidskopljak.skopljakzavrsni.interfaces.Trackable;
 
-import java.sql.SQLException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,9 +22,10 @@ public non-sealed class Case extends Entity implements Trackable<CaseState>, Not
     private Operator firstOperator;
     private Operator lastEditedOperator;
     private Vehicle clientVehicle;
+    private LocalDate clientVehicleFirstRegistrationDate;
     private List<Note> caseNotes = new ArrayList<>();
     private String damageDescription;
-    private Optional<Service> activeService;
+    private Optional<Service> activeService = Optional.empty();
     private CaseState caseState;
     private VehicleDamageType damageType;
     private VehicleDamageCause damageCause;
@@ -55,14 +54,12 @@ public non-sealed class Case extends Entity implements Trackable<CaseState>, Not
     }
 
     @Override
-    public void setNotes(String notes) {
-        try{
-            caseNotes = JSONParser.parseCaseNotes(notes);
-            System.out.println("Case notes in Case.setNotes() - " + caseNotes.toString());
-        }catch (SQLException e){
-            System.out.println("SQLException in Case.setNotes() - " + e.getMessage());
-            CRMApplication.log.error(e.getMessage());
-        }
+    public void addNotes(List<Note> notes) {
+        caseNotes.addAll(notes);
+    }
+
+    public void addNote(Note note) {
+        this.caseNotes.add(note);
     }
 
     public Location getLocation() {
@@ -125,6 +122,10 @@ public non-sealed class Case extends Entity implements Trackable<CaseState>, Not
         return this;
     }
 
+    public VehicleDamageType getDamageType() {
+        return damageType;
+    }
+
     public VehicleDamageCause getDamageCause() {
         return damageCause;
     }
@@ -152,7 +153,13 @@ public non-sealed class Case extends Entity implements Trackable<CaseState>, Not
         return this;
     }
 
-    public VehicleDamageType getDamageType() {
-        return damageType;
+    public LocalDate getClientVehicleFirstRegistrationDate() {
+        return clientVehicleFirstRegistrationDate;
     }
+
+    public Case setClientVehicleFirstRegistrationDate(LocalDate clientVehicleFirstRegistrationDate) {
+        this.clientVehicleFirstRegistrationDate = clientVehicleFirstRegistrationDate;
+        return this;
+    }
+
 }

@@ -1,0 +1,51 @@
+2025-06-16 20:40:24,422 [   3596]   WARN - #c.i.i.s.i.StartupManagerImpl - Migrate org.sonarlint.intellij.StartServicesOnProjectOpened to ProjectActivity [Plugin: org.sonarlint.idea]
+com.intellij.diagnostic.PluginException: Migrate org.sonarlint.intellij.StartServicesOnProjectOpened to ProjectActivity [Plugin: org.sonarlint.idea]
+	at com.intellij.ide.startup.impl.StartupManagerImpl.doRunPostStartupActivities(StartupManagerImpl.kt:293)
+	at com.intellij.ide.startup.impl.StartupManagerImpl.access$doRunPostStartupActivities(StartupManagerImpl.kt:70)
+	at com.intellij.ide.startup.impl.StartupManagerImpl$runPostStartupActivities$3$2.invokeSuspend(StartupManagerImpl.kt:193)
+	at com.intellij.ide.startup.impl.StartupManagerImpl$runPostStartupActivities$3$2.invoke(StartupManagerImpl.kt)
+	at com.intellij.ide.startup.impl.StartupManagerImpl$runPostStartupActivities$3$2.invoke(StartupManagerImpl.kt)
+	at kotlinx.coroutines.intrinsics.UndispatchedKt.startUndispatchedOrReturn(Undispatched.kt:62)
+	at kotlinx.coroutines.BuildersKt__Builders_commonKt.withContext(Builders.common.kt:163)
+	at kotlinx.coroutines.BuildersKt.withContext(Unknown Source)
+	at com.intellij.ide.startup.impl.StartupManagerImpl$runPostStartupActivities$3.invokeSuspend(StartupManagerImpl.kt:192)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.UndispatchedCoroutine.afterResume(CoroutineContext.kt:277)
+	at kotlinx.coroutines.AbstractCoroutine.resumeWith(AbstractCoroutine.kt:99)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:46)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:104)
+	at kotlinx.coroutines.scheduling.CoroutineScheduler.runSafely(CoroutineScheduler.kt:608)
+	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.executeTask(CoroutineScheduler.kt:873)
+	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.runWorker(CoroutineScheduler.kt:763)
+	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.run(CoroutineScheduler.kt:750)
+2025-06-16 20:40:24,425 [   3599]   WARN - #c.i.i.s.i.StartupManagerImpl - Migrate org.sonarlint.intellij.OpenWelcomePageOnceOneProjectOpened to ProjectActivity [Plugin: org.sonarlint.idea]
+com.intellij.diagnostic.PluginException: Migrate org.sonarlint.intellij.OpenWelcomePageOnceOneProjectOpened to ProjectActivity [Plugin: org.sonarlint.idea]
+	at com.intellij.ide.startup.impl.StartupManagerImpl.doRunPostStartupActivities(StartupManagerImpl.kt:293)
+	at com.intellij.ide.startup.impl.StartupManagerImpl.access$doRunPostStartupActivities(StartupManagerImpl.kt:70)
+	at com.intellij.ide.startup.impl.StartupManagerImpl$runPostStartupActivities$3$2.invokeSuspend(StartupManagerImpl.kt:193)
+	at com.intellij.ide.startup.impl.StartupManagerImpl$runPostStartupActivities$3$2.invoke(StartupManagerImpl.kt)
+	at com.intellij.ide.startup.impl.StartupManagerImpl$runPostStartupActivities$3$2.invoke(StartupManagerImpl.kt)
+	at kotlinx.coroutines.intrinsics.UndispatchedKt.startUndispatchedOrReturn(Undispatched.kt:62)
+	at kotlinx.coroutines.BuildersKt__Builders_commonKt.withContext(Builders.common.kt:163)
+	at kotlinx.coroutines.BuildersKt.withContext(Unknown Source)
+	at com.intellij.ide.startup.impl.StartupManagerImpl$runPostStartupActivities$3.invokeSuspend(StartupManagerImpl.kt:192)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.UndispatchedCoroutine.afterResume(CoroutineContext.kt:277)
+	at kotlinx.coroutines.AbstractCoroutine.resumeWith(AbstractCoroutine.kt:99)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:46)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:104)
+	at kotlinx.coroutines.scheduling.CoroutineScheduler.runSafely(CoroutineScheduler.kt:608)
+	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.executeTask(CoroutineScheduler.kt:873)
+	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.runWorker(CoroutineScheduler.kt:763)
+	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.run(CoroutineScheduler.kt:750)
+2025-06-16 20:40:24,431 [   3605]   WARN - #c.i.m.l.c.q.QuotaManager2 - Wanted to update to Available(current=0, maximum=300000, until=2025-10-19T21:00:00Z)
+2025-06-16 20:42:44,337 [ 143511]   WARN - #o.j.k.i.s.r.KotlinCompilerReferenceIndexStorage - kotlin-data-container is not found
+Exception in thread "SonarLint Client RPC sequential executor" java.lang.NullPointerException: Cannot invoke "com.intellij.openapi.application.Application.getService(java.lang.Class)" because the return value of "com.intellij.openapi.application.ApplicationManager.getApplication()" is null
+
+Exception: java.lang.IllegalStateException thrown from the UncaughtExceptionHandler in thread "SonarLint Client RPC sequential Eexecutor"
+xception in thread "SonarLint Client RPC sequential executor" java.lang.NullPointerException: Cannot invoke "com.intellij.openapi.application.Application.getService(java.lang.Class)" because the return value of "com.intellij.openapi.application.ApplicationManager.getApplication()" is null
+
+Exception: java.lang.IllegalStateException thrown from the UncaughtExceptionHandler in thread "SonarLint Client RPC sequential executor"
+Exception in thread "SonarLint Client RPC sequential executor" java.lang.NullPointerException: Cannot invoke "com.intellij.openapi.application.Application.getService(java.lang.Class)" because the return value of "com.intellij.openapi.application.ApplicationManager.getApplication()" is null
+
+Exception: java.lang.IllegalStateException thrown from the UncaughtExceptionHandler in thread "SonarLint Client RPC sequential executor"

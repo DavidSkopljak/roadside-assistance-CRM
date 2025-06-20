@@ -8,5 +8,6 @@ import java.util.List;
 
 public sealed interface Noteable permits Case, Service {
     public List<Note> getNotes();
-    public void setNotes(String notes); //this will process json data from the db and turn it into Note objects
+    public void addNotes(List<Note> notes);
+    public void addNote(Note note);
 }

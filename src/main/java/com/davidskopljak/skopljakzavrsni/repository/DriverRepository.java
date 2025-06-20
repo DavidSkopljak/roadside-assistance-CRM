@@ -122,6 +122,21 @@ public class DriverRepository extends AbstractRepository<Driver> {
         }
     }
 
+    @Override
+    public void update(Long id) throws SQLException {
+
+    }
+
+    @Override
+    public void deleteById(Long id) throws SQLException {
+
+    }
+
+    @Override
+    public void saveAll(List<Long> id) throws SQLException {
+
+    }
+
 
     Location queryLocationById(Long locationId) throws SQLException {
         LocationRepository locationRepository = new LocationRepository();
