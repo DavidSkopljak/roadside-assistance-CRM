@@ -1,7 +1,7 @@
 package com.davidskopljak.skopljakzavrsni.controller;
 
+import com.davidskopljak.skopljakzavrsni.entity.Case;
 import com.davidskopljak.skopljakzavrsni.entity.Operator;
-import com.davidskopljak.skopljakzavrsni.repository.OperatorRepository;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -15,8 +15,7 @@ public class CRMApplication extends Application {
     public static final Logger log = LoggerFactory.getLogger(CRMApplication.class);
     private static Stage PRIMARY_STAGE;
     private static Operator ACTIVE_OPERATOR;
-    private static NewCaseController SHARED_NEW_CASE_CONTROLLER;
-    //private static CaseController SHARED_CASE_CONTROLLER;
+    private static Case UNFINISHED_NEW_CASE;
 
     @Override
     public void start(Stage stage){
@@ -45,10 +44,5 @@ public class CRMApplication extends Application {
     public static Stage getPrimaryStage() {return PRIMARY_STAGE;}
     private static void setPrimaryStage(Stage primaryStage) {CRMApplication.PRIMARY_STAGE = primaryStage;}
     public static Operator getActiveOperator() {return ACTIVE_OPERATOR;}
-    public static NewCaseController getSharedNewCaseController() {
-        if (SHARED_NEW_CASE_CONTROLLER == null) {
-            SHARED_NEW_CASE_CONTROLLER = new NewCaseController();
-        }
-        return SHARED_NEW_CASE_CONTROLLER;
-    }
+    public static Case getUnfinishedNewCase() {if(UNFINISHED_NEW_CASE == null) {UNFINISHED_NEW_CASE = new Case();} return UNFINISHED_NEW_CASE;}
 }

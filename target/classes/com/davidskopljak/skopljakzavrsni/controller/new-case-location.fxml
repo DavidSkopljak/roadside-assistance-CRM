@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="600.0" prefWidth="1080.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane prefHeight="600.0" prefWidth="1080.0" xmlns="http://javafx.com/javafx/24" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.davidskopljak.skopljakzavrsni.controller.NewCaseLocationController">
     <fx:include source="new-case-menu.fxml" />
     <ScrollPane layoutY="29.0" prefHeight="571.0" prefWidth="1080.0">
         <content>
@@ -33,15 +33,15 @@
                                 </font>
                             </Label>
                             <Label text="Country:" />
-                            <TextField fx:id="countryField" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="300.0" />
+                            <TextField fx:id="countryTextField" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="300.0" />
                             <Label text="City:" />
-                            <TextField fx:id="cityField" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="300.0" />
+                            <TextField fx:id="cityTextField" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="300.0" />
                             <Label text="Address:" />
-                            <TextField fx:id="addressField" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="300.0" />
+                            <TextField fx:id="addressTextField" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="300.0" />
                             <Label text="House number:" />
-                            <TextField fx:id="houseNumberField" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="300.0" />
+                            <TextField fx:id="houseNumberTextField" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="300.0" />
                             <Label text="Postal code:" />
-                            <TextField fx:id="postalCodeField" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="300.0" />
+                            <TextField fx:id="postalCodeTextField" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="300.0" />
                             <Button fx:id="confirm" mnemonicParsing="false" onAction="#setLocationInfo" text="Confirm">
                                 <VBox.margin>
                                     <Insets top="50.0" />
@@ -62,9 +62,9 @@
                                 </font>
                             </Label>
                             <Label text="X coordinates " />
-                            <TextField fx:id="coordinatesXField" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="300.0" />
+                            <TextField fx:id="coordinatesXTextField" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="300.0" />
                      <Label text="Y coordinates " />
-                     <TextField fx:id="coordinatesYField" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="300.0" />
+                     <TextField fx:id="coordinatesYTextField" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="300.0" />
                         </children></VBox>
                 </children>
             </GridPane>
