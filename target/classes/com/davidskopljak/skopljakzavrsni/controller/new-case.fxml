@@ -14,8 +14,8 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="600.0" prefWidth="1080.0" xmlns="http://javafx.com/javafx/24" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.davidskopljak.skopljakzavrsni.controller.NewCaseController">
-    <fx:include source="case-menu.fxml" />
+<AnchorPane prefHeight="600.0" prefWidth="1080.0" xmlns="http://javafx.com/javafx/24" xmlns:fx="http://javafx.com/fxml/1">
+   <fx:include source="new-case-menu.fxml" />
    <ScrollPane layoutY="29.0" prefHeight="571.0" prefWidth="1080.0">
       <content>
          <GridPane gridLinesVisible="false" prefHeight="570.0" prefWidth="1080.0">
@@ -164,7 +164,7 @@
                      <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
                   </padding>
                </VBox>
-               <Button fx:id="confirm" mnemonicParsing="false" onAction="#saveCase" text="Confirm" GridPane.columnSpan="3" GridPane.halignment="CENTER" GridPane.rowIndex="6" GridPane.valignment="CENTER" />
+               <Button fx:id="confirm" mnemonicParsing="false" onAction="#setCaseInfo" text="Confirm" GridPane.columnSpan="3" GridPane.halignment="CENTER" GridPane.rowIndex="6" GridPane.valignment="CENTER" />
             </children>
             <padding>
                <Insets right="10.0" />

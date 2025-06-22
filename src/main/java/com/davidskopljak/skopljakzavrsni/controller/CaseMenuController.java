@@ -1,5 +1,6 @@
 package com.davidskopljak.skopljakzavrsni.controller;
 
+import com.davidskopljak.skopljakzavrsni.helpers.MiscHelpers;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -7,43 +8,16 @@ import javafx.scene.Scene;
 import java.io.IOException;
 
 public class CaseMenuController {
-    public void handleViewCaseInfo() throws IOException {
-        try{
-            FXMLLoader fxmlLoader = new FXMLLoader(CRMApplication.class.getResource("new-case.fxml"));
-            Scene scene = new Scene(fxmlLoader.load());
-            CRMApplication.getPrimaryStage().setTitle("View Case Info");
-            CRMApplication.getPrimaryStage().setScene(scene);
-            CRMApplication.getPrimaryStage().show();
-        }catch(IOException e){
-            CRMApplication.log.error(e.getMessage());
-            throw e;
-        }
+    public void handleViewCaseInfo() {
+        MiscHelpers.loadScene("case.fxml", "View case info");
     }
 
-    public void handleViewServices() throws IOException {
-        try{
-            FXMLLoader fxmlLoader = new FXMLLoader(CRMApplication.class.getResource("view-services.fxml"));
-            Scene scene = new Scene(fxmlLoader.load());
-            CRMApplication.getPrimaryStage().setTitle("View services");
-            CRMApplication.getPrimaryStage().setScene(scene);
-            CRMApplication.getPrimaryStage().show();
-        }catch(IOException e){
-            CRMApplication.log.error(e.getMessage());
-            throw e;
-        }
+    public void handleViewServices() {
+        MiscHelpers.loadScene("case-services.fxml", "View services");
     }
 
-    public void handleViewLocationInfo() throws IOException {
-        try{
-            FXMLLoader fxmlLoader = new FXMLLoader(CRMApplication.class.getResource("view-location.fxml"));
-            Scene scene = new Scene(fxmlLoader.load());
-            CRMApplication.getPrimaryStage().setTitle("View location");
-            CRMApplication.getPrimaryStage().setScene(scene);
-            CRMApplication.getPrimaryStage().show();
-        }catch(IOException e){
-            CRMApplication.log.error(e.getMessage());
-            throw e;
-        }
+    public void handleViewLocationInfo(){
+        MiscHelpers.loadScene("case-location.fxml", "View location");
     }
 
     public void handleSaveCase() {

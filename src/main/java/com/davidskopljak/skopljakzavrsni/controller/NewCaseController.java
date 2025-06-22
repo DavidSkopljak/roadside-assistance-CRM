@@ -27,6 +27,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 public class NewCaseController {
@@ -103,24 +104,14 @@ public class NewCaseController {
         }
     }
 
-    public void saveCase(ActionEvent event){
+    public void saveCase(){
         try{
-            setCaseInfo();
-            //validateCaseLocation();
+            validateCaseInfo();
+            //validateLocationInfo();
             Location location = new Location("address", "city", "country", "postalCode", new BigDecimal(45.8089772239981), new BigDecimal(15.716704654770382));
-
-            ClientRepository clientRepository = new ClientRepository();
             Client client = new Client(firstName, lastName, contactNumber);
-
-            VehicleRepository vehicleRepository = new VehicleRepository();
             Vehicle clientVehicle = new Vehicle(licensePlate, vehicleModel, vinText);
-
-
-            OperatorRepository operatorRepository = new OperatorRepository();
-            Operator firstOperator = operatorRepository.findById(140L);
-
-            Operator lastEditedOperator = firstOperator;
-
+            Operator firstOperator = CRMApplication.getActiveOperator();
             CaseState caseState = CaseState.ACTIVE;
 
             Case newCase = new Case();
@@ -131,7 +122,7 @@ public class NewCaseController {
                     .setDamageCause(damageCause)
                     .setDamageType(damageType)
                     .setFirstOperator(firstOperator)
-                    .setLastEditedOperator(lastEditedOperator)
+                    .setLastEditedOperator(firstOperator)
                     .setLocation(location)
                     .setDamageDescription(damageDescription)
                     .setCreatedDateTime(LocalDateTime.now().truncatedTo(java.time.temporal.ChronoUnit.SECONDS));
@@ -148,114 +139,101 @@ public class NewCaseController {
             a.setContentText("Invalid case information. Please check the case details.");
             a.show();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-
-        /*
-        try{
-            Client client = new Client(firstName, lastName, contactNumber);
-            Vehicle clientVehicle = new Vehicle(licensePlate, vehicleModel, firstRegLocalDate, vinText);
-
-            CaseRepository caseRepository = new CaseRepository();
-            Case newCase;
-            newCase.setClient(client)
-                    .setClientVehicle(clientVehicle)
-                    .setDamageCause(damageCause)
-                    .setDamageType(damageType)
-                    .setFirstOperator(CRMApplication.getCurrentOperator())
-                    .setLastEditedOperator(CRMApplication.getCurrentOperator())
-                    .setLocation(location)
-                    .setDamageDescription(damageDescription)
-                    .setCreatedDateTime(createdDateTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())
-                    .setActiveService(activeService);
-
-        }catch(SQLException e){
-            CRMApplication.log.error(e.getMessage());
-            Alert a = new Alert(Alert.AlertType.ERROR);
-            a.setHeaderText(null);
-            a.setContentText("Something went wrong. Please try again.");
-            a.show();
-        }
-        */
-
-        //VehicleRepository.addToDatabase(new Vehicle(Validators.removeSpecialCharacters(licensePlate), vehicleModel, firstRegLocalDate, vinText));
-        //LocationRepository.addToDatabase(/*new Location(location data)*/);
-    }
-
-    public void setCaseInfo() throws InvalidCaseInfoException{
-        firstName = this.firstNameTextField.getText();
-        lastName = this.lastNameTextField.getText();
-        contactNumber = this.contactNumberTextField.getText();
-        licensePlate = this.licensePlateTextField.getText();
-        damageDescription = this.damageDescriptionTextField.getText();
-        vehicleModel = this.modelComboBox.getValue();
-        vinText = this.vinTextField.getText();
-        firstRegLocalDate = this.firstRegDateDatePicker.getValue();
-        damageType = this.damageTypeComboBox.getValue();
-        damageCause = this.damageCauseComboBox.getValue();
-        try{
-            validateCaseInfo();
-        }catch (InvalidCaseInfoException e){
-            CRMApplication.log.error(e.getMessage());
-            Alert a = new Alert(Alert.AlertType.WARNING);
-            a.setHeaderText(null);
-            a.setContentText("Invalid case information. Please check the case details.");
-            throw new InvalidCaseInfoException(e.getMessage());
+            throw new RepositoryAccessException("Failed to save new case: " + e);
         }
     }
 
-    public Boolean validateCaseInfo() throws InvalidCaseInfoException {
-        System.out.println("Validating not-null values...");
+    public void setCaseInfo(){
+            firstName = this.firstNameTextField.getText();
+            lastName = this.lastNameTextField.getText();
+            contactNumber = this.contactNumberTextField.getText();
+            licensePlate = this.licensePlateTextField.getText();
+            damageDescription = this.damageDescriptionTextField.getText();
+            vehicleModel = this.modelComboBox.getValue();
+            vinText = this.vinTextField.getText();
+            firstRegLocalDate = this.firstRegDateDatePicker.getValue();
+            damageType = this.damageTypeComboBox.getValue();
+            damageCause = this.damageCauseComboBox.getValue();
+    }
+
+    public void setLocationInfo() {
+        country = countryTextField.getText();
+        city = cityTextField.getText();
+        address = addressTextField.getText();
+        houseNumber = houseNumberTextField.getText();
+        postalCode = postalCodeTextField.getText();
+        coordinatesX = coordinatesXTextField.getText();
+        coordinatesY = coordinatesYTextField.getText();
+    }
+
+
+    public void validateCaseInfo() throws InvalidCaseInfoException {
         if (Boolean.FALSE.equals(Validators.isNotNull(Arrays.asList(vehicleModel, firstRegLocalDate, damageType, damageCause)))) {
-            System.out.println("❌ Not-null validation failed.");
             throw new InvalidCaseInfoException("Some required fields are null.");
         }
 
-        /*System.out.println("Validating strings...");
-        if (Boolean.FALSE.equals(Validators.isValidString(Arrays.asList(firstName, lastName, licensePlate, vinText, damageDescription)))) {
-            System.out.println("❌ String validation failed.");
-            throw new InvalidCaseInfoException("One or more string fields are invalid.");
-        }*/
-
-
-        if (!Validators.isValidString(firstName)) {
-            System.out.println("❌ Invalid first name: " + firstName);
+        List<String> fields = List.of(firstName, lastName, damageDescription);
+        if (!Validators.isValidString(fields)) {
             throw new InvalidCaseInfoException("Invalid first name.");
         }
 
-        if (!Validators.isValidString(lastName)) {
-            System.out.println("❌ Invalid last name: " + lastName);
-            throw new InvalidCaseInfoException("Invalid last name.");
-        }
-
-        if (!Validators.isValidString(damageDescription)) {
-            System.out.println("❌ Invalid damage description: " + damageDescription);
-            throw new InvalidCaseInfoException("Invalid damage description.");
-        }
-
-        System.out.println("Validating contact number...");
         if (!Validators.isValidHRPhoneNumber(contactNumber)) {
-            System.out.println("❌ Phone number validation failed: " + contactNumber);
             throw new InvalidCaseInfoException("Invalid phone number.");
         }
 
-        System.out.println("Validating VIN...");
         if (!Validators.isValidVIN(vinText)) {
-            System.out.println("❌ VIN validation failed: " + vinText);
             throw new InvalidCaseInfoException("Invalid VIN.");
         }
 
-        System.out.println("Validating license plate...");
         if (!Validators.isValidHRLicensePlateNumber(licensePlate)) {
-            System.out.println("❌ License plate validation failed: " + licensePlate);
             throw new InvalidCaseInfoException("Invalid license plate number.");
         }
-
-        return true;
     }
 
     public Boolean validateCaseLocation() throws InvalidCaseLocationException {
         //if(!(Validators.is))
         return true;
     }
+
+    public void resetForm() {
+        firstNameTextField.clear();
+        lastNameTextField.clear();
+        contactNumberTextField.clear();
+        licensePlateTextField.clear();
+        vinTextField.clear();
+        damageDescriptionTextField.clear();
+        firstRegDateDatePicker.setValue(null);
+        modelComboBox.getSelectionModel().clearSelection();
+        damageTypeComboBox.getSelectionModel().clearSelection();
+        damageCauseComboBox.getSelectionModel().clearSelection();
+        countryTextField.clear();
+        cityTextField.clear();
+        addressTextField.clear();
+        houseNumberTextField.clear();
+        postalCodeTextField.clear();
+        coordinatesXTextField.clear();
+        coordinatesYTextField.clear();
+    }
+
+    public void outputForm() {
+        System.out.println("First name: " + firstName);
+        System.out.println("Last name: " + lastName);
+        System.out.println("Contact number: " + contactNumber);
+        System.out.println("License plate: " + licensePlate);
+        System.out.println("VIN: " + vinText);
+        System.out.println("Damage description: " + damageDescription);
+        System.out.println("First registration date: " + firstRegLocalDate);
+        System.out.println("Vehicle model: " + vehicleModel);
+        System.out.println("Damage type: " + damageType);
+        System.out.println("Damage cause: " + damageCause);
+        System.out.println("Country: " + country);
+        System.out.println("City: " + city);
+        System.out.println("Address: " + address);
+        System.out.println("House number: " + houseNumber);
+        System.out.println("Postal code: " + postalCode);
+        System.out.println("Coordinates X: " + coordinatesX);
+        System.out.println("Coordinates Y: " + coordinatesY);
+        System.out.println();
+    }
+
 }
