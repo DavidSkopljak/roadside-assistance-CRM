@@ -1,11 +1,18 @@
 package com.davidskopljak.skopljakzavrsni.entity;
 //operators filling out the forms with client data and dispatching tow truck drivers
 public class Operator extends Person{
-    public Operator(Long id, String firstName, String lastName) {
+    private final String username;
+    public Operator(Long id, String username,  String firstName, String lastName) {
         super(id, firstName, lastName);
+        this.username = username;
     }
 
-    public Operator(String firstName, String lastName) {
+    public Operator(String username, String firstName, String lastName) {
         super(firstName, lastName);
+        this.username = username;
+    }
+
+    public String getUsername() {
+        return username;
     }
 }

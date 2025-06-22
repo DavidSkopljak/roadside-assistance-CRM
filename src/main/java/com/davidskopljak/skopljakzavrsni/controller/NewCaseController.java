@@ -117,7 +117,7 @@ public class NewCaseController {
 
 
             OperatorRepository operatorRepository = new OperatorRepository();
-            Operator firstOperator = operatorRepository.findById(1L);
+            Operator firstOperator = operatorRepository.findById(140L);
 
             Operator lastEditedOperator = firstOperator;
 

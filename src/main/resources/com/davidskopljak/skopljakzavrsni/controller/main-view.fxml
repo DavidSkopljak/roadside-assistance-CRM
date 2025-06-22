@@ -4,17 +4,18 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane id="anchorPane" prefHeight="428.0" prefWidth="87.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.davidskopljak.skopljakzavrsni.controller.MainViewController">
+<AnchorPane id="anchorPane" prefHeight="597.0" prefWidth="1191.0" xmlns="http://javafx.com/javafx/24" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.davidskopljak.skopljakzavrsni.controller.MainViewController">
     <fx:include source="main-menu.fxml" />
-    <TableView id="caseTableView" layoutY="28.0">
+    <TableView id="caseTableView" fx:id="casesTableView" layoutY="28.0" prefHeight="572.0" prefWidth="1243.0">
         <columns>
-            <TableColumn id="caseIDTableColumn" minWidth="-Infinity" prefWidth="90.0" text="Case ID" />
-            <TableColumn id="lastNameTableColumn" minWidth="-Infinity" prefWidth="165.0" text="Last name" />
-            <TableColumn id="firstNameTableColumn" minWidth="-Infinity" prefWidth="165.0" text="First name" />
-            <TableColumn id="vehicleBrandTableColumn" minWidth="-Infinity" prefWidth="165.0" text="Vehicle brand" />
-            <TableColumn id="licensePlateTableColumn" minWidth="-Infinity" prefWidth="165.0" text="License plate" />
-            <TableColumn id="LocationTableColumn" minWidth="-Infinity" prefWidth="165.0" text="Location" />
-            <TableColumn id="lastEditedOperatorTableColumn" minWidth="-Infinity" prefWidth="165.0" text="Last edited operator" />
+            <TableColumn id="caseIDTableColumn" fx:id="caseIdTableColumn" minWidth="-Infinity" prefWidth="90.0" text="Case ID" />
+            <TableColumn id="lastNameTableColumn" fx:id="lastNameTableColumn" minWidth="-Infinity" prefWidth="165.0" text="Last name" />
+            <TableColumn id="firstNameTableColumn" fx:id="firstNameTableColumn" minWidth="-Infinity" prefWidth="165.0" text="First name" />
+            <TableColumn id="vehicleBrandTableColumn" fx:id="vehicleBrandTableColumn" minWidth="-Infinity" prefWidth="165.0" text="Vehicle brand" />
+            <TableColumn id="licensePlateTableColumn" fx:id="licensePlateTableColumn" minWidth="-Infinity" prefWidth="165.0" text="License plate" />
+            <TableColumn id="LocationTableColumn" fx:id="locationTableColumn" minWidth="-Infinity" prefWidth="165.0" text="Location" />
+         <TableColumn id="lastEditedOperatorTableColumn" fx:id="firstEditedOperatorTableColumn" minWidth="-Infinity" prefWidth="165.0" text="First edited operator" />
+            <TableColumn id="lastEditedOperatorTableColumn" fx:id="lastEditedOperatorTableColumn" minWidth="-Infinity" prefWidth="165.0" text="Last edited operator" />
         </columns>
     </TableView>
 </AnchorPane>

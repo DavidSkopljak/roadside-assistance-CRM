@@ -69,7 +69,6 @@ public class CaseRepository extends AbstractRepository<Case> {
              PreparedStatement ps = conn.prepareStatement(sql)){
 
             LocationRepository locationRepository = new LocationRepository();
-            OperatorRepository operatorRepository = new OperatorRepository();
             VehicleRepository vehicleRepository = new VehicleRepository();
             ServiceRepository serviceRepository = new ServiceRepository();
             ClientRepository clientRepository = new ClientRepository();
@@ -77,7 +76,7 @@ public class CaseRepository extends AbstractRepository<Case> {
             Long locationId = locationRepository.save(entity.getLocation());
             ps.setLong(1, locationId);
 
-            Long firstOperatorid = operatorRepository.save(entity.getFirstOperator());
+            Long firstOperatorid = entity.getFirstOperator().getId();
             ps.setLong(2, firstOperatorid);
 
             Long lasteditedOperatorid = firstOperatorid;

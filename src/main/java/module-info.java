@@ -8,6 +8,7 @@ module com.davidskopljak.skopljakzavrsni {
     requires com.fasterxml.jackson.datatype.jsr310;
     requires com.fasterxml.jackson.databind;
     requires java.sql;
+    requires jdk.jconsole;
 
     opens com.davidskopljak.skopljakzavrsni.controller to javafx.fxml;
     exports com.davidskopljak.skopljakzavrsni.controller to javafx.graphics;

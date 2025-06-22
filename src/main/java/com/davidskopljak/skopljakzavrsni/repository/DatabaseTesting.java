@@ -79,9 +79,7 @@ public class DatabaseTesting {
 
         VehicleDamageType damageType = VehicleDamageType.TIRE;
 
-        Operator firstOperator = new Operator("First Operator", "First Operator");
-
-        Operator lastEditedOperator = firstOperator;
+        Operator firstOperator = new Operator("username", "First Operator", "First Operator");
 
         String damageDescription = "flat tire";
 
@@ -99,7 +97,7 @@ public class DatabaseTesting {
                 .setDamageCause(damageCause)
                 .setDamageType(damageType)
                 .setFirstOperator(firstOperator)
-                .setLastEditedOperator(lastEditedOperator)
+                .setLastEditedOperator(firstOperator)
                 .setLocation(location)
                 .setDamageDescription(damageDescription)
                 .setCreatedDateTime(LocalDateTime.now().truncatedTo(java.time.temporal.ChronoUnit.SECONDS))
