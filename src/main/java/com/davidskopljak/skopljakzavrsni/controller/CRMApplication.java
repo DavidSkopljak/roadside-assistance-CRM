@@ -15,7 +15,7 @@ public class CRMApplication extends Application {
     public static final Logger log = LoggerFactory.getLogger(CRMApplication.class);
     private static Stage PRIMARY_STAGE;
     private static Operator ACTIVE_OPERATOR;
-    private static Case UNFINISHED_NEW_CASE;
+    private static Case CASE_IN_PROGRESS;
 
     @Override
     public void start(Stage stage){
@@ -38,11 +38,11 @@ public class CRMApplication extends Application {
 
     public static void logIn(Operator operator){
         ACTIVE_OPERATOR = operator;
-        System.out.println("Logged in as operator: " + ACTIVE_OPERATOR.getUsername());
     }
 
     public static Stage getPrimaryStage() {return PRIMARY_STAGE;}
     private static void setPrimaryStage(Stage primaryStage) {CRMApplication.PRIMARY_STAGE = primaryStage;}
     public static Operator getActiveOperator() {return ACTIVE_OPERATOR;}
-    public static Case getUnfinishedNewCase() {if(UNFINISHED_NEW_CASE == null) {UNFINISHED_NEW_CASE = new Case();} return UNFINISHED_NEW_CASE;}
+    public static Case getCaseInProgress() {if(CASE_IN_PROGRESS == null) {CASE_IN_PROGRESS = new Case();} return CASE_IN_PROGRESS;}
+    public static void clearCaseInProgress() {CASE_IN_PROGRESS = null;}
 }

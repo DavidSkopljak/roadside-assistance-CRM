@@ -10,6 +10,8 @@ import java.io.IOException;
 
 public class MiscHelpers {
 
+    private MiscHelpers() {}
+
     public static void showAlert(String msg) {
         showAlert(msg, Alert.AlertType.INFORMATION);
     }

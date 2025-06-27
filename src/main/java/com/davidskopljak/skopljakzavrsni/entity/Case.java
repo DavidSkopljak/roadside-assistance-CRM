@@ -12,11 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-// case, needs info about client, their vehicle, total number of people who need assistance,
-// location of case, ability to assign driver, ability to add notes, cause of accident/vehicle damage, nature and description of
-// vehicle damage, ability to assign state of case(no driver assigned, driver en route, cancelled, resolved)
-
-//this class has required fields(Long id, Location location, Driver assignedDriver, Operator firstOperator, Vehicle clientVehicle, String damageDescription, CauseOfVehicleDamage causeOfDamage, VehicleDamageType damageType) and optional ones (caseNotes, lastEditedOperator)
 public non-sealed class Case extends Entity implements Trackable<CaseState>, Noteable {
     private Location location;
     private Operator firstOperator;
@@ -26,6 +21,11 @@ public non-sealed class Case extends Entity implements Trackable<CaseState>, Not
     private List<Note> caseNotes = new ArrayList<>();
     private String damageDescription;
     private Optional<Service> activeService = Optional.empty();
+
+    public void setCaseState(CaseState caseState) {
+        this.caseState = caseState;
+    }
+
     private CaseState caseState;
     private VehicleDamageType damageType;
     private VehicleDamageCause damageCause;

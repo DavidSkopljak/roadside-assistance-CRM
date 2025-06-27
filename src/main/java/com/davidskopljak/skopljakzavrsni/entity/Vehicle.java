@@ -1,10 +1,7 @@
 package com.davidskopljak.skopljakzavrsni.entity;
 
 import com.davidskopljak.skopljakzavrsni.enums.VehicleModel;
-import java.time.LocalDate;
 
-// vehicle, either for clients or tow truck drivers
-// needs license plate, mileage(optional), date of first registration(necessary to decide if car is under warranty, optional), VehicleBrand, VehicleType
 public class Vehicle extends Entity {
    private String licensePlate;
    private VehicleModel model;

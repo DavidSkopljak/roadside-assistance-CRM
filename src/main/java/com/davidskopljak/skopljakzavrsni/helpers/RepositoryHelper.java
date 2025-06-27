@@ -5,8 +5,12 @@ import com.davidskopljak.skopljakzavrsni.exceptions.EmptyResultSetException;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.List;
 
 public class RepositoryHelper {
+
+    private RepositoryHelper() {}
+
     public static CaseState queryCaseStateById(Long caseStateId, Connection conn) throws SQLException {
         String vehicleModelQuery = "SELECT case_state.state FROM case_state WHERE id = ?";
         try(PreparedStatement vmq = conn.prepareStatement(vehicleModelQuery)){
@@ -165,7 +169,7 @@ public class RepositoryHelper {
         }
     }
 
-    public static ArrayList<VehicleDamageType> queryAllVehicleDamageTypes(Connection conn) throws SQLException {
+    public static List<VehicleDamageType> queryAllVehicleDamageTypes(Connection conn) throws SQLException {
         String vehicleDamageTypeQuery = "SELECT vehicle_damage_type.damage_type FROM vehicle_damage_type";
         ArrayList<VehicleDamageType> types = new ArrayList<>();
         try(Statement stmt = conn.createStatement()){
@@ -184,7 +188,7 @@ public class RepositoryHelper {
         }
     }
 
-    public static ArrayList<VehicleDamageCause> queryAllVehicleDamageCauses(Connection conn) throws SQLException {
+    public static List<VehicleDamageCause> queryAllVehicleDamageCauses(Connection conn) throws SQLException {
         String vehicleDamageCauseQuery = "SELECT vehicle_damage_cause.damage_cause FROM vehicle_damage_cause";
         ArrayList<VehicleDamageCause> causes = new ArrayList<>();
         try(Statement stmt = conn.createStatement()){

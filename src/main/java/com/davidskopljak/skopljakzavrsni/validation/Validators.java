@@ -35,6 +35,20 @@ public class Validators {
         return true;
     }
 
+    public static Boolean isValidStringWithNumbers(String str) {
+        str = str.trim();
+        return !(str.isEmpty()) && str.matches("(?iu)[A-ZČĆŠŽĐ0-9 ]*");
+    }
+
+    public static Boolean isValidStringWithNumbers(List<String> list) {
+        for (String s : list) {
+            if (Boolean.FALSE.equals(isValidStringWithNumbers(s))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public static Boolean isValidHRPhoneNumber(String str){
         str = str.trim();
         str = str.replaceAll("\\s", "");

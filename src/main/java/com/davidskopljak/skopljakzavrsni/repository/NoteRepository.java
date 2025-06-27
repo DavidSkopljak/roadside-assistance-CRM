@@ -38,7 +38,7 @@ public class NoteRepository extends AbstractRepository<Note>{
 
     }
 
-    public ArrayList<Note> findAllById(Long id) throws SQLException {
+    public List<Note> findAllById(Long id) throws SQLException {
         return new ArrayList<>();
     }
 }

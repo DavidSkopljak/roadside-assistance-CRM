@@ -2,13 +2,10 @@ package com.davidskopljak.skopljakzavrsni.controller;
 
 import com.davidskopljak.skopljakzavrsni.entity.Operator;
 import com.davidskopljak.skopljakzavrsni.exceptions.AccountCreationExcepiton;
-import com.davidskopljak.skopljakzavrsni.exceptions.AccountLoginException;
 import com.davidskopljak.skopljakzavrsni.helpers.MiscHelpers;
 import com.davidskopljak.skopljakzavrsni.repository.OperatorRepository;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;

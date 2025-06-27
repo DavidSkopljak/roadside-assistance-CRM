@@ -1,6 +1,5 @@
 package com.davidskopljak.skopljakzavrsni.repository;
 
-import java.math.BigInteger;
 import java.sql.SQLException;
 import java.util.List;
 

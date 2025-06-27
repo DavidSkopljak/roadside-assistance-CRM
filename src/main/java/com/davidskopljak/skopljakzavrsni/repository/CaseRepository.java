@@ -9,7 +9,6 @@ import com.davidskopljak.skopljakzavrsni.helpers.RepositoryHelper;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -42,7 +41,7 @@ public class CaseRepository extends AbstractRepository<Case> {
     public List<Case> findAll() throws SQLException {
         List<Case> cases = new ArrayList<>();
         LOCK.lock();
-        String sql = "SELECT cases.id, cases.location_id, cases.first_operator_id, cases.last_edited_operator_id, cases.client_vehicle_id, cases.damage_description, cases.case_state_id, cases.damage_type_id, cases.vehicle_damage_cause_id, cases.created_date_time, cases.active_service_id, cases.client_id FROM cases WHERE 1 = 1";
+        String sql = "SELECT cases.id, cases.location_id, cases.first_operator_id, cases.last_edited_operator_id, cases.client_vehicle_id, cases.damage_description, cases.case_state_id, cases.damage_type_id, cases.vehicle_damage_cause_id, cases.created_date_time, cases.active_service_id, cases.client_id, cases.vehicle_first_registration_date FROM cases WHERE 1 = 1";
 
         try (Connection conn = DatabaseConnectionManager.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
@@ -169,7 +168,7 @@ public class CaseRepository extends AbstractRepository<Case> {
         ServiceRepository serviceRepository = new ServiceRepository();
         NoteRepository noteRepository = new NoteRepository();
 
-        ArrayList<Note> caseNotes = noteRepository.findAllById(caseId);
+        ArrayList<Note> caseNotes = new ArrayList<> (noteRepository.findAllById(caseId));
         Location location = locationRepository.findById(locationId);
         Operator firstOperator = operatorRepository.findById(firstOperatorId);
         Operator lastEditedOperator = operatorRepository.findById(lastEditedOperatorId);

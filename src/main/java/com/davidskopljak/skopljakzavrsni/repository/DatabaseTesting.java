@@ -9,10 +9,26 @@ import java.math.BigDecimal;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 public class DatabaseTesting {
     public static void main(String[] args) throws IOException, SQLException {
+
+        CaseRepository caseRepository = new CaseRepository();
+        List<Case> cases = caseRepository.findAll();
+        for (Case case1 : cases) {
+            System.out.println(case1.getId());
+            System.out.println(case1.getClient().getFirstName());
+            System.out.println(case1.getClient().getLastName());
+            System.out.println(case1.getClientVehicle().getLicensePlate());
+            System.out.println(case1.getState());
+            System.out.println(case1.getCreatedDateTime());
+            System.out.println(case1.getActiveService().isPresent());
+            if(case1.getActiveService().isPresent()){
+                System.out.println(case1.getActiveService().get().getAssignedDriver().getFirstName());
+            }
+        }
         /*VehicleRepository vehicleRepository = new VehicleRepository();
         try{
             Long vehicleId = vehicleRepository.save(new Vehicle("TESTPLATE2", VehicleModel.BMW, null, "11111111111111112"));
@@ -65,7 +81,7 @@ public class DatabaseTesting {
             System.out.println(service.getAssignedDriver().getFirstName() + " " + service.getAssignedDriver().getLastName());
             System.out.println(service.getServiceType());
             System.out.println();
-        }*/
+        }
 
         Location location = new Location("address", "city", "country", "postalCode", new BigDecimal(45.8089772239981), new BigDecimal(15.716704654770382));
 
@@ -108,7 +124,7 @@ public class DatabaseTesting {
         System.out.println("saved case(id " + caseId + ")");
         System.out.println(LocalDateTime.now().truncatedTo(java.time.temporal.ChronoUnit.SECONDS));
 
-        /*
+
         Long id = workshopRepository.save(new Workshop("workshop_test" , location));
 
         System.out.println("saved workshop record(id " + id + ")");

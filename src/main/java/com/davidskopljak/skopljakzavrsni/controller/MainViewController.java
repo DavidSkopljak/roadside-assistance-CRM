@@ -1,7 +1,8 @@
 package com.davidskopljak.skopljakzavrsni.controller;
 
 import com.davidskopljak.skopljakzavrsni.entity.*;
-import com.davidskopljak.skopljakzavrsni.enums.VehicleModel;
+import com.davidskopljak.skopljakzavrsni.exceptions.RepositoryAccessException;
+import com.davidskopljak.skopljakzavrsni.repository.CaseRepository;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -14,24 +15,59 @@ public class MainViewController {
     private TableColumn<Case, Long> caseIdTableColumn;
 
     @FXML
-    private TableColumn<Client, String> lastNameTableColumn;
+    private TableColumn<Case, String> lastNameTableColumn;
 
     @FXML
-    private TableColumn<Client, String> firstNameTableColumn;
+    private TableColumn<Case, String> firstNameTableColumn;
 
     @FXML
-    private TableColumn<VehicleModel, String> vehicleBrandTableColumn;
+    private TableColumn<Case, String> vehicleBrandTableColumn;
 
     @FXML
-    private TableColumn<Vehicle, String> licensePlateTableColumn;
+    private TableColumn<Case, String> licensePlateTableColumn;
 
     @FXML
-    private TableColumn<Location, String> locationTableColumn;
+    private TableColumn<Case, String> locationTableColumn;
 
     @FXML
-    private TableColumn<Operator, String> firstEditedOperatorTableColumn;
+    private TableColumn<Case, String> firstEditedOperatorTableColumn;
 
     @FXML
-    private TableColumn<Operator, String> lastEditedOperatorTableColumn;
+    private TableColumn<Case, String> lastEditedOperatorTableColumn;
+
+    public void initialize() {
+
+        caseIdTableColumn.setCellValueFactory(cellData ->
+                new javafx.beans.property.SimpleLongProperty(cellData.getValue().getId()).asObject());
+
+        lastNameTableColumn.setCellValueFactory(cellData ->
+                new javafx.beans.property.SimpleStringProperty(cellData.getValue().getClient().getLastName()));
+
+        firstNameTableColumn.setCellValueFactory(cellData ->
+                new javafx.beans.property.SimpleStringProperty(cellData.getValue().getClient().getFirstName()));
+
+        vehicleBrandTableColumn.setCellValueFactory(cellData ->
+                new javafx.beans.property.SimpleStringProperty(cellData.getValue().getClientVehicle().getModel().toString()));
+
+        locationTableColumn.setCellValueFactory(cellData ->
+                new javafx.beans.property.SimpleStringProperty(cellData.getValue().getLocation().getAddress() + ", " + cellData.getValue().getLocation().getCity()));
+
+        licensePlateTableColumn.setCellValueFactory(cellData ->
+                new javafx.beans.property.SimpleStringProperty(cellData.getValue().getClientVehicle().getLicensePlate()));
+
+        firstEditedOperatorTableColumn.setCellValueFactory(cellData ->
+                new javafx.beans.property.SimpleStringProperty(cellData.getValue().getFirstOperator().getFirstName() + " " + cellData.getValue().getFirstOperator().getLastName()));
+
+        lastEditedOperatorTableColumn.setCellValueFactory(cellData ->
+                new javafx.beans.property.SimpleStringProperty(cellData.getValue().getLastEditedOperator().getFirstName() + " " + cellData.getValue().getLastEditedOperator().getLastName()));
+
+        try{
+            CaseRepository caseRepository = new CaseRepository();
+            casesTableView.getItems().addAll(caseRepository.findAll());
+        } catch (Exception e) {
+            throw new RepositoryAccessException("Failed to load cases: " + e);
+        }
+
+    }
 
 }

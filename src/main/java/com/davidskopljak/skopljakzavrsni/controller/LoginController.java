@@ -1,13 +1,10 @@
 package com.davidskopljak.skopljakzavrsni.controller;
 
-import com.davidskopljak.skopljakzavrsni.entity.Operator;
 import com.davidskopljak.skopljakzavrsni.exceptions.AccountLoginException;
 import com.davidskopljak.skopljakzavrsni.helpers.MiscHelpers;
 import com.davidskopljak.skopljakzavrsni.repository.OperatorRepository;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
@@ -19,8 +16,6 @@ import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
-import java.util.List;
-import java.util.Optional;
 
 public class LoginController {
     @FXML
@@ -52,7 +47,7 @@ public class LoginController {
             String firstName = null;
             String lastName = null;
 
-            try (BufferedReader reader = Files.newBufferedReader(existingUsersPath)) {
+            try (BufferedReader reader = new BufferedReader(new FileReader(existingUsersPath.toFile()))) {
                 String storedUsername;
                 while ((storedUsername = reader.readLine()) != null) {
                     String storedHash = reader.readLine();

@@ -3,7 +3,6 @@ package com.davidskopljak.skopljakzavrsni.repository;
 import com.davidskopljak.skopljakzavrsni.entity.Operator;
 import com.davidskopljak.skopljakzavrsni.exceptions.EmptyResultSetException;
 import com.davidskopljak.skopljakzavrsni.exceptions.RepositoryAccessException;
-import com.sun.tools.jconsole.JConsoleContext;
 
 import java.sql.*;
 import java.util.ArrayList;
