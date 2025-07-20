@@ -90,10 +90,10 @@ public class DriverRepository extends AbstractRepository<Driver> {
         String sql = "INSERT INTO driver (first_name, last_name, contact_number, vehicle_id, current_location_id, driver_state_id) VALUES (?, ?, ?, ?, ?, ?) RETURNING id";
         try (Connection conn = DatabaseConnectionManager.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)){
-            
+
             VehicleRepository vehicleRepository = new VehicleRepository();
             Long vehicleId = vehicleRepository.save(entity.getVehicle());
-            
+
             LocationRepository locationRepository = new LocationRepository();
             Long locationId = locationRepository.save(entity.getCurrentLocation());
 
@@ -123,9 +123,39 @@ public class DriverRepository extends AbstractRepository<Driver> {
     }
 
     @Override
-    public void update(Long id) throws SQLException {
+    public void update(Driver entity) throws SQLException {
+        LOCK.lock();
+        String sql = "UPDATE driver SET first_name = ?, last_name = ?, contact_number = ?, vehicle_id = ?, current_location_id = ?, driver_state_id = ? WHERE id = ?";
 
+        try (Connection conn = DatabaseConnectionManager.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            VehicleRepository vehicleRepository = new VehicleRepository();
+            vehicleRepository.update(entity.getVehicle());
+            ps.setLong(4, entity.getVehicle().getId());
+
+            LocationRepository locationRepository = new LocationRepository();
+            locationRepository.update(entity.getCurrentLocation());
+            ps.setLong(5, entity.getCurrentLocation().getId());
+
+            Long driverStateId = RepositoryHelper.queryDriverStateByState(entity.getState(), conn);
+            ps.setLong(6, driverStateId);
+
+            ps.setString(1, entity.getFirstName());
+            ps.setString(2, entity.getLastName());
+            ps.setString(3, entity.getContactNumber());
+
+            ps.setLong(7, entity.getId());
+
+            ps.executeUpdate();
+
+        } catch (RepositoryAccessException | SQLException e) {
+            throw new RepositoryAccessException(e.getMessage(), e);
+        } finally {
+            LOCK.unlock();
+        }
     }
+
 
     @Override
     public void deleteById(Long id) throws SQLException {
@@ -133,8 +163,56 @@ public class DriverRepository extends AbstractRepository<Driver> {
     }
 
     @Override
-    public void saveAll(List<Long> id) throws SQLException {
+    public List<Driver> saveAll(List<Driver> entities) throws SQLException {
+        LOCK.lock();
+        List<Driver> savedDrivers = new ArrayList<>();
+        String sql = "INSERT INTO driver (first_name, last_name, contact_number, vehicle_id, current_location_id, driver_state_id) " +
+                "VALUES (?, ?, ?, ?, ?, ?) RETURNING id";
 
+        try (Connection conn = DatabaseConnectionManager.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            VehicleRepository vehicleRepository = new VehicleRepository();
+            LocationRepository locationRepository = new LocationRepository();
+
+            for (Driver entity : entities) {
+                Long vehicleId = vehicleRepository.save(entity.getVehicle());
+                Long locationId = locationRepository.save(entity.getCurrentLocation());
+                Long driverStateId = RepositoryHelper.queryDriverStateByState(entity.getState(), conn);
+
+                ps.setString(1, entity.getFirstName());
+                ps.setString(2, entity.getLastName());
+                ps.setString(3, entity.getContactNumber());
+                ps.setLong(4, vehicleId);
+                ps.setLong(5, locationId);
+                ps.setLong(6, driverStateId);
+
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        long generatedId = rs.getLong("id");
+                        Driver savedDriver = new Driver(
+                                generatedId,
+                                entity.getFirstName(),
+                                entity.getLastName(),
+                                entity.getContactNumber(),
+                                entity.getCurrentLocation(),
+                                entity.getVehicle(),
+                                entity.getState()
+                        );
+                        savedDrivers.add(savedDriver);
+                    } else {
+                        throw new EmptyResultSetException("No ID returned for inserted driver.");
+                    }
+                }
+            }
+
+            return savedDrivers;
+
+        } catch (RepositoryAccessException | SQLException e) {
+            throw new RepositoryAccessException(e.getMessage(), e);
+        } finally {
+            LOCK.unlock();
+        }
     }
 
 

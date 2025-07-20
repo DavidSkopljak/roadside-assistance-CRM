@@ -3,8 +3,10 @@ package com.davidskopljak.skopljakzavrsni.helpers;
 import com.davidskopljak.skopljakzavrsni.controller.CRMApplication;
 import com.davidskopljak.skopljakzavrsni.exceptions.AccountLoginException;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.stage.Stage;
 
 import java.io.IOException;
 
@@ -33,6 +35,23 @@ public class MiscHelpers {
         } catch(IOException e) {
             CRMApplication.log.error(e.getMessage());
             throw new AccountLoginException("Could not load scene with URL: " + sceneUrl + ".");
+        }
+    }
+
+    public static Stage loadSceneInNewStage(String sceneUrl, String title) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(CRMApplication.class.getResource(sceneUrl));
+            Parent root = fxmlLoader.load();
+
+            Stage stage = new Stage();
+            stage.setTitle(title);
+            stage.setScene(new Scene(root));
+            stage.show();
+
+            return stage;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 

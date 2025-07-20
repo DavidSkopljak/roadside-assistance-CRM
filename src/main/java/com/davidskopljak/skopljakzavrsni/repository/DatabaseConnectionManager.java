@@ -43,12 +43,10 @@ public class DatabaseConnectionManager {
         return INSTANCE;
     }
 
-    // Get a connection from the pool
     public Connection getConnection() throws SQLException {
         return dataSource.getConnection();
     }
 
-    // Optional: Close the connection pool when application shuts down
     public void close() {
         if (dataSource != null) {
             dataSource.close();

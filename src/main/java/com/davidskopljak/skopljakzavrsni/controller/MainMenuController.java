@@ -4,6 +4,6 @@ import com.davidskopljak.skopljakzavrsni.helpers.MiscHelpers;
 
 public class MainMenuController {
     public void handleNewCase() {
-        MiscHelpers.loadScene("new-case.fxml", "New case");
+        MiscHelpers.loadScene("case.fxml", "New case");
     }
 }

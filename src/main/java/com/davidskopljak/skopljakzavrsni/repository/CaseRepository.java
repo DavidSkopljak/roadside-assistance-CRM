@@ -125,8 +125,63 @@ public class CaseRepository extends AbstractRepository<Case> {
     }
 
     @Override
-    public void update(Long id) throws SQLException {
+    public void update(Case entity) throws SQLException {
+        LOCK.lock();
+        String sql = "UPDATE cases SET location_id = ?, first_operator_id = ?, last_edited_operator_id = ?, client_vehicle_id = ?, damage_description = ?, case_state_id = ?, damage_type_id = ?, vehicle_damage_cause_id = ?, created_date_time = ?, active_service_id = ?, client_id = ?, vehicle_first_registration_date = ? WHERE id = ?";
 
+        try (Connection conn = DatabaseConnectionManager.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)){
+
+            LocationRepository locationRepository = new LocationRepository();
+            VehicleRepository vehicleRepository = new VehicleRepository();
+            ServiceRepository serviceRepository = new ServiceRepository();
+            ClientRepository clientRepository = new ClientRepository();
+
+            locationRepository.update(entity.getLocation());
+            ps.setLong(1, entity.getLocation().getId());
+
+            Long firstOperatorid = entity.getFirstOperator().getId();
+            ps.setLong(2, firstOperatorid);
+
+            Long lasteditedOperatorid = entity.getLastEditedOperator().getId();
+            ps.setLong(3, lasteditedOperatorid);
+
+            vehicleRepository.update(entity.getClientVehicle());
+            ps.setLong(4, entity.getClientVehicle().getId());
+
+            ps.setString(5, entity.getDamageDescription());
+
+            Long caseStateId = RepositoryHelper.queryCaseStateByState(entity.getState(), conn);
+            ps.setLong(6, caseStateId);
+
+            Long damageTypeId = RepositoryHelper.queryVehicleDamageTypeByType(entity.getDamageType(), conn);
+            ps.setLong(7, damageTypeId);
+
+            Long damageCauseId = RepositoryHelper.queryVehicleDamageCauseByCause(entity.getDamageCause(), conn);
+            ps.setLong(8, damageCauseId);
+
+            ps.setTimestamp(9, Timestamp.valueOf(entity.getCreatedDateTime()));
+
+            if(entity.getActiveService().isPresent()){
+                serviceRepository.update(entity.getActiveService().get());
+                ps.setLong(10, entity.getActiveService().get().getId());
+            }else{
+                ps.setNull(10, java.sql.Types.NULL);
+            }
+
+            clientRepository.update(entity.getClient());
+            ps.setLong(11, entity.getClient().getId());
+
+            ps.setTimestamp(12, Timestamp.valueOf(entity.getClientVehicleFirstRegistrationDate().atStartOfDay()));
+
+            ps.setLong(13, entity.getId());
+
+            ps.executeUpdate();
+        }catch(RepositoryAccessException | SQLException e){
+            throw new RepositoryAccessException(e.getMessage(), e);
+        }finally {
+            LOCK.unlock();
+        }
     }
 
     @Override
@@ -135,8 +190,78 @@ public class CaseRepository extends AbstractRepository<Case> {
     }
 
     @Override
-    public void saveAll(List<Long> id) throws SQLException {
+    public List<Case> saveAll(List<Case> cases) throws SQLException {
+        LOCK.lock();
 
+        String sql = "INSERT INTO cases (location_id, first_operator_id, last_edited_operator_id, client_vehicle_id, " +
+                "damage_description, case_state_id, damage_type_id, vehicle_damage_cause_id, created_date_time, " +
+                "active_service_id, client_id, vehicle_first_registration_date) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id";
+
+        List<Case> savedCases = new ArrayList<>();
+
+        try (Connection conn = DatabaseConnectionManager.getInstance().getConnection()) {
+            LocationRepository locationRepository = new LocationRepository();
+            VehicleRepository vehicleRepository = new VehicleRepository();
+            ServiceRepository serviceRepository = new ServiceRepository();
+            ClientRepository clientRepository = new ClientRepository();
+
+            for (Case entity : cases) {
+                try (PreparedStatement ps = conn.prepareStatement(sql)) {
+
+                    Long locationId = locationRepository.save(entity.getLocation());
+                    ps.setLong(1, locationId);
+
+                    Long firstOperatorId = entity.getFirstOperator().getId();
+                    ps.setLong(2, firstOperatorId);
+                    ps.setLong(3, firstOperatorId);
+
+                    Long clientVehicleId = vehicleRepository.save(entity.getClientVehicle());
+                    ps.setLong(4, clientVehicleId);
+
+                    ps.setString(5, entity.getDamageDescription());
+
+                    Long caseStateId = RepositoryHelper.queryCaseStateByState(entity.getState(), conn);
+                    ps.setLong(6, caseStateId);
+
+                    Long damageTypeId = RepositoryHelper.queryVehicleDamageTypeByType(entity.getDamageType(), conn);
+                    ps.setLong(7, damageTypeId);
+
+                    Long damageCauseId = RepositoryHelper.queryVehicleDamageCauseByCause(entity.getDamageCause(), conn);
+                    ps.setLong(8, damageCauseId);
+
+                    ps.setTimestamp(9, Timestamp.valueOf(entity.getCreatedDateTime()));
+
+                    if (entity.getActiveService().isPresent()) {
+                        Long activeServiceId = serviceRepository.save(entity.getActiveService().get());
+                        ps.setLong(10, activeServiceId);
+                    } else {
+                        ps.setNull(10, java.sql.Types.NULL);
+                    }
+
+                    Long clientId = clientRepository.save(entity.getClient());
+                    ps.setLong(11, clientId);
+
+                    ps.setTimestamp(12, Timestamp.valueOf(entity.getClientVehicleFirstRegistrationDate().atStartOfDay()));
+
+                    try (ResultSet rs = ps.executeQuery()) {
+                        if (rs.next()) {
+                            entity.setId(rs.getLong("id"));
+                            savedCases.add(entity);
+                        } else {
+                            throw new EmptyResultSetException("No id retrieved for Case: " + entity);
+                        }
+                    }
+                }
+            }
+
+            return savedCases;
+
+        } catch (RepositoryAccessException | SQLException e) {
+            throw new RepositoryAccessException(e.getMessage(), e);
+        } finally {
+            LOCK.unlock();
+        }
     }
 
     private Case extractCase(ResultSet rs, Connection conn) throws SQLException {

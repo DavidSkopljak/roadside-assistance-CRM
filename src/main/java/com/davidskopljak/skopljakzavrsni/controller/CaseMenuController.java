@@ -1,37 +1,47 @@
 package com.davidskopljak.skopljakzavrsni.controller;
 
+import com.davidskopljak.skopljakzavrsni.enums.CaseState;
+import com.davidskopljak.skopljakzavrsni.exceptions.RepositoryAccessException;
 import com.davidskopljak.skopljakzavrsni.helpers.MiscHelpers;
-import javafx.event.ActionEvent;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
+import com.davidskopljak.skopljakzavrsni.repository.CaseRepository;
 
-import java.io.IOException;
+import java.sql.SQLException;
 
-public class CaseMenuController {
-    public void handleViewCaseInfo() {
-        MiscHelpers.loadScene("case.fxml", "View case info");
-    }
+public class CaseMenuController{
+    private CaseWindowController caseWindowController;
 
-    public void handleViewServices() {
-        MiscHelpers.loadScene("case-services.fxml", "View services");
-    }
+    public void handleViewCaseInfo(){caseWindowController.loadScene("case.fxml", "View case info",  CaseInfoController.class);}
 
-    public void handleViewLocationInfo(){
-        MiscHelpers.loadScene("case-location.fxml", "View location");
-    }
+    public void handleViewLocationInfo() {caseWindowController.loadScene("case-location.fxml", "View case info",  CaseLocationController.class);}
 
     public void handleSaveCase() {
+        try{
+            CaseRepository caseRepository = new CaseRepository();
+            CRMApplication.getCaseInProgress().setCaseState(CaseState.ACTIVE);
+            caseRepository.save(CRMApplication.getCaseInProgress());
+            CRMApplication.clearCaseInProgress();
+            MiscHelpers.loadScene("main-view.fxml", "Main menu");
 
+            CaseRepository caseRepository = new CaseRepository();
+            caseWindowController.getactiveCase().setCaseState(CaseState.ACTIVE);
+            if( caseWindowController.getactiveCase().getId() != null){
+                caseRepository.update(caseWindowController.getactiveCase()));
+            }else {
+                caseRepository.save(caseWindowController.getactiveCase());
+            }
+
+        }catch(SQLException e){
+            throw new RepositoryAccessException("Failed to save new case: " + e);
+        }
     }
 
-    public void handleNewService(ActionEvent actionEvent) {
+    public void handleCancelCase() {
+        CRMApplication.clearCaseInProgress();
+        MiscHelpers.loadScene("main-view.fxml", "Main menu");
     }
 
-    public void handleResolveCase(ActionEvent actionEvent) {
+    public void setCaseWindowController(CaseWindowController controller) {
+        System.out.println("Setting case window controller inside CaseMenuController: " + controller.getClass().getSimpleName());
+        this.caseWindowController = controller;
     }
-
-    public void handleCancelCase(ActionEvent actionEvent) {
-    }
-
-
 }

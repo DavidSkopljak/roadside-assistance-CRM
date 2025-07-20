@@ -52,7 +52,7 @@ public class LocationRepository extends AbstractRepository<Location> {
         LOCK.lock();
         List<Location> locations = new ArrayList<>();
 
-        String sql = "SELECT location.id, location.address, location.city, location.country, location.postal_code, location.coordinates_x, location.coordinates_y FROM location WHERE 1 = 1";
+        String sql = "SELECT location.id, location.address, location.city, location.country, location.postal_code, location.coordinates_x, location.coordinates_y FROM location";
         try (Connection conn = DatabaseConnectionManager.getInstance().getConnection();
              final PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()){
@@ -83,20 +83,20 @@ public class LocationRepository extends AbstractRepository<Location> {
         try (Connection conn = DatabaseConnectionManager.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)){
 
-            ps.setString(1, entity.getAddress());
-            ps.setString(2, entity.getCity());
-            ps.setString(3, entity.getCountry());
-            ps.setString(4, entity.getPostalCode());
-            ps.setBigDecimal(5, entity.getCoordinatesX());
-            ps.setBigDecimal(6, entity.getCoordinatesY());
+                ps.setString(1, entity.getAddress());
+                ps.setString(2, entity.getCity());
+                ps.setString(3, entity.getCountry());
+                ps.setString(4, entity.getPostalCode());
+                ps.setBigDecimal(5, entity.getCoordinatesX());
+                ps.setBigDecimal(6, entity.getCoordinatesY());
 
-            try(ResultSet rs = ps.executeQuery();){
-                if (rs.next()) {
-                    return rs.getLong("id");
-                }else{
-                    throw new EmptyResultSetException("No id retrieved for created operator, possible issue with database");
+                try(ResultSet rs = ps.executeQuery();){
+                    if (rs.next()) {
+                        return rs.getLong("id");
+                    }else{
+                        throw new EmptyResultSetException("No id retrieved for created location " + entity.getId() + ", possible issue with database");
+                    }
                 }
-            }
 
         }catch(RepositoryAccessException e){
             throw new RepositoryAccessException(e.getMessage(), e);
@@ -106,17 +106,72 @@ public class LocationRepository extends AbstractRepository<Location> {
     }
 
     @Override
-    public void update(Long id) throws SQLException {
-
+    public void update(Location entity) throws SQLException {
+        LOCK.lock();
+        String sql = "UPDATE location SET address = ?, city = ?, country = ?, postal_code = ?, coordinates_x = ?, coordinates_y = ? WHERE id = ?";
+        try (Connection conn = DatabaseConnectionManager.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)){
+            ps.setString(1, entity.getAddress());
+            ps.setString(2, entity.getCity());
+            ps.setString(3, entity.getCountry());
+            ps.setString(4, entity.getPostalCode());
+            ps.setBigDecimal(5, entity.getCoordinatesX());
+            ps.setBigDecimal(6, entity.getCoordinatesY());
+            ps.setLong(7, entity.getId());
+        }catch(RepositoryAccessException e){
+            throw new RepositoryAccessException(e.getMessage(), e);
+        }finally {
+            LOCK.unlock();
+        }
     }
 
     @Override
     public void deleteById(Long id) throws SQLException {
-
+        LOCK.lock();
+        String sql = "DELETE FROM location WHERE id = ?";
+        try (Connection conn = DatabaseConnectionManager.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)){
+            ps.setLong(1, id);
+            ps.executeUpdate();
+        }catch(RepositoryAccessException e){
+            throw new RepositoryAccessException(e.getMessage(), e);
+        }finally {
+            LOCK.unlock();
+        }
     }
 
     @Override
-    public void saveAll(List<Long> id) throws SQLException {
+    public List<Location> saveAll(List<Location> entities) throws SQLException {
+        LOCK.lock();
+        String sql = "INSERT INTO location (address, city, country, postal_code, coordinates_x, coordinates_y) " +
+                "VALUES (?, ?, ?, ?, ?, ?) RETURNING id";
 
+        try (Connection conn = DatabaseConnectionManager.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            for (Location entity : entities) {
+                ps.setString(1, entity.getAddress());
+                ps.setString(2, entity.getCity());
+                ps.setString(3, entity.getCountry());
+                ps.setString(4, entity.getPostalCode());
+                ps.setBigDecimal(5, entity.getCoordinatesX());
+                ps.setBigDecimal(6, entity.getCoordinatesY());
+
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        long generatedId = rs.getLong("id");
+                        entity.setId(generatedId);  // update entity with DB-generated id
+                    } else {
+                        throw new EmptyResultSetException("No id retrieved for location: " + entity.getAddress());
+                    }
+                }
+            }
+
+            return entities;  // return the updated list with IDs set
+        } catch (RepositoryAccessException | SQLException e) {
+            throw new RepositoryAccessException(e.getMessage(), e);
+        } finally {
+            LOCK.unlock();
+        }
     }
 }

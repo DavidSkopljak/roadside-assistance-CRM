@@ -8,16 +8,21 @@ import com.davidskopljak.skopljakzavrsni.exceptions.InvalidCaseInfoException;
 import com.davidskopljak.skopljakzavrsni.exceptions.RepositoryAccessException;
 import com.davidskopljak.skopljakzavrsni.helpers.MiscHelpers;
 import com.davidskopljak.skopljakzavrsni.helpers.RepositoryHelper;
+import com.davidskopljak.skopljakzavrsni.interfaces.CaseController;
 import com.davidskopljak.skopljakzavrsni.repository.*;
 import com.davidskopljak.skopljakzavrsni.validation.Validators;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.AnchorPane;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -25,7 +30,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
-public class NewCaseController {
+public class CaseInfoController implements CaseController {
     @FXML
     private TextField firstNameTextField;
     @FXML
@@ -46,7 +51,8 @@ public class NewCaseController {
     private ComboBox<VehicleDamageType> damageTypeComboBox;
     @FXML
     private ComboBox<VehicleDamageCause> damageCauseComboBox;
-
+    @FXML
+    private AnchorPane rootAnchorPane;
 
     String firstName;
     String lastName;
@@ -59,6 +65,31 @@ public class NewCaseController {
     VehicleDamageType damageType;
     VehicleDamageCause damageCause;
 
+    private CaseWindowController caseWindowController;
+    private CaseMenuController caseMenuController;
+
+    public void setCaseWindowController(CaseWindowController caseWindowController){
+        this.caseWindowController = caseWindowController;
+        try {
+            FXMLLoader loader = new FXMLLoader(CRMApplication.class.getResource("case-menu.fxml"));
+            Parent menuRoot = loader.load();
+            caseMenuController = loader.getController();
+
+            // Add the menu to your root pane
+            rootAnchorPane.getChildren().add(0, menuRoot); // Add at index 0 to put it at the top
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        injectCaseMenuControllerWindowReference();
+        initializeActiveCase();
+    }
+
+    public void injectCaseMenuControllerWindowReference() {
+        if (caseMenuController != null) {
+            caseMenuController.setCaseWindowController(caseWindowController);
+        }
+    }
 
     public void initialize() throws SQLException {
         try (Connection conn = DatabaseConnectionManager.getInstance().getConnection();){
@@ -76,8 +107,10 @@ public class NewCaseController {
         }catch(RepositoryAccessException e){
             throw new RepositoryAccessException("Failed to load vehicle models, damage types or damage causes from database: " + e.getMessage());
         }
+    }
 
-        Case caseInProgress = CRMApplication.getCaseInProgress();
+    private void initializeActiveCase() {
+        Case caseInProgress = this.caseWindowController.getactiveCase();
 
         Client client = caseInProgress.getClient();
         if (client != null) {
@@ -106,10 +139,40 @@ public class NewCaseController {
             damageCauseComboBox.getSelectionModel().select(caseInProgress.getDamageCause());
     }
 
+
+    public void setCase(Case existingCase){
+        Client client = existingCase.getClient();
+        if (client != null) {
+            setText(firstNameTextField, client.getFirstName());
+            setText(lastNameTextField, client.getLastName());
+            setText(contactNumberTextField, client.getContactNumber());
+        }
+
+        Vehicle vehicle = existingCase.getClientVehicle();
+        if (vehicle != null) {
+            setText(licensePlateTextField, vehicle.getLicensePlate());
+            setText(vinTextField, vehicle.getVin());
+            modelComboBox.getSelectionModel().select(vehicle.getModel());
+        }
+
+        if (existingCase.getDamageDescription() != null)
+            setText(damageDescriptionTextField, existingCase.getDamageDescription());
+
+        if (existingCase.getClientVehicleFirstRegistrationDate() != null)
+            firstRegDateDatePicker.setValue(existingCase.getClientVehicleFirstRegistrationDate());
+
+        if (existingCase.getDamageType() != null)
+            damageTypeComboBox.getSelectionModel().select(existingCase.getDamageType());
+
+        if (existingCase.getDamageCause() != null)
+            damageCauseComboBox.getSelectionModel().select(existingCase.getDamageCause());
+    }
+
     private static void setText(TextField field, String value) {
         field.setText(value == null ? "" : value);
     }
 
+    @FXML
     public void setCaseInfo() {
 
         firstName = firstNameTextField.getText();

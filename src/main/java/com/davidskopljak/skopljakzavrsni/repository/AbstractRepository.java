@@ -7,7 +7,7 @@ public abstract class AbstractRepository <T>{
     public abstract T findById(Long id) throws SQLException;
     public abstract List<T> findAll() throws SQLException;
     public abstract Long save(T entity) throws SQLException;
-    public abstract void update(Long id) throws SQLException;
+    public abstract void update(T entity) throws SQLException;
     public abstract void deleteById(Long id) throws SQLException;
-    public abstract void saveAll(List<Long> id) throws SQLException;
+    public abstract List<T> saveAll(List<T> entities) throws SQLException;
 }

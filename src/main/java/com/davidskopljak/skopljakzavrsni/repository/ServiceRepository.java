@@ -33,18 +33,12 @@ public class ServiceRepository extends AbstractRepository<Service> {
                     Long assignedDriverId = rs.getLong("assigned_driver_id");
                     Long serviceTypeId = rs.getLong("service_type_id");
                     Long serviceStateId = rs.getLong("service_state_id");
-                    String serviceNotes = rs.getString("service_notes");
 
                     Driver assignedDriver = queryAssignedDriverById(assignedDriverId);
                     ServiceType serviceType = queryServiceTypeById(serviceTypeId, conn);
                     ServiceState serviceState = queryServiceStateById(serviceStateId, conn);
 
-                    Service service = new Service(serviceId, assignedDriver, serviceType, serviceState);
-                    if(!"[]".equals(serviceNotes)) {
-                        //service.addNotes(serviceNotes);
-                    }
-
-                    return service;
+                    return new Service(serviceId, assignedDriver, serviceType, serviceState);
                 }else{
                     throw new EmptyResultSetException("service with id " + id + " not found");
                 }
@@ -71,17 +65,12 @@ public class ServiceRepository extends AbstractRepository<Service> {
                     Long assignedDriverId = rs.getLong("assigned_driver_id");
                     Long serviceTypeId = rs.getLong("service_type_id");
                     Long serviceStateId = rs.getLong("service_state_id");
-                    String serviceNotes = rs.getString("service_notes");
 
                     Driver assignedDriver = queryAssignedDriverById(assignedDriverId);
                     ServiceType serviceType = queryServiceTypeById(serviceTypeId, conn);
                     ServiceState serviceState = queryServiceStateById(serviceStateId, conn);
 
                     Service service = new Service(serviceId, assignedDriver, serviceType, serviceState);
-                    if(!"[]".equals(serviceNotes)) {
-                        //service.addNotes(serviceNotes);
-                    }
-
                     services.add(service);
                 }
                 return services;

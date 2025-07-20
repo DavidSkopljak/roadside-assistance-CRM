@@ -3,18 +3,22 @@ package com.davidskopljak.skopljakzavrsni.controller;
 import com.davidskopljak.skopljakzavrsni.entity.*;
 import com.davidskopljak.skopljakzavrsni.exceptions.InvalidCaseLocationException;
 import com.davidskopljak.skopljakzavrsni.helpers.MiscHelpers;
+import com.davidskopljak.skopljakzavrsni.interfaces.CaseController;
 import com.davidskopljak.skopljakzavrsni.validation.Validators;
 import com.sothawo.mapjfx.*;
 import com.sothawo.mapjfx.event.MapViewEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 
-public class NewCaseLocationController {
+public class CaseLocationController implements CaseController {
 
     @FXML
     private TextField countryTextField;
@@ -30,8 +34,12 @@ public class NewCaseLocationController {
     private TextField coordinatesYTextField;
     @FXML
     private AnchorPane mapContainer;
+    @FXML
+    private AnchorPane rootAnchorPane;
 
     private final MapView mapView = new MapView();
+    private CaseWindowController caseWindowController;
+    private CaseMenuController caseMenuController;
 
     String country;
     String city;
@@ -40,18 +48,27 @@ public class NewCaseLocationController {
     String coordinatesX;
     String coordinatesY;
 
-    public void initialize(){
-        Case caseInProgress = CRMApplication.getCaseInProgress();
-        Location location = caseInProgress.getLocation();
-        if (location != null) {
-            setText(countryTextField, location.getCountry());
-            setText(cityTextField, location.getCity());
-            setText(addressTextField, location.getAddress());
-            setText(postalCodeTextField, location.getPostalCode());
-            setText(coordinatesXTextField, location.getCoordinatesX().toString());
-            setText(coordinatesYTextField, location.getCoordinatesY().toString());
+    public void setCaseWindowController(CaseWindowController caseWindowController){
+        this.caseWindowController = caseWindowController;
+        try {
+            FXMLLoader loader = new FXMLLoader(CRMApplication.class.getResource("case-menu.fxml"));
+            Parent menuRoot = loader.load();
+            caseMenuController = loader.getController();
+            rootAnchorPane.getChildren().add(0, menuRoot); // Add at index 0 to put it at the top
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+        injectCaseMenuControllerWindowReference();
+        initializeActiveCase();
+    }
 
+    public void injectCaseMenuControllerWindowReference() {
+        if (caseMenuController != null && caseWindowController != null) {
+            caseMenuController.setCaseWindowController(caseWindowController);
+        }
+    }
+
+    public void initialize(){
         mapView.setMapType(MapType.OSM);
         mapView.initialize(Configuration.builder()
                 .showZoomControls(true)
@@ -88,6 +105,20 @@ public class NewCaseLocationController {
         AnchorPane.setLeftAnchor(mapView, 0.0);
 
         mapContainer.getChildren().add(mapView);
+    }
+
+    private void initializeActiveCase() {
+        Case caseInProgress = this.caseWindowController.getactiveCase();
+
+        Location location = caseInProgress.getLocation();
+        if (location != null) {
+            setText(countryTextField, location.getCountry());
+            setText(cityTextField, location.getCity());
+            setText(addressTextField, location.getAddress());
+            setText(postalCodeTextField, location.getPostalCode());
+            setText(coordinatesXTextField, location.getCoordinatesX().toString());
+            setText(coordinatesYTextField, location.getCoordinatesY().toString());
+        }
     }
 
     private static void setText(TextField field, String value) {

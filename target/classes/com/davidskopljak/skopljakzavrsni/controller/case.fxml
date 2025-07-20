@@ -14,8 +14,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="600.0" prefWidth="1080.0" xmlns="http://javafx.com/javafx/24" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.davidskopljak.skopljakzavrsni.controller.NewCaseController">
-   <fx:include source="new-case-menu.fxml" />
+<AnchorPane fx:id="rootAnchorPane" prefHeight="600.0" prefWidth="1080.0" xmlns="http://javafx.com/javafx/24" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.davidskopljak.skopljakzavrsni.controller.CaseInfoController">
    <ScrollPane layoutY="29.0" prefHeight="571.0" prefWidth="1080.0">
       <content>
          <GridPane gridLinesVisible="false" prefHeight="570.0" prefWidth="1080.0">

@@ -87,8 +87,25 @@ public class ClientRepository extends AbstractRepository<Client> {
     }
 
     @Override
-    public void update(Long id) throws SQLException {
+    public void update(Client entity) throws SQLException {
+        LOCK.lock();
+        String sql = "UPDATE client SET first_name = ?, last_name = ?, contact_number = ? WHERE id = ?";
 
+        try (Connection conn = DatabaseConnectionManager.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, entity.getFirstName());
+            ps.setString(2, entity.getLastName());
+            ps.setString(3, entity.getContactNumber());
+            ps.setLong(4, entity.getId());
+
+            ps.executeUpdate();
+
+        } catch (RepositoryAccessException | SQLException e) {
+            throw new RepositoryAccessException(e.getMessage(), e);
+        } finally {
+            LOCK.unlock();
+        }
     }
 
     @Override
@@ -97,8 +114,36 @@ public class ClientRepository extends AbstractRepository<Client> {
     }
 
     @Override
-    public void saveAll(List<Long> id) throws SQLException {
+    public List<Client> saveAll(List<Client> entities) throws SQLException {
+        LOCK.lock();
 
+        String sql = "INSERT INTO client (first_name, last_name, contact_number) VALUES (?, ?, ?) RETURNING id";
+        List<Client> savedClients = new ArrayList<>();
+
+        try (Connection conn = DatabaseConnectionManager.getInstance().getConnection()) {
+            for (Client entity : entities) {
+                try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                    ps.setString(1, entity.getFirstName());
+                    ps.setString(2, entity.getLastName());
+                    ps.setString(3, entity.getContactNumber());
+
+                    try (ResultSet rs = ps.executeQuery()) {
+                        if (rs.next()) {
+                            entity.setId(rs.getLong("id"));
+                            savedClients.add(entity);
+                        } else {
+                            throw new EmptyResultSetException("No id retrieved for client: " + entity);
+                        }
+                    }
+                }
+            }
+            return savedClients;
+
+        } catch (RepositoryAccessException e) {
+            throw new RepositoryAccessException(e.getMessage(), e);
+        } finally {
+            LOCK.unlock();
+        }
     }
 
 
