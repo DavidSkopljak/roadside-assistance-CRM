@@ -79,7 +79,7 @@ public class MainViewController {
                     try {
                         CaseWindowController caseWindowController = new CaseWindowController(selectedCase);
                     } catch (Exception e) {
-                        CRMApplication.log.error("Failed to open case window: " + e.getMessage());
+                        CRMApplication.log.error("Failed to open existing case window: " + e.getMessage());
                         e.printStackTrace();
                     }
                 }

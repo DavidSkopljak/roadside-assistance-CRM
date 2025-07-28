@@ -9,6 +9,7 @@ import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.net.URL;
 
 public class MiscHelpers {
 
@@ -25,16 +26,35 @@ public class MiscHelpers {
         alert.showAndWait();
     }
 
-    public static void loadScene(String sceneUrl, String title){
-        try{
-            FXMLLoader fxmlLoader = new FXMLLoader(CRMApplication.class.getResource(sceneUrl));
-            Scene scene = new Scene(fxmlLoader.load());
-            CRMApplication.getPrimaryStage().setTitle(title);
-            CRMApplication.getPrimaryStage().setScene(scene);
-            CRMApplication.getPrimaryStage().show();
-        } catch(IOException e) {
-            CRMApplication.log.error(e.getMessage());
-            throw new AccountLoginException("Could not load scene with URL: " + sceneUrl + ".");
+    public static void loadScene(String fxmlFile, String title) {
+        try {
+            URL fxmlUrl = CRMApplication.class.getResource(fxmlFile);
+            if (fxmlUrl == null) {
+                String msg = "FXML file not found at: " + fxmlFile;
+                System.err.println(msg);
+                throw new AccountLoginException(msg);
+            }
+
+            FXMLLoader fxmlLoader = new FXMLLoader(fxmlUrl);
+            Parent root = fxmlLoader.load();
+
+            Stage stage = (Stage) CRMApplication.getPrimaryStage();
+
+            stage.setTitle(title);
+            stage.setScene(new Scene(root));
+            stage.show();
+
+        } catch (IOException e) {
+            System.err.println("IOException while loading FXML: " + fxmlFile);
+            e.printStackTrace();
+            throw new AccountLoginException("Failed to load FXML: " + fxmlFile + " - " + e.getMessage());
+        } catch (AccountLoginException e) {
+            // Already printed error, rethrow
+            throw e;
+        } catch (Exception e) {
+            System.err.println("Unexpected exception while loading scene: " + fxmlFile);
+            e.printStackTrace();
+            throw new AccountLoginException("Unexpected error loading FXML: " + fxmlFile + " - " + e.getMessage());
         }
     }
 

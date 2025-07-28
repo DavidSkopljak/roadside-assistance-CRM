@@ -14,7 +14,16 @@ public class Client extends Person {
         this.contactNumber = contactNumber;
     }
 
+    public Client(Long id, Client client) {
+        super(id, client.getFirstName(), client.getLastName());
+        this.contactNumber = client.getContactNumber();
+    }
+
     public String getContactNumber() {
         return contactNumber;
+    }
+
+    public void setContactNumber(String contactNumber) {
+        this.contactNumber = contactNumber;
     }
 }

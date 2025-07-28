@@ -1,6 +1,5 @@
 package com.davidskopljak.skopljakzavrsni.controller;
 
-import com.davidskopljak.skopljakzavrsni.entity.Case;
 import com.davidskopljak.skopljakzavrsni.entity.Operator;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -15,7 +14,6 @@ public class CRMApplication extends Application {
     public static final Logger log = LoggerFactory.getLogger(CRMApplication.class);
     private static Stage PRIMARY_STAGE;
     private static Operator ACTIVE_OPERATOR;
-    private static Case CASE_IN_PROGRESS;
 
     @Override
     public void start(Stage stage){
@@ -43,6 +41,4 @@ public class CRMApplication extends Application {
     public static Stage getPrimaryStage() {return PRIMARY_STAGE;}
     private static void setPrimaryStage(Stage primaryStage) {CRMApplication.PRIMARY_STAGE = primaryStage;}
     public static Operator getActiveOperator() {return ACTIVE_OPERATOR;}
-    public static Case getCaseInProgress() {if(CASE_IN_PROGRESS == null) {CASE_IN_PROGRESS = new Case();} return CASE_IN_PROGRESS;}
-    public static void clearCaseInProgress() {CASE_IN_PROGRESS = null;}
 }

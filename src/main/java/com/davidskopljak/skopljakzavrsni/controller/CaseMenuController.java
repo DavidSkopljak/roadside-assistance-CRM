@@ -17,17 +17,12 @@ public class CaseMenuController{
     public void handleSaveCase() {
         try{
             CaseRepository caseRepository = new CaseRepository();
-            CRMApplication.getCaseInProgress().setCaseState(CaseState.ACTIVE);
-            caseRepository.save(CRMApplication.getCaseInProgress());
-            CRMApplication.clearCaseInProgress();
-            MiscHelpers.loadScene("main-view.fxml", "Main menu");
-
-            CaseRepository caseRepository = new CaseRepository();
-            caseWindowController.getactiveCase().setCaseState(CaseState.ACTIVE);
-            if( caseWindowController.getactiveCase().getId() != null){
-                caseRepository.update(caseWindowController.getactiveCase()));
+            caseWindowController.getActiveCase().setCaseState(CaseState.ACTIVE);
+            if( caseWindowController.getActiveCase().getId() != null){
+                System.out.println("Updating case: " + caseWindowController.getActiveCase().getId() + "with vehicle with id " + caseWindowController.getActiveCase().getClientVehicle().getId());
+                caseRepository.update(caseWindowController.getActiveCase());
             }else {
-                caseRepository.save(caseWindowController.getactiveCase());
+                caseRepository.save(caseWindowController.getActiveCase());
             }
 
         }catch(SQLException e){
@@ -36,7 +31,6 @@ public class CaseMenuController{
     }
 
     public void handleCancelCase() {
-        CRMApplication.clearCaseInProgress();
         MiscHelpers.loadScene("main-view.fxml", "Main menu");
     }
 

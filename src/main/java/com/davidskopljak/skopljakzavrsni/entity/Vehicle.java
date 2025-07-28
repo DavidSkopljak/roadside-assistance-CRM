@@ -20,6 +20,13 @@ public class Vehicle extends Entity {
       this.vin = vin;
    }
 
+   public Vehicle(Long id, Vehicle vehicle){
+      super(id);
+      this.licensePlate = vehicle.getLicensePlate();
+      this.model = vehicle.getModel();
+      this.vin = vehicle.getVin();
+   }
+
    public String getLicensePlate() {
       return licensePlate;
    }

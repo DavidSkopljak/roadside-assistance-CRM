@@ -19,7 +19,7 @@ public abstract class Person extends Entity {
     }
 
     protected Person(String firstName, String lastName) {
-        super();
+        super(null);
         this.firstName = firstName;
         this.lastName = lastName;
     }

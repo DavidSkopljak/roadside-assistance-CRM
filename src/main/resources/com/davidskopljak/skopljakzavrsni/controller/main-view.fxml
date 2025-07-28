@@ -14,7 +14,7 @@
             <TableColumn id="vehicleBrandTableColumn" fx:id="vehicleBrandTableColumn" minWidth="-Infinity" prefWidth="165.0" text="Vehicle brand" />
             <TableColumn id="licensePlateTableColumn" fx:id="licensePlateTableColumn" minWidth="-Infinity" prefWidth="165.0" text="License plate" />
             <TableColumn id="LocationTableColumn" fx:id="locationTableColumn" minWidth="-Infinity" prefWidth="165.0" text="Location" />
-         <TableColumn id="lastEditedOperatorTableColumn" fx:id="firstEditedOperatorTableColumn" minWidth="-Infinity" prefWidth="165.0" text="First edited operator" />
+            <TableColumn id="firstEditedOperatorTableColumn" fx:id="firstEditedOperatorTableColumn" minWidth="-Infinity" prefWidth="165.0" text="First edited operator" />
             <TableColumn id="lastEditedOperatorTableColumn" fx:id="lastEditedOperatorTableColumn" minWidth="-Infinity" prefWidth="165.0" text="Last edited operator" />
         </columns>
     </TableView>

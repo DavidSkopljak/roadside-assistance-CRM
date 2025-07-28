@@ -206,4 +206,60 @@ public class RepositoryHelper {
             }
         }
     }
+
+    public static ServiceType queryServiceTypeById(Long id, Connection conn) throws SQLException {
+        String sql = "SELECT service_type.type FROM service_type WHERE id = ?";
+        try(PreparedStatement ps = conn.prepareStatement(sql)){
+            ps.setLong(1, id);
+            try(ResultSet rs = ps.executeQuery();){
+                if(rs.next()) {
+                    return ServiceType.valueOf(rs.getString("type"));
+                }else{
+                    throw new EmptyResultSetException("No service type retrieved, possible issue with database");
+                }
+            }
+        }
+    }
+
+    public static Long queryServiceTypeByType(ServiceType serviceType, Connection conn) throws SQLException {
+        String sql = "SELECT service_type.id FROM service_type WHERE type = ?";
+        try(PreparedStatement ps = conn.prepareStatement(sql)){
+            ps.setString(1, serviceType.toString());
+            try(ResultSet rs = ps.executeQuery();){
+                if(rs.next()) {
+                    return rs.getLong("id");
+                }else{
+                    throw new EmptyResultSetException("No service type id retrieved, possible issue with database");
+                }
+            }
+        }
+    }
+
+    public static ServiceState queryServiceStateById(Long id, Connection conn) throws SQLException {
+        String sql = "SELECT service_state.state FROM service_state WHERE id = ?";
+        try(PreparedStatement ps = conn.prepareStatement(sql)){
+            ps.setLong(1, id);
+            try(ResultSet rs = ps.executeQuery();){
+                if(rs.next()) {
+                    return ServiceState.valueOf(rs.getString("state"));
+                }else{
+                    throw new EmptyResultSetException("No service state retrieved, possible issue with database");
+                }
+            }
+        }
+    }
+
+    public static Long queryServiceStateByState(ServiceState serviceState, Connection conn) throws SQLException {
+        String sql = "SELECT service_state.id FROM service_state WHERE state = ?";
+        try(PreparedStatement ps = conn.prepareStatement(sql)){
+            ps.setString(1, serviceState.toString());
+            try(ResultSet rs = ps.executeQuery();){
+                if(rs.next()) {
+                    return rs.getLong("id");
+                }else{
+                    throw new EmptyResultSetException("No service state id retrieved, possible issue with database");
+                }
+            }
+        }
+    }
 }

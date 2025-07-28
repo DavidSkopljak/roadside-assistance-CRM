@@ -31,6 +31,14 @@ public class Driver extends Person implements Trackable<DriverState> {
         this.driverState = driverState;
     }
 
+    public Driver(Long id, Driver driver) {
+        super(id, driver.getFirstName(), driver.getLastName());
+        this.contactNumber = driver.getContactNumber();
+        this.currentLocation = driver.getCurrentLocation();
+        this.vehicle = driver.getVehicle();
+        this.driverState = driver.getState();
+    }
+
     public String getContactNumber() { return contactNumber; }
 
     public Location getCurrentLocation() { return currentLocation; }

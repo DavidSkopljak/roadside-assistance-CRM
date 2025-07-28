@@ -109,8 +109,28 @@ public class OperatorRepository extends AbstractRepository<Operator> {
     }
 
     @Override
-    public void update(Long id) throws SQLException {
+    public void update(Operator entity) throws SQLException {
+        LOCK.lock();
+        String sql = "UPDATE operator SET username = LOWER(?), first_name = INITCAP(?), last_name = INITCAP(?) WHERE id = ?";
 
+        try (Connection conn = DatabaseConnectionManager.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, entity.getUsername());
+            ps.setString(2, entity.getFirstName());
+            ps.setString(3, entity.getLastName());
+            ps.setLong(4, entity.getId());
+
+            int rowsAffected = ps.executeUpdate();
+            if (rowsAffected == 0) {
+                throw new EmptyResultSetException("Update failed, no operator found with ID: " + entity.getId());
+            }
+
+        } catch (RepositoryAccessException | SQLException e) {
+            throw new RepositoryAccessException(e.getMessage(), e);
+        } finally {
+            LOCK.unlock();
+        }
     }
 
     @Override
@@ -119,7 +139,39 @@ public class OperatorRepository extends AbstractRepository<Operator> {
     }
 
     @Override
-    public void saveAll(List<Long> id) throws SQLException {
+    public List<Operator> saveAll(List<Operator> entities) throws SQLException {
+        LOCK.lock();
+        String sql = "INSERT INTO operator (username, first_name, last_name) VALUES (LOWER(?), INITCAP(?), INITCAP(?)) RETURNING id";
+        List<Operator> savedOperators = new ArrayList<>();
 
+        try (Connection conn = DatabaseConnectionManager.getInstance().getConnection()) {
+            for (Operator entity : entities) {
+                try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                    ps.setString(1, entity.getUsername());
+                    ps.setString(2, entity.getFirstName());
+                    ps.setString(3, entity.getLastName());
+
+                    try (ResultSet rs = ps.executeQuery()) {
+                        if (rs.next()) {
+                            Long id = rs.getLong("id");
+                            savedOperators.add(new Operator(
+                                    id,
+                                    entity.getUsername(),
+                                    entity.getFirstName(),
+                                    entity.getLastName()
+                            ));
+                        } else {
+                            throw new EmptyResultSetException("Failed to insert operator with username: " + entity.getUsername());
+                        }
+                    }
+                }
+            }
+            return savedOperators;
+        } catch (RepositoryAccessException | SQLException e) {
+            throw new RepositoryAccessException(e.getMessage(), e);
+        } finally {
+            LOCK.unlock();
+        }
     }
+
 }

@@ -32,7 +32,7 @@ public class MapTestApplication extends Application {
         mapView.addEventHandler(MapViewEvent.MAP_CLICKED, event -> {
             Coordinate coord = event.getCoordinate();
             location = Location.getLocationFromCoordinates(BigDecimal.valueOf(coord.getLatitude()), BigDecimal.valueOf(coord.getLongitude()));
-            System.out.println(location.getAddress() + " " + location.getCity() + " " + location.getCountry() + " " + " " + location.getPostalCode() + " " + location.getCoordinatesX() + " " + location.getCoordinatesY() + "\n----------------------------");
+            System.out.println(location.getAddress() + " " + location.getCity() + " " + location.getCountry() + " " + " " + location.getPostalCode() + " " + location.getLatitude() + " " + location.getLongitude() + "\n----------------------------");
 
             Marker marker = Marker.createProvided(Marker.Provided.RED)
                     .setPosition(coord)

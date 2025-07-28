@@ -107,17 +107,65 @@ public class WorkshopRepository extends AbstractRepository<Workshop> {
     }
 
     @Override
-    public void update(Long id) throws SQLException {
+    public List<Workshop> saveAll(List<Workshop> entities) throws SQLException {
+        LOCK.lock();
+        String sql = "INSERT INTO workshop (name, location_id, vehicle_model_id) VALUES (?, ?, ?) RETURNING id";
+        List<Workshop> saved = new ArrayList<>();
 
+        try (Connection conn = DatabaseConnectionManager.getInstance().getConnection()) {
+            LocationRepository locationRepository = new LocationRepository();
+
+            for (Workshop entity : entities) {
+                try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                    Long locationId = locationRepository.save(entity.getLocation());
+                    Long modelId = RepositoryHelper.queryVehicleModelByModel(entity.getPermittedVehicleModel(), conn);
+
+                    ps.setString(1, entity.getName());
+                    ps.setLong(2, locationId);
+                    ps.setLong(3, modelId);
+
+                    try (ResultSet rs = ps.executeQuery()) {
+                        if (rs.next()) {
+                            saved.add(new Workshop(rs.getLong("id"), entity.getName(), entity.getLocation(), entity.getPermittedVehicleModel()));
+                        } else {
+                            throw new EmptyResultSetException("No id retrieved for workshop.");
+                        }
+                    }
+                }
+            }
+        } finally {
+            LOCK.unlock();
+        }
+
+        return saved;
+    }
+
+    @Override
+    public void update(Workshop entity) throws SQLException {
+        LOCK.lock();
+        String sql = "UPDATE workshop SET name = ?, location_id = ?, vehicle_model_id = ? WHERE id = ?";
+
+        try (Connection conn = DatabaseConnectionManager.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            LocationRepository locationRepository = new LocationRepository();
+            locationRepository.update(entity.getLocation());
+
+            Long modelId = RepositoryHelper.queryVehicleModelByModel(entity.getPermittedVehicleModel(), conn);
+
+            ps.setString(1, entity.getName());
+            ps.setLong(2, entity.getLocation().getId());
+            ps.setLong(3, modelId);
+            ps.setLong(4, entity.getId());
+
+            ps.executeUpdate();
+        } finally {
+            LOCK.unlock();
+        }
     }
 
     @Override
     public void deleteById(Long id) throws SQLException {
-
-    }
-
-    @Override
-    public void saveAll(List<Long> id) throws SQLException {
 
     }
 

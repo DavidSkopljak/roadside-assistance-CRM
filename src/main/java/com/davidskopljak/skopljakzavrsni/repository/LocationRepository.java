@@ -32,10 +32,10 @@ public class LocationRepository extends AbstractRepository<Location> {
                 String city = rs.getString("city");
                 String country = rs.getString("country");
                 String postalCode = rs.getString("postal_code");
-                BigDecimal coordinatesX = rs.getBigDecimal("coordinates_x");
-                BigDecimal coordinatesY = rs.getBigDecimal("coordinates_y");
+                BigDecimal lat = rs.getBigDecimal("coordinates_x");
+                BigDecimal lon = rs.getBigDecimal("coordinates_y");
 
-                return new Location(locationId, address, city, country, postalCode, coordinatesX, coordinatesY);
+                return new Location(locationId, address, city, country, postalCode, lat, lon);
 
             }else{
                 throw new EmptyResultSetException("Vehicle with id " + id + " not found");
@@ -87,8 +87,8 @@ public class LocationRepository extends AbstractRepository<Location> {
                 ps.setString(2, entity.getCity());
                 ps.setString(3, entity.getCountry());
                 ps.setString(4, entity.getPostalCode());
-                ps.setBigDecimal(5, entity.getCoordinatesX());
-                ps.setBigDecimal(6, entity.getCoordinatesY());
+                ps.setBigDecimal(5, entity.getLatitude());
+                ps.setBigDecimal(6, entity.getLongitude());
 
                 try(ResultSet rs = ps.executeQuery();){
                     if (rs.next()) {
@@ -115,9 +115,10 @@ public class LocationRepository extends AbstractRepository<Location> {
             ps.setString(2, entity.getCity());
             ps.setString(3, entity.getCountry());
             ps.setString(4, entity.getPostalCode());
-            ps.setBigDecimal(5, entity.getCoordinatesX());
-            ps.setBigDecimal(6, entity.getCoordinatesY());
+            ps.setBigDecimal(5, entity.getLatitude());
+            ps.setBigDecimal(6, entity.getLongitude());
             ps.setLong(7, entity.getId());
+            ps.executeUpdate();
         }catch(RepositoryAccessException e){
             throw new RepositoryAccessException(e.getMessage(), e);
         }finally {
@@ -154,20 +155,20 @@ public class LocationRepository extends AbstractRepository<Location> {
                 ps.setString(2, entity.getCity());
                 ps.setString(3, entity.getCountry());
                 ps.setString(4, entity.getPostalCode());
-                ps.setBigDecimal(5, entity.getCoordinatesX());
-                ps.setBigDecimal(6, entity.getCoordinatesY());
+                ps.setBigDecimal(5, entity.getLatitude());
+                ps.setBigDecimal(6, entity.getLongitude());
 
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) {
                         long generatedId = rs.getLong("id");
-                        entity.setId(generatedId);  // update entity with DB-generated id
+                        entity.setId(generatedId);
                     } else {
                         throw new EmptyResultSetException("No id retrieved for location: " + entity.getAddress());
                     }
                 }
             }
 
-            return entities;  // return the updated list with IDs set
+            return entities;
         } catch (RepositoryAccessException | SQLException e) {
             throw new RepositoryAccessException(e.getMessage(), e);
         } finally {

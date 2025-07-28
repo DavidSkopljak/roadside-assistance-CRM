@@ -25,6 +25,7 @@ import javafx.scene.layout.AnchorPane;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -75,14 +76,18 @@ public class CaseInfoController implements CaseController {
             Parent menuRoot = loader.load();
             caseMenuController = loader.getController();
 
-            // Add the menu to your root pane
-            rootAnchorPane.getChildren().add(0, menuRoot); // Add at index 0 to put it at the top
+            rootAnchorPane.getChildren().add(0, menuRoot);
 
         } catch (IOException e) {
             e.printStackTrace();
         }
         injectCaseMenuControllerWindowReference();
-        initializeActiveCase();
+
+        if(caseWindowController.getActiveCase() != null){
+            initializeActiveCase();
+        } else{
+            caseWindowController.setActiveCase(new Case());
+        }
     }
 
     public void injectCaseMenuControllerWindowReference() {
@@ -110,7 +115,7 @@ public class CaseInfoController implements CaseController {
     }
 
     private void initializeActiveCase() {
-        Case caseInProgress = this.caseWindowController.getactiveCase();
+        Case caseInProgress = this.caseWindowController.getActiveCase();
 
         Client client = caseInProgress.getClient();
         if (client != null) {
@@ -186,6 +191,8 @@ public class CaseInfoController implements CaseController {
         damageType = damageTypeComboBox.getValue();
         damageCause = damageCauseComboBox.getValue();
 
+        System.out.println("setting case info: " + firstName + lastName + contactNumber + licensePlate + damageDescription + vehicleModel + vinText + firstRegLocalDate + damageType + damageCause);
+
         try {
             validateCaseInfo();
         } catch (InvalidCaseInfoException e) {
@@ -194,11 +201,41 @@ public class CaseInfoController implements CaseController {
             return;
         }
 
-        Case newCase = CRMApplication.getCaseInProgress();
+        Case newCase = caseWindowController.getActiveCase();
+        if (newCase == null) {
+            newCase = new Case();
+        }
 
-        Client client = new Client(firstName, lastName, contactNumber);
-        Vehicle clientVehicle = new Vehicle(licensePlate, vehicleModel, vinText);
-        Operator firstOperator = CRMApplication.getActiveOperator();
+        Client client;
+        if (newCase.getClient() != null) {
+            client = new Client(
+                    newCase.getClient().getId(),
+                    firstName,
+                    lastName,
+                    contactNumber
+            );
+        } else {
+            client = new Client(firstName, lastName, contactNumber);
+        }
+
+        Vehicle clientVehicle;
+        if (newCase.getClientVehicle() != null) {
+            clientVehicle = new Vehicle(
+                    newCase.getClientVehicle().getId(),
+                    licensePlate,
+                    vehicleModel,
+                    vinText
+            );
+        } else {
+            clientVehicle = new Vehicle(licensePlate, vehicleModel, vinText);
+        }
+        Operator firstOperator = newCase.getFirstOperator() != null ?
+                newCase.getFirstOperator() : CRMApplication.getActiveOperator();
+        Operator lastOperator = CRMApplication.getActiveOperator();
+
+        LocalDateTime createdTime = newCase.getCreatedDateTime() != null ?
+                newCase.getCreatedDateTime() :
+                LocalDateTime.now().truncatedTo(java.time.temporal.ChronoUnit.SECONDS);
 
         newCase.setClient(client)
                 .setClientVehicle(clientVehicle)
@@ -206,9 +243,12 @@ public class CaseInfoController implements CaseController {
                 .setDamageCause(damageCause)
                 .setDamageType(damageType)
                 .setFirstOperator(firstOperator)
-                .setLastEditedOperator(firstOperator)
+                .setLastEditedOperator(lastOperator)
                 .setDamageDescription(damageDescription)
-                .setCreatedDateTime(LocalDateTime.now().truncatedTo(java.time.temporal.ChronoUnit.SECONDS));
+                .setCreatedDateTime(createdTime);
+
+        System.out.println("Setting newCase info with vehicle: " + newCase.getClientVehicle().getId() + " " + newCase.getClientVehicle().getModel());
+        caseWindowController.setActiveCase(newCase);
     }
 
 
@@ -217,9 +257,12 @@ public class CaseInfoController implements CaseController {
             throw new InvalidCaseInfoException("Some required fields are null.");
         }
 
-        List<String> fields = List.of(firstName, lastName, damageDescription);
-        if (Boolean.FALSE.equals(Validators.isValidString(fields))) {
-            throw new InvalidCaseInfoException("Invalid first name.");
+        if (Boolean.FALSE.equals(Validators.isValidString(List.of(firstName, lastName)))) {
+            throw new InvalidCaseInfoException("Invalid client information.");
+        }
+
+        if (Boolean.FALSE.equals(Validators.isValidString(damageDescription))) {
+            throw new InvalidCaseInfoException("Invalid vehicle damage description.");
         }
 
         if (Boolean.FALSE.equals(Validators.isValidHRPhoneNumber(contactNumber))) {

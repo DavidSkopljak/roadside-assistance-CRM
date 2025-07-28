@@ -2,15 +2,18 @@ package com.davidskopljak.skopljakzavrsni.entity;
 
 import com.davidskopljak.skopljakzavrsni.exceptions.ApiException;
 import com.davidskopljak.skopljakzavrsni.exceptions.LocationNotFoundException;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 
 // needs fields for coordinates, operators note(to further specify location)
 public class Location extends Entity {
@@ -18,29 +21,29 @@ public class Location extends Entity {
     String city;
     String country;
     String postalCode;
-    BigDecimal coordinatesX;
-    BigDecimal coordinatesY;
+    BigDecimal latitude;
+    BigDecimal longitude;
 
-    public Location(Long id, String address, String city, String country, String postalCode, BigDecimal coordinatesX, BigDecimal coordinatesY) {
+    public Location(Long id, String address, String city, String country, String postalCode, BigDecimal latitude, BigDecimal longitude) {
         super(id);
         this.address = address;
         this.city = city;
         this.country = country;
         this.postalCode = postalCode;
-        this.coordinatesX = coordinatesX;
-        this.coordinatesY = coordinatesY;
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 
-    public Location(Long id, BigDecimal coordinatesX, BigDecimal coordinatesY) {
+    public Location(Long id, BigDecimal latitude, BigDecimal longitude) {
         super(id);
-        Location fetched = getLocationFromCoordinates(coordinatesX, coordinatesY);
+        Location fetched = getLocationFromCoordinates(latitude, longitude);
 
         this.address = fetched.address;
         this.city = fetched.city;
         this.country = fetched.country;
         this.postalCode = fetched.postalCode;
-        this.coordinatesX = fetched.coordinatesX;
-        this.coordinatesY = fetched.coordinatesY;
+        this.latitude = fetched.latitude;
+        this.longitude = fetched.longitude;
     }
 
     public Location(Long id, String address, String city, String country, String postalCode) {
@@ -51,28 +54,28 @@ public class Location extends Entity {
         this.city = fetched.city;
         this.country = fetched.country;
         this.postalCode = fetched.postalCode;
-        this.coordinatesX = fetched.coordinatesX;
-        this.coordinatesY = fetched.coordinatesY;
+        this.latitude = fetched.latitude;
+        this.longitude = fetched.longitude;
     }
 
-    public Location(String address, String city, String country, String postalCode, BigDecimal coordinatesX, BigDecimal coordinatesY) {
+    public Location(String address, String city, String country, String postalCode, BigDecimal latitude, BigDecimal longitude) {
         this.address = address;
         this.city = city;
         this.country = country;
         this.postalCode = postalCode;
-        this.coordinatesX = coordinatesX;
-        this.coordinatesY = coordinatesY;
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 
-    public Location(BigDecimal coordinatesX, BigDecimal coordinatesY) {
-        Location fetched = getLocationFromCoordinates(coordinatesX, coordinatesY);
+    public Location(BigDecimal latitude, BigDecimal longitude) {
+        Location fetched = getLocationFromCoordinates(latitude, longitude);
 
         this.address = fetched.address;
         this.city = fetched.city;
         this.country = fetched.country;
         this.postalCode = fetched.postalCode;
-        this.coordinatesX = fetched.coordinatesX;
-        this.coordinatesY = fetched.coordinatesY;
+        this.latitude = fetched.latitude;
+        this.longitude = fetched.longitude;
     }
 
     public Location(String postalCode, String country, String city, String address) {
@@ -82,35 +85,59 @@ public class Location extends Entity {
         this.city = fetched.city;
         this.country = fetched.country;
         this.postalCode = fetched.postalCode;
-        this.coordinatesX = fetched.coordinatesX;
-        this.coordinatesY = fetched.coordinatesY;
+        this.latitude = fetched.latitude;
+        this.longitude = fetched.longitude;
+    }
+    
+    public Location(Long id, Location location){
+        super(id);
+        this.address = location.address;
+        this.city = location.city;
+        this.country = location.country;
+        this.postalCode = location.postalCode;
+        this.latitude = location.latitude;
+        this.longitude = location.longitude;
     }
 
     public static Location getLocationFromAddress(String country, String city, String postalCode, String address) {
         try (HttpClient client = HttpClient.newHttpClient()) {
-            String addressData = address + "+" + postalCode + "+" + city + "+" + country;
+            String rawQuery = String.join(" ", address, city, postalCode, country);
+            String encodedQuery = URLEncoder.encode(rawQuery, StandardCharsets.UTF_8);
+
+            String fullUrl = "https://nominatim.openstreetmap.org/search?addressdetails=1&q=" + encodedQuery + "&format=jsonv2&limit=1";
+            System.out.println("inside getLocationFromAddress with query: " + fullUrl);
+
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create("https://nominatim.openstreetmap.org/search?addressdetails=1&q=" + addressData + "&format=jsonv2&limit=1"))
+                    .uri(URI.create("https://nominatim.openstreetmap.org/search?addressdetails=1&q=" + encodedQuery + "&format=jsonv2&limit=1"))
                     .build();
+
+            System.out.println("inside getLocationFromAddress with query: " + "https://nominatim.openstreetmap.org/search?addressdetails=1&q=" + encodedQuery + "&format=jsonv2&limit=1");
 
             HttpResponse<String> response = client.send(request,
                     HttpResponse.BodyHandlers.ofString());
 
-            Object file = JSONValue.parse(response.body());
-            JSONObject jsonObjectdecode = (JSONObject) file;
+            Object parsed = JSONValue.parse(response.body());
+            JSONArray results = (JSONArray) parsed;
+
+            if (results == null || results.isEmpty()) {
+                throw new LocationNotFoundException("Could not translate address to coordinates. Please check your address and try again.");
+            }
+
+            JSONObject jsonObjectdecode = (JSONObject) results.get(0);
 
             String lat = (String) jsonObjectdecode.get("lat");
             String lon = (String) jsonObjectdecode.get("lon");
+            System.out.println(lat + " " + lon);
 
             if(lat == null || lat.isEmpty() || lon == null || lon.isEmpty()){
-                throw new LocationNotFoundException("Could not translate address to coordinates. Please check your address and try again.");
+                throw new LocationNotFoundException("No coordinates retrieved for queried location. Please check your address and try again.");
             }
 
             return new Location(address, city, country, postalCode, new BigDecimal(lat), new BigDecimal(lon));
         } catch (IOException e) {
             throw new ApiException("Error translating address data to coordinates: " + e.getMessage());
         } catch (InterruptedException e) {
-            Thread.currentThread().interrupt(); // Restore interrupted status
+            Thread.currentThread().interrupt();
             throw new ApiException("Thread was interrupted while translating address data to coordinates:" + e.getMessage());
         }
     }
@@ -119,7 +146,7 @@ public class Location extends Entity {
         try (HttpClient client = HttpClient.newHttpClient()) {
 
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create("https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat="+ lat +"&lon="+ lon))
+                    .uri(URI.create("https://nominatim.openstreetmap.org/reverse?lat="+ lat +"&lon="+ lon + "&format=jsonv2"))
                     .build();
 
             HttpResponse<String> response = client.send(request,
@@ -181,11 +208,11 @@ public class Location extends Entity {
         return postalCode;
     }
 
-    public BigDecimal getCoordinatesX() {
-        return coordinatesX;
+    public BigDecimal getLatitude() {
+        return latitude;
     }
 
-    public BigDecimal getCoordinatesY() {
-        return coordinatesY;
+    public BigDecimal getLongitude() {
+        return longitude;
     }
 }

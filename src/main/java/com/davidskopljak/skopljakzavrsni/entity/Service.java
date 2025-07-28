@@ -27,6 +27,14 @@ public non-sealed class Service extends Entity implements Trackable<ServiceState
         this.serviceState = serviceState;
     }
 
+    public Service(Long id, Service service) {
+        super(id);
+        this.assignedDriver = service.getAssignedDriver();
+        this.serviceType = service.getServiceType();
+        this.serviceState = service.getState();
+        this.serviceNotes = service.getNotes();
+    }
+
     public Driver getAssignedDriver() {
         return assignedDriver;
     }

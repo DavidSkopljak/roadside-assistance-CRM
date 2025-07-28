@@ -6,6 +6,7 @@ import com.davidskopljak.skopljakzavrsni.enums.ServiceState;
 import com.davidskopljak.skopljakzavrsni.enums.ServiceType;
 import com.davidskopljak.skopljakzavrsni.exceptions.EmptyResultSetException;
 import com.davidskopljak.skopljakzavrsni.exceptions.RepositoryAccessException;
+import com.davidskopljak.skopljakzavrsni.helpers.RepositoryHelper;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -35,8 +36,8 @@ public class ServiceRepository extends AbstractRepository<Service> {
                     Long serviceStateId = rs.getLong("service_state_id");
 
                     Driver assignedDriver = queryAssignedDriverById(assignedDriverId);
-                    ServiceType serviceType = queryServiceTypeById(serviceTypeId, conn);
-                    ServiceState serviceState = queryServiceStateById(serviceStateId, conn);
+                    ServiceType serviceType = RepositoryHelper.queryServiceTypeById(serviceTypeId, conn);
+                    ServiceState serviceState = RepositoryHelper.queryServiceStateById(serviceStateId, conn);
 
                     return new Service(serviceId, assignedDriver, serviceType, serviceState);
                 }else{
@@ -67,8 +68,8 @@ public class ServiceRepository extends AbstractRepository<Service> {
                     Long serviceStateId = rs.getLong("service_state_id");
 
                     Driver assignedDriver = queryAssignedDriverById(assignedDriverId);
-                    ServiceType serviceType = queryServiceTypeById(serviceTypeId, conn);
-                    ServiceState serviceState = queryServiceStateById(serviceStateId, conn);
+                    ServiceType serviceType = RepositoryHelper.queryServiceTypeById(serviceTypeId, conn);
+                    ServiceState serviceState = RepositoryHelper.queryServiceStateById(serviceStateId, conn);
 
                     Service service = new Service(serviceId, assignedDriver, serviceType, serviceState);
                     services.add(service);
@@ -91,9 +92,9 @@ public class ServiceRepository extends AbstractRepository<Service> {
             DriverRepository driverRepository = new DriverRepository();
             Long driverId = driverRepository.save(entity.getAssignedDriver());
 
-            Long serviceTypeId = queryServiceTypeByType(entity.getServiceType(), conn);
+            Long serviceTypeId = RepositoryHelper.queryServiceTypeByType(entity.getServiceType(), conn);
 
-            Long serviceStateId = queryServiceStateByState(entity.getState(), conn);
+            Long serviceStateId = RepositoryHelper.queryServiceStateByState(entity.getState(), conn);
 
 
             ps.setLong(1, driverId);
@@ -115,17 +116,68 @@ public class ServiceRepository extends AbstractRepository<Service> {
     }
 
     @Override
-    public void update(Long id) throws SQLException {
+    public List<Service> saveAll(List<Service> entities) throws SQLException {
+        LOCK.lock();
+        String sql = "INSERT INTO service (assigned_driver_id, service_type_id, service_state_id) VALUES (?, ?, ?) RETURNING id";
+        List<Service> saved = new ArrayList<>();
 
+        try (Connection conn = DatabaseConnectionManager.getInstance().getConnection()) {
+            for (Service entity : entities) {
+                try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                    DriverRepository driverRepository = new DriverRepository();
+                    Long driverId = driverRepository.save(entity.getAssignedDriver());
+
+                    Long serviceTypeId = RepositoryHelper.queryServiceTypeByType(entity.getServiceType(), conn);
+                    Long serviceStateId = RepositoryHelper.queryServiceStateByState(entity.getState(), conn);
+
+                    ps.setLong(1, driverId);
+                    ps.setLong(2, serviceTypeId);
+                    ps.setLong(3, serviceStateId);
+
+                    try (ResultSet rs = ps.executeQuery()) {
+                        if (rs.next()) {
+                            entity.setId(rs.getLong("id"));
+                            saved.add(entity);
+                        } else {
+                            throw new EmptyResultSetException("No id retrieved for created service.");
+                        }
+                    }
+                }
+            }
+        } finally {
+            LOCK.unlock();
+        }
+
+        return saved;
+    }
+
+    @Override
+    public void update(Service entity) throws SQLException {
+        LOCK.lock();
+        String sql = "UPDATE service SET assigned_driver_id = ?, service_type_id = ?, service_state_id = ? WHERE id = ?";
+
+        try (Connection conn = DatabaseConnectionManager.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            DriverRepository driverRepository = new DriverRepository();
+            driverRepository.update(entity.getAssignedDriver());
+
+            Long serviceTypeId = RepositoryHelper.queryServiceTypeByType(entity.getServiceType(), conn);
+            Long serviceStateId = RepositoryHelper.queryServiceStateByState(entity.getState(), conn);
+
+            ps.setLong(1, entity.getAssignedDriver().getId());
+            ps.setLong(2, serviceTypeId);
+            ps.setLong(3, serviceStateId);
+            ps.setLong(4, entity.getId());
+
+            ps.executeUpdate();
+        } finally {
+            LOCK.unlock();
+        }
     }
 
     @Override
     public void deleteById(Long id) throws SQLException {
-
-    }
-
-    @Override
-    public void saveAll(List<Long> id) throws SQLException {
 
     }
 
@@ -134,59 +186,5 @@ public class ServiceRepository extends AbstractRepository<Service> {
         return(driverRepository.findById(id));
     }
 
-    private ServiceType queryServiceTypeById(Long id, Connection conn) throws SQLException {
-        String sql = "SELECT service_type.type FROM service_type WHERE id = ?";
-        try(PreparedStatement ps = conn.prepareStatement(sql)){
-            ps.setLong(1, id);
-            try(ResultSet rs = ps.executeQuery();){
-                if(rs.next()) {
-                    return ServiceType.valueOf(rs.getString("type"));
-                }else{
-                    throw new EmptyResultSetException("No service type retrieved, possible issue with database");
-                }
-            }
-        }
-    }
 
-    private Long queryServiceTypeByType(ServiceType serviceType, Connection conn) throws SQLException {
-        String sql = "SELECT service_type.id FROM service_type WHERE type = ?";
-        try(PreparedStatement ps = conn.prepareStatement(sql)){
-            ps.setString(1, serviceType.toString());
-            try(ResultSet rs = ps.executeQuery();){
-                if(rs.next()) {
-                    return rs.getLong("id");
-                }else{
-                    throw new EmptyResultSetException("No service type id retrieved, possible issue with database");
-                }
-            }
-        }
-    }
-
-    private ServiceState queryServiceStateById(Long id, Connection conn) throws SQLException {
-        String sql = "SELECT service_state.state FROM service_state WHERE id = ?";
-        try(PreparedStatement ps = conn.prepareStatement(sql)){
-            ps.setLong(1, id);
-            try(ResultSet rs = ps.executeQuery();){
-                if(rs.next()) {
-                    return ServiceState.valueOf(rs.getString("state"));
-                }else{
-                    throw new EmptyResultSetException("No service state retrieved, possible issue with database");
-                }
-            }
-        }
-    }
-
-    private Long queryServiceStateByState(ServiceState serviceState, Connection conn) throws SQLException {
-        String sql = "SELECT service_state.id FROM service_state WHERE state = ?";
-        try(PreparedStatement ps = conn.prepareStatement(sql)){
-            ps.setString(1, serviceState.toString());
-            try(ResultSet rs = ps.executeQuery();){
-                if(rs.next()) {
-                    return rs.getLong("id");
-                }else{
-                    throw new EmptyResultSetException("No service state id retrieved, possible issue with database");
-                }
-            }
-        }
-    }
 }

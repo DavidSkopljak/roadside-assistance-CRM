@@ -12,6 +12,11 @@ public class Operator extends Person{
         this.username = username;
     }
 
+    public Operator(Long id, Operator operator){
+        super(id, operator.getFirstName(), operator.getLastName());
+        this.username = operator.getUsername();
+    }
+
     public String getUsername() {
         return username;
     }

@@ -34,7 +34,7 @@ public class VehicleRepository extends AbstractRepository<Vehicle> {
                 String vin = rs.getString("vin");
 
                 VehicleModel vehicleModel = RepositoryHelper.queryVehicleModelById(vehicleModelId, conn);
-
+                System.out.println("Found vehicle with id " + vehicleId + " with license plate " + licensePlate + " and vin " + vin + " and model " + vehicleModel.toString() + ".");
                 return new Vehicle(vehicleId, licensePlate, vehicleModel, vin);
             }else{
                 throw new EmptyResultSetException("Vehicle with id " + id + " not found");
@@ -103,19 +103,61 @@ public class VehicleRepository extends AbstractRepository<Vehicle> {
     }
 
     @Override
-    public void update(Long id) throws SQLException {
+    public List<Vehicle> saveAll(List<Vehicle> entities) throws SQLException {
+        LOCK.lock();
+        String sql = "INSERT INTO vehicle (license_plate, vin, vehicle_model_id) VALUES (?, ?, ?) RETURNING id";
+        List<Vehicle> saved = new ArrayList<>();
 
+        try (Connection conn = DatabaseConnectionManager.getInstance().getConnection()) {
+            for (Vehicle entity : entities) {
+                try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                    Long modelId = RepositoryHelper.queryVehicleModelByModel(entity.getModel(), conn);
+
+                    ps.setString(1, entity.getLicensePlate());
+                    ps.setString(2, entity.getVin());
+                    ps.setLong(3, modelId);
+
+                    try (ResultSet rs = ps.executeQuery()) {
+                        if (rs.next()) {
+                            entity.setId(rs.getLong("id"));
+                            saved.add(entity);
+                        } else {
+                            throw new EmptyResultSetException("No id retrieved for vehicle.");
+                        }
+                    }
+                }
+            }
+        } finally {
+            LOCK.unlock();
+        }
+
+        return saved;
+    }
+
+    @Override
+    public void update(Vehicle entity) throws SQLException {
+        LOCK.lock();
+        String sql = "UPDATE vehicle SET license_plate = ?, vin = ?, vehicle_model_id = ? WHERE id = ?";
+
+        try (Connection conn = DatabaseConnectionManager.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            Long modelId = RepositoryHelper.queryVehicleModelByModel(entity.getModel(), conn);
+
+            ps.setString(1, entity.getLicensePlate());
+            ps.setString(2, entity.getVin());
+            ps.setLong(3, modelId);
+            ps.setLong(4, entity.getId());
+
+            System.out.println("Updating vehicle with sql: " + ps.toString() );
+            ps.executeUpdate();
+        } finally {
+            LOCK.unlock();
+        }
     }
 
     @Override
     public void deleteById(Long id) throws SQLException {
 
     }
-
-    @Override
-    public void saveAll(List<Long> id) throws SQLException {
-
-    }
-
-
 }

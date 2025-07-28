@@ -38,7 +38,7 @@ public class UserInputValidation {
     }
 
     public static Boolean validateLocation(Location location) {
-        Boolean validCoords = Validators.isValidGeoCoords(location.getCoordinatesX().toString() + ", " + location.getCoordinatesY().toString());
+        Boolean validCoords = Validators.isValidGeoCoords(location.getLatitude().toString() + ", " + location.getLongitude().toString());
         Boolean validAddress = Validators.isValidString(Arrays.asList(location.getCountry(), location.getCity(), location.getPostalCode(), location.getAddress()));
         return (validCoords && validAddress);
     }

@@ -128,7 +128,6 @@ public class CaseRepository extends AbstractRepository<Case> {
     public void update(Case entity) throws SQLException {
         LOCK.lock();
         String sql = "UPDATE cases SET location_id = ?, first_operator_id = ?, last_edited_operator_id = ?, client_vehicle_id = ?, damage_description = ?, case_state_id = ?, damage_type_id = ?, vehicle_damage_cause_id = ?, created_date_time = ?, active_service_id = ?, client_id = ?, vehicle_first_registration_date = ? WHERE id = ?";
-
         try (Connection conn = DatabaseConnectionManager.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)){
 
@@ -175,6 +174,8 @@ public class CaseRepository extends AbstractRepository<Case> {
             ps.setTimestamp(12, Timestamp.valueOf(entity.getClientVehicleFirstRegistrationDate().atStartOfDay()));
 
             ps.setLong(13, entity.getId());
+
+            System.out.println("Updating case with id " + entity.getId() + " with sql: " + ps.toString());
 
             ps.executeUpdate();
         }catch(RepositoryAccessException | SQLException e){
@@ -293,7 +294,7 @@ public class CaseRepository extends AbstractRepository<Case> {
         ServiceRepository serviceRepository = new ServiceRepository();
         NoteRepository noteRepository = new NoteRepository();
 
-        ArrayList<Note> caseNotes = new ArrayList<> (noteRepository.findAllById(caseId));
+        ArrayList<Note> caseNotes = new ArrayList<> (noteRepository.findAllByCaseId(caseId));
         Location location = locationRepository.findById(locationId);
         Operator firstOperator = operatorRepository.findById(firstOperatorId);
         Operator lastEditedOperator = operatorRepository.findById(lastEditedOperatorId);
