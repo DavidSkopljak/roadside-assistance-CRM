@@ -23,7 +23,7 @@ public class ServiceRepository extends AbstractRepository<Service> {
     public Service findById(Long id) throws SQLException {
         LOCK.lock();
 
-        String sql = "SELECT service.id, service.assigned_driver_id, service.service_type_id, service.service_state_id, service.service_notes FROM service WHERE id = ?";
+        String sql = "SELECT service.id, service.assigned_driver_id, service.service_type_id, service.service_state_id, service.service_notes, service.case_id FROM service WHERE id = ?";
         try (Connection conn = DatabaseConnectionManager.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)){
             ps.setLong(1, id);
@@ -57,7 +57,7 @@ public class ServiceRepository extends AbstractRepository<Service> {
         List<Service> services = new ArrayList<>();
         LOCK.lock();
 
-        String sql = "SELECT service.id, service.assigned_driver_id, service.service_type_id, service.service_state_id, service.service_notes FROM service WHERE 1 = 1";
+        String sql = "SELECT service.id, service.assigned_driver_id, service.service_type_id, service.service_state_id, service.service_notes, service.case_id FROM service WHERE 1 = 1";
         try (Connection conn = DatabaseConnectionManager.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()){
@@ -85,7 +85,7 @@ public class ServiceRepository extends AbstractRepository<Service> {
     @Override
     public Long save(Service entity) throws SQLException {
         LOCK.lock();
-        String sql = "INSERT INTO service (assigned_driver_id, service_type_id, service_state_id) VALUES (?, ?, ?) RETURNING id";
+        String sql = "INSERT INTO service (assigned_driver_id, service_type_id, service_state_id, service.case_id) VALUES (?, ?, ?, ?) RETURNING id";
         try (Connection conn = DatabaseConnectionManager.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)){
 
@@ -96,15 +96,18 @@ public class ServiceRepository extends AbstractRepository<Service> {
 
             Long serviceStateId = RepositoryHelper.queryServiceStateByState(entity.getState(), conn);
 
+            Long caseId = entity.getCaseId();
+
 
             ps.setLong(1, driverId);
             ps.setLong(2, serviceTypeId);
             ps.setLong(3, serviceStateId);
+            ps.setLong(4, caseId);
             try(ResultSet rs = ps.executeQuery();){
                 if (rs.next()) {
                     return rs.getLong("id");
                 }else{
-                    throw new EmptyResultSetException("No id retrieved for created driver, possible issue with database");
+                    throw new EmptyResultSetException("No id retrieved for created service, possible issue with database");
                 }
             }
 
@@ -118,7 +121,7 @@ public class ServiceRepository extends AbstractRepository<Service> {
     @Override
     public List<Service> saveAll(List<Service> entities) throws SQLException {
         LOCK.lock();
-        String sql = "INSERT INTO service (assigned_driver_id, service_type_id, service_state_id) VALUES (?, ?, ?) RETURNING id";
+        String sql = "INSERT INTO service (assigned_driver_id, service_type_id, service_state_id, case_id) VALUES (?, ?, ?, ?) RETURNING id";
         List<Service> saved = new ArrayList<>();
 
         try (Connection conn = DatabaseConnectionManager.getInstance().getConnection()) {
@@ -129,10 +132,12 @@ public class ServiceRepository extends AbstractRepository<Service> {
 
                     Long serviceTypeId = RepositoryHelper.queryServiceTypeByType(entity.getServiceType(), conn);
                     Long serviceStateId = RepositoryHelper.queryServiceStateByState(entity.getState(), conn);
+                    Long caseId = entity.getCaseId();
 
                     ps.setLong(1, driverId);
                     ps.setLong(2, serviceTypeId);
                     ps.setLong(3, serviceStateId);
+                    ps.setLong(4, caseId);
 
                     try (ResultSet rs = ps.executeQuery()) {
                         if (rs.next()) {
@@ -150,6 +155,7 @@ public class ServiceRepository extends AbstractRepository<Service> {
 
         return saved;
     }
+
 
     @Override
     public void update(Service entity) throws SQLException {

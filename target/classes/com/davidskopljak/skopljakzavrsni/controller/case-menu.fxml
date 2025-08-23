@@ -21,9 +21,21 @@
                 <MenuItem mnemonicParsing="false" onAction="#handleViewLocationInfo" text="View case location" />
             </items>
         </Menu>
+
         <Menu mnemonicParsing="false" text="Resolve case">
             <items>
+                <MenuItem mnemonicParsing="false" onAction="#handleResolveCase" text="Resolve" />
+            </items>
+            <items>
                 <MenuItem mnemonicParsing="false" onAction="#handleCancelCase" text="Cancel" />
+            </items>
+            <items>
+                <MenuItem mnemonicParsing="false" onAction="#handleExitCase" text="Exit" />
+            </items>
+        </Menu>
+        <Menu id="viewServicesMenu" mnemonicParsing="false" text="Services">
+            <items>
+                <MenuItem mnemonicParsing="false" onAction="#handleViewServices" text="View services" />
             </items>
         </Menu>
     </menus>

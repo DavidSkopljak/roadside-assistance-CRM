@@ -1,16 +1,11 @@
 package com.davidskopljak.skopljakzavrsni.controller;
 
 import com.davidskopljak.skopljakzavrsni.entity.*;
-import com.davidskopljak.skopljakzavrsni.exceptions.AccountLoginException;
 import com.davidskopljak.skopljakzavrsni.exceptions.RepositoryAccessException;
 import com.davidskopljak.skopljakzavrsni.repository.CaseRepository;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-
-import java.io.IOException;
 
 public class MainViewController {
     @FXML

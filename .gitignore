@@ -143,5 +143,6 @@ replay_pid*
 *.properties
 *.env
 *.log
+database_backup
 
 # End of https://www.toptal.com/developers/gitignore/api/intellij,java

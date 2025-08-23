@@ -4,7 +4,11 @@ import com.davidskopljak.skopljakzavrsni.enums.CaseState;
 import com.davidskopljak.skopljakzavrsni.exceptions.RepositoryAccessException;
 import com.davidskopljak.skopljakzavrsni.helpers.MiscHelpers;
 import com.davidskopljak.skopljakzavrsni.repository.CaseRepository;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 
+import java.io.IOException;
 import java.sql.SQLException;
 
 public class CaseMenuController{
@@ -30,8 +34,27 @@ public class CaseMenuController{
         }
     }
 
-    public void handleCancelCase() {
-        MiscHelpers.loadScene("main-view.fxml", "Main menu");
+    public void handleCancelCase() { /*TODO*/ }
+
+    public void handleExitCase() {
+        caseWindowController.getStage().close();
+    }
+
+    public void handleResolveCase() { /*TODO*/ }
+
+
+    public void handleViewServices() {
+        try {
+            FXMLLoader loader = new FXMLLoader(CRMApplication.class.getResource("services-list.fxml"));
+            Parent root = loader.load();
+            caseWindowController.getStage().setScene(new Scene(root));
+            caseWindowController.getStage().setTitle("View services");
+            caseWindowController.getStage().show();
+            ServicesListController servicesListController = loader.getController();
+            servicesListController.setCaseId(this.caseWindowController.getActiveCase().getId());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void setCaseWindowController(CaseWindowController controller) {

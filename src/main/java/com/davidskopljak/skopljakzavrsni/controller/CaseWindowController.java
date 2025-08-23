@@ -14,15 +14,11 @@ public class CaseWindowController {
     private Case activeCase;
 
     public CaseWindowController() {
-        this.activeCase = new Case();
         this.stage = new Stage();
         this.stage.setTitle("Case Window");
         this.activeCase = null;
 
-        // Load initial scene
         loadScene("case.fxml", "Case info", CaseInfoController.class );
-
-        stage.show();
     }
 
     public CaseWindowController(Case activeCase) {
@@ -31,7 +27,7 @@ public class CaseWindowController {
         this.stage.setTitle("Case Window");
 
         loadScene("case.fxml", "Case info", CaseInfoController.class);
-        System.out.println("Case window controller created with case: " + activeCase.getId() + " - " + activeCase.getClient().getFirstName() + " " + activeCase.getClient().getLastName() + activeCase.getLocation().getAddress() + ", " + activeCase.getClientVehicle().getId() );
+        System.out.println("Case window controller created with case: " + activeCase.getId() + " - " + activeCase.getClient().getFirstName() + " " + activeCase.getClient().getLastName() + activeCase.getLocation().getAddress() + ", " + activeCase.getClientVehicle().getId());
         stage.show();
     }
 
@@ -59,5 +55,8 @@ public class CaseWindowController {
     }
     public void setActiveCase(Case activeCase) {
         this.activeCase = activeCase;
+    }
+    public Stage getStage() {
+        return this.stage;
     }
 }

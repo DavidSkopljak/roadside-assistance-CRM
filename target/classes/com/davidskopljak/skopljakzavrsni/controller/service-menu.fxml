@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+
+<MenuBar prefHeight="30.0" prefWidth="1080.0" xmlns="http://javafx.com/javafx/24" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.davidskopljak.skopljakzavrsni.controller.ServiceMenuController">
+    <menus>
+        <Menu mnemonicParsing="false" text="Save service">
+            <items>
+                <MenuItem mnemonicParsing="false" onAction="#handleSaveService" text="Save" />
+            </items>
+        </Menu>
+        <Menu mnemonicParsing="false" text="Service notes">
+            <items>
+                <MenuItem mnemonicParsing="false" onAction="#handleViewServiceNotes" text="View notes" />
+            </items>
+        </Menu>
+        <Menu mnemonicParsing="false" text="Resolve service">
+            <items>
+                <MenuItem mnemonicParsing="false" onAction="#handleResolveService" text="Resolve" />
+            </items>
+            <items>
+                <MenuItem mnemonicParsing="false" onAction="#handleCancelService" text="Cancel" />
+            </items>
+        </Menu>
+    </menus>
+</MenuBar>

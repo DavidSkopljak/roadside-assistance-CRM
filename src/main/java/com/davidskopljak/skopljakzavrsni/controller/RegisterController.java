@@ -101,7 +101,7 @@ public class RegisterController {
             OperatorRepository repository = new OperatorRepository();
             Long operatorId = repository.save(new Operator(username, firstName, lastName));
             CRMApplication.logIn(new Operator(operatorId, username, firstName, lastName));
-            MiscHelpers.loadScene("main-view.fxml", "Cases overview");
+            MiscHelpers.loadScene("main-view.fxml", "Cases overview", CRMApplication.getPrimaryStage());
         } catch (IOException | SQLException e) {
             System.out.println(e.getMessage());
             throw new AccountCreationExcepiton("Failed to create new account.");
@@ -110,6 +110,6 @@ public class RegisterController {
 
     @FXML
     public void handleOpenLogin(ActionEvent event) {
-        MiscHelpers.loadScene("login.fxml", "Log in");
+        MiscHelpers.loadScene("login.fxml", "Log in", CRMApplication.getPrimaryStage());
     }
 }

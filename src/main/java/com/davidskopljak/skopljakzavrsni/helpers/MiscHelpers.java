@@ -26,7 +26,7 @@ public class MiscHelpers {
         alert.showAndWait();
     }
 
-    public static void loadScene(String fxmlFile, String title) {
+    public static void loadScene(String fxmlFile, String title, Stage stage) {
         try {
             URL fxmlUrl = CRMApplication.class.getResource(fxmlFile);
             if (fxmlUrl == null) {
@@ -37,9 +37,6 @@ public class MiscHelpers {
 
             FXMLLoader fxmlLoader = new FXMLLoader(fxmlUrl);
             Parent root = fxmlLoader.load();
-
-            Stage stage = (Stage) CRMApplication.getPrimaryStage();
-
             stage.setTitle(title);
             stage.setScene(new Scene(root));
             stage.show();

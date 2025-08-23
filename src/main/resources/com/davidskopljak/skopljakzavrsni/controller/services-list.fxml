@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+
+
+<AnchorPane fx:id="rootAnchorPane" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1080.0" xmlns="http://javafx.com/javafx/24" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.davidskopljak.skopljakzavrsni.controller.ServicesListController">
+    <TableView id="caseTableView" fx:id="servicesTableView" layoutY="28.0" prefHeight="572.0" prefWidth="1080.0">
+        <columns>
+            <TableColumn id="serviceIDTableColumn" fx:id="caseIdTableColumn" minWidth="-Infinity" prefWidth="270.0" text="Service ID" />
+            <TableColumn id="serviceTypeTableColumn" fx:id="vehicleBrandTableColumn" minWidth="-Infinity" prefWidth="270.0" text="Service type" />
+            <TableColumn id="driverLastNameTableColumn" fx:id="lastNameTableColumn" minWidth="-Infinity" prefWidth="270.0" text="Last name" />
+            <TableColumn id="driverFirstNameTableColumn" fx:id="firstNameTableColumn" minWidth="-Infinity" prefWidth="270.0" text="First name" />
+        </columns>
+    </TableView>
+</AnchorPane>

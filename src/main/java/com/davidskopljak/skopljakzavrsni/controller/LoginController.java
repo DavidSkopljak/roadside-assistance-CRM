@@ -82,7 +82,7 @@ public class LoginController {
 
                 OperatorRepository repository = new OperatorRepository();
                 CRMApplication.logIn(repository.findByUsername(username));
-                MiscHelpers.loadScene("main-view.fxml", "Cases overview");
+                MiscHelpers.loadScene("main-view.fxml", "Cases overview", CRMApplication.getPrimaryStage());
 
             } else {
                 MiscHelpers.showAlert("Incorrect username or password. Please try again.");
@@ -97,6 +97,6 @@ public class LoginController {
 
     @FXML
     public void handleOpenRegister(ActionEvent event) {
-        MiscHelpers.loadScene("register.fxml", "Register");
+        MiscHelpers.loadScene("register.fxml", "Register", CRMApplication.getPrimaryStage());
     }
 }
