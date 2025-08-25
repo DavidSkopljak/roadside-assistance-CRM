@@ -23,6 +23,9 @@
             <items>
                 <MenuItem mnemonicParsing="false" onAction="#handleCancelService" text="Cancel" />
             </items>
+            <items>
+                <MenuItem mnemonicParsing="false" onAction="#handleExitService" text="Exit" />
+            </items>
         </Menu>
     </menus>
 </MenuBar>

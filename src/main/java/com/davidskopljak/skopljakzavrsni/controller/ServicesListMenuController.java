@@ -15,15 +15,18 @@ public class ServicesListMenuController {
         try {
             FXMLLoader loader = new FXMLLoader(CRMApplication.class.getResource("service.fxml"));
             Parent root = loader.load();
+            ServiceController serviceController = loader.getController();
             if (this.caseId != null) {
-                ServiceController serviceController = loader.getController();
                 serviceController.setCaseId(this.caseId);
-                serviceController.setServicesListController(this.servicesListController);
             }
+            serviceController.setServicesListController(this.servicesListController);
+            serviceController.setActiveService(null);
             Stage stage = new Stage();
+            serviceController.setStage(stage);
             stage.setScene(new Scene(root));
             stage.setTitle("New service");
             stage.show();
+
         } catch (IOException e) {
             e.printStackTrace();
         }

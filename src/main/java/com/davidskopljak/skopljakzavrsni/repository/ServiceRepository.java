@@ -23,7 +23,7 @@ public class ServiceRepository extends AbstractRepository<Service> {
     public Service findById(Long id) throws SQLException {
         LOCK.lock();
 
-        String sql = "SELECT service.id, service.assigned_driver_id, service.service_type_id, service.service_state_id, service.service_notes, service.case_id FROM service WHERE id = ?";
+        String sql = "SELECT service.id, service.assigned_driver_id, service.service_type_id, service.service_state_id, service.service_notes, service.case_id, service.driver_notes FROM service WHERE id = ?";
         try (Connection conn = DatabaseConnectionManager.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)){
             ps.setLong(1, id);
@@ -39,7 +39,10 @@ public class ServiceRepository extends AbstractRepository<Service> {
                     ServiceType serviceType = RepositoryHelper.queryServiceTypeById(serviceTypeId, conn);
                     ServiceState serviceState = RepositoryHelper.queryServiceStateById(serviceStateId, conn);
 
-                    return new Service(serviceId, assignedDriver, serviceType, serviceState);
+                    Long caseId = rs.getLong("case_id");
+                    String driverNotes = rs.getString("driver_notes");
+
+                    return new Service(serviceId, caseId, assignedDriver, serviceType, serviceState,driverNotes);
                 }else{
                     throw new EmptyResultSetException("service with id " + id + " not found");
                 }
@@ -57,7 +60,7 @@ public class ServiceRepository extends AbstractRepository<Service> {
         List<Service> services = new ArrayList<>();
         LOCK.lock();
 
-        String sql = "SELECT service.id, service.assigned_driver_id, service.service_type_id, service.service_state_id, service.service_notes, service.case_id FROM service WHERE 1 = 1";
+        String sql = "SELECT service.id, service.assigned_driver_id, service.service_type_id, service.service_state_id, service.service_notes, service.case_id, service.driver_notes FROM service WHERE 1 = 1";
         try (Connection conn = DatabaseConnectionManager.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()){
@@ -71,7 +74,10 @@ public class ServiceRepository extends AbstractRepository<Service> {
                     ServiceType serviceType = RepositoryHelper.queryServiceTypeById(serviceTypeId, conn);
                     ServiceState serviceState = RepositoryHelper.queryServiceStateById(serviceStateId, conn);
 
-                    Service service = new Service(serviceId, assignedDriver, serviceType, serviceState);
+                    Long caseId = rs.getLong("case_id");
+                    String driverNotes = rs.getString("driver_notes");
+
+                    Service service = new Service(caseId, serviceId, assignedDriver, serviceType, serviceState, driverNotes);
                     services.add(service);
                 }
                 return services;
@@ -85,24 +91,23 @@ public class ServiceRepository extends AbstractRepository<Service> {
     @Override
     public Long save(Service entity) throws SQLException {
         LOCK.lock();
-        String sql = "INSERT INTO service (assigned_driver_id, service_type_id, service_state_id, service.case_id) VALUES (?, ?, ?, ?) RETURNING id";
+        String sql = "INSERT INTO service (assigned_driver_id, service_type_id, service_state_id, case_id, driver_notes) VALUES (?, ?, ?, ?, ?) RETURNING id";
         try (Connection conn = DatabaseConnectionManager.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)){
 
             DriverRepository driverRepository = new DriverRepository();
             Long driverId = driverRepository.save(entity.getAssignedDriver());
-
             Long serviceTypeId = RepositoryHelper.queryServiceTypeByType(entity.getServiceType(), conn);
-
             Long serviceStateId = RepositoryHelper.queryServiceStateByState(entity.getState(), conn);
-
             Long caseId = entity.getCaseId();
+            String driverNotes = entity.getDriverNotes();
 
 
             ps.setLong(1, driverId);
             ps.setLong(2, serviceTypeId);
             ps.setLong(3, serviceStateId);
             ps.setLong(4, caseId);
+            ps.setString(5, driverNotes);
             try(ResultSet rs = ps.executeQuery();){
                 if (rs.next()) {
                     return rs.getLong("id");
@@ -121,7 +126,7 @@ public class ServiceRepository extends AbstractRepository<Service> {
     @Override
     public List<Service> saveAll(List<Service> entities) throws SQLException {
         LOCK.lock();
-        String sql = "INSERT INTO service (assigned_driver_id, service_type_id, service_state_id, case_id) VALUES (?, ?, ?, ?) RETURNING id";
+        String sql = "INSERT INTO service (assigned_driver_id, service_type_id, service_state_id, case_id, driver_notes) VALUES (?, ?, ?, ?, ?) RETURNING id";
         List<Service> saved = new ArrayList<>();
 
         try (Connection conn = DatabaseConnectionManager.getInstance().getConnection()) {
@@ -129,15 +134,16 @@ public class ServiceRepository extends AbstractRepository<Service> {
                 try (PreparedStatement ps = conn.prepareStatement(sql)) {
                     DriverRepository driverRepository = new DriverRepository();
                     Long driverId = driverRepository.save(entity.getAssignedDriver());
-
                     Long serviceTypeId = RepositoryHelper.queryServiceTypeByType(entity.getServiceType(), conn);
                     Long serviceStateId = RepositoryHelper.queryServiceStateByState(entity.getState(), conn);
                     Long caseId = entity.getCaseId();
+                    String driverNotes = entity.getDriverNotes(); // <-- added
 
                     ps.setLong(1, driverId);
                     ps.setLong(2, serviceTypeId);
                     ps.setLong(3, serviceStateId);
                     ps.setLong(4, caseId);
+                    ps.setString(5, driverNotes); // <-- added
 
                     try (ResultSet rs = ps.executeQuery()) {
                         if (rs.next()) {
@@ -160,7 +166,7 @@ public class ServiceRepository extends AbstractRepository<Service> {
     @Override
     public void update(Service entity) throws SQLException {
         LOCK.lock();
-        String sql = "UPDATE service SET assigned_driver_id = ?, service_type_id = ?, service_state_id = ? WHERE id = ?";
+        String sql = "UPDATE service SET assigned_driver_id = ?, service_type_id = ?, service_state_id = ?, driver_notes = ? WHERE id = ?";
 
         try (Connection conn = DatabaseConnectionManager.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -170,17 +176,20 @@ public class ServiceRepository extends AbstractRepository<Service> {
 
             Long serviceTypeId = RepositoryHelper.queryServiceTypeByType(entity.getServiceType(), conn);
             Long serviceStateId = RepositoryHelper.queryServiceStateByState(entity.getState(), conn);
+            String driverNotes = entity.getDriverNotes(); // <-- added
 
             ps.setLong(1, entity.getAssignedDriver().getId());
             ps.setLong(2, serviceTypeId);
             ps.setLong(3, serviceStateId);
-            ps.setLong(4, entity.getId());
+            ps.setString(4, driverNotes); // <-- added
+            ps.setLong(5, entity.getId());
 
             ps.executeUpdate();
         } finally {
             LOCK.unlock();
         }
     }
+
 
     @Override
     public void deleteById(Long id) throws SQLException {

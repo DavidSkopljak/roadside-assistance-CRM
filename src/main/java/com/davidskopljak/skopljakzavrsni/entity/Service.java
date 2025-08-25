@@ -15,26 +15,23 @@ public non-sealed class Service extends Entity implements Trackable<ServiceState
     private List<Note> serviceNotes = new ArrayList<>();
     private Workshop workshop;
     private Long caseId;
+    private String driverNotes;
 
-    public Service(Long id, Driver assignedDriver, ServiceType serviceType, ServiceState serviceState){
+    public Service(Long id, Long caseId, Driver assignedDriver, ServiceType serviceType, ServiceState serviceState, String driverNotes){
         super(id);
+        this.caseId = caseId;
         this.assignedDriver = assignedDriver;
         this.serviceType = serviceType;
         this.serviceState = serviceState;
+        this.driverNotes = driverNotes;
     }
 
-    public Service(Driver assignedDriver, ServiceType serviceType, ServiceState serviceState) {
+    public Service(Long caseId, Driver assignedDriver, ServiceType serviceType, ServiceState serviceState, String driverNotes) {
+        this.caseId = caseId;
         this.assignedDriver = assignedDriver;
         this.serviceType = serviceType;
         this.serviceState = serviceState;
-    }
-
-    public Service(Long id, Service service) {
-        super(id);
-        this.assignedDriver = service.getAssignedDriver();
-        this.serviceType = service.getServiceType();
-        this.serviceState = service.getState();
-        this.serviceNotes = service.getNotes();
+        this.driverNotes = driverNotes;
     }
 
     public Driver getAssignedDriver() {
@@ -90,6 +87,17 @@ public non-sealed class Service extends Entity implements Trackable<ServiceState
         return caseId;
     }
 
+    public void setCaseId(Long caseId) {
+        this.caseId = caseId;
+    }
+
+    public String getDriverNotes() {
+        return driverNotes;
+    }
+
+    public void setDriverNotes(String driverNotes) {
+        this.driverNotes = driverNotes;
+    }
 
     @Override
     public void updateState(ServiceState state) {

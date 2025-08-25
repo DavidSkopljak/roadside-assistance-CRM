@@ -246,7 +246,6 @@ public class CaseInfoController implements CaseController {
                 .setDamageDescription(damageDescription)
                 .setCreatedDateTime(createdTime);
 
-        System.out.println("Setting newCase info with vehicle: " + newCase.getClientVehicle().getId() + " " + newCase.getClientVehicle().getModel());
         caseWindowController.setActiveCase(newCase);
     }
 

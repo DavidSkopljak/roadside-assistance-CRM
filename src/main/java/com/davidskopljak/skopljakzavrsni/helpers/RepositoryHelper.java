@@ -207,6 +207,42 @@ public class RepositoryHelper {
         }
     }
 
+    public static List <ServiceType> queryAllServiceTypes(Connection conn) throws SQLException {
+        String serviceTypeQuery = "SELECT service_type.type FROM service_type";
+        ArrayList<ServiceType> types = new ArrayList<>();
+        try(Statement stmt = conn.createStatement()){
+            try(ResultSet rs = stmt.executeQuery(serviceTypeQuery)){
+                while (rs.next()) {
+                    ServiceType type = ServiceType.valueOf(rs.getString("type"));
+                    types.add(type);
+                }
+                if (types.isEmpty()) {
+                    throw new EmptyResultSetException("No service types retrieved from the database.");
+                } else{
+                    return types;
+                }
+            }
+        }
+    }
+
+    public static List <DriverState> queryAllDriverStates(Connection conn) throws SQLException {
+        String serviceTypeQuery = "SELECT driver_state.state FROM driver_state";
+        ArrayList<DriverState> states = new ArrayList<>();
+        try(Statement stmt = conn.createStatement()){
+            try(ResultSet rs = stmt.executeQuery(serviceTypeQuery)){
+                while (rs.next()) {
+                    DriverState state = DriverState.valueOf(rs.getString("state"));
+                    states.add(state);
+                }
+                if (states.isEmpty()) {
+                    throw new EmptyResultSetException("No driver states retrieved from the database.");
+                }else{
+                    return states;
+                }
+            }
+        }
+    }
+
     public static ServiceType queryServiceTypeById(Long id, Connection conn) throws SQLException {
         String sql = "SELECT service_type.type FROM service_type WHERE id = ?";
         try(PreparedStatement ps = conn.prepareStatement(sql)){
@@ -262,6 +298,4 @@ public class RepositoryHelper {
             }
         }
     }
-
-
 }

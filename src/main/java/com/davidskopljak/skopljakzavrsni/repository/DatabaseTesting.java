@@ -3,6 +3,7 @@ import com.davidskopljak.skopljakzavrsni.entity.*;
 import com.davidskopljak.skopljakzavrsni.enums.CaseState;
 import com.davidskopljak.skopljakzavrsni.enums.VehicleDamageCause;
 import com.davidskopljak.skopljakzavrsni.enums.VehicleDamageType;
+import com.davidskopljak.skopljakzavrsni.enums.VehicleModel;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -138,6 +139,8 @@ public class DatabaseTesting {
             System.out.println(workshop.getLocation().getPostalCode());
             System.out.println();
         }*/
+        WorkshopRepository workshopRepository = new WorkshopRepository();
+        workshopRepository.save(new Workshop("Roca", (new Location(new BigDecimal(45.7940682315135), new BigDecimal(15.95745913839981))), VehicleModel.RENAULT));
     }
 
 }
