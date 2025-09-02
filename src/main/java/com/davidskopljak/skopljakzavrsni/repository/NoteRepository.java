@@ -13,25 +13,24 @@ public class NoteRepository extends AbstractRepository<Note>{
     private static final ReentrantLock LOCK = new ReentrantLock(true);
 
     @Override
-    public Note findById(Long id) throws SQLException {
+    public Note findById(Long id) {
         return null;
     }
 
     @Override
-    public List<Note> findAll() throws SQLException {
+    public List<Note> findAll() {
         return List.of();
     }
 
     @Override
-    public Long save(Note entity) throws SQLException {
+    public Long save(Note entity){
         LOCK.lock();
-        String sql = "INSERT INTO note (text, case_id, date_created) VALUES (?, ?, ?) RETURNING id";
+        String sql = "INSERT INTO note (text, case_id) VALUES (?, ?) RETURNING id";
         try (Connection conn = DatabaseConnectionManager.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)){
 
             ps.setString(1, entity.getMessage());
-            ps.setTimestamp(2, Timestamp.from(entity.getTimestamp()));
-            ps.setString(3, entity.getMessage());
+            ps.setLong(2, entity.getCaseId());
 
             try(ResultSet rs = ps.executeQuery();){
                 if (rs.next()) {
@@ -41,25 +40,24 @@ public class NoteRepository extends AbstractRepository<Note>{
                 }
             }
 
-        }catch(RepositoryAccessException e){
-            throw new RepositoryAccessException(e.getMessage(), e);
+        }catch(SQLException | RepositoryAccessException e){
+            throw new RepositoryAccessException(e);
         }finally {
             LOCK.unlock();
         }
     }
 
     @Override
-    public void update(Note entity) throws SQLException {
+    public void update(Note entity) {
         LOCK.lock();
-        String sql = "UPDATE note SET text = ?, case_id = ?, date_created = ? WHERE id = ?";
+        String sql = "UPDATE note SET text = ?, case_id = ? WHERE id = ?";
 
         try (Connection conn = DatabaseConnectionManager.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, entity.getMessage());
             ps.setLong(2, entity.getCaseId());
-            ps.setTimestamp(3, Timestamp.from(entity.getTimestamp()));
-            ps.setLong(4, entity.getId());
+            ps.setLong(3, entity.getId());
 
             int updatedRows = ps.executeUpdate();
             if (updatedRows == 0) {
@@ -67,21 +65,19 @@ public class NoteRepository extends AbstractRepository<Note>{
             }
 
         } catch (RepositoryAccessException | SQLException e) {
-            throw new RepositoryAccessException(e.getMessage(), e);
+            throw new RepositoryAccessException(e);
         } finally {
             LOCK.unlock();
         }
     }
 
     @Override
-    public void deleteById(Long id) throws SQLException {
-
-    }
+    public void deleteById(Long id) {}
 
     @Override
-    public List<Note> saveAll(List<Note> entities) throws SQLException {
+    public List<Note> saveAll(List<Note> entities) {
         LOCK.lock();
-        String sql = "INSERT INTO note (text, case_id, date_created) VALUES (?, ?, ?) RETURNING id";
+        String sql = "INSERT INTO note (text, case_id) VALUES (?, ?) RETURNING id";
         List<Note> savedNotes = new ArrayList<>();
 
         try (Connection conn = DatabaseConnectionManager.getInstance().getConnection()) {
@@ -89,14 +85,12 @@ public class NoteRepository extends AbstractRepository<Note>{
                 try (PreparedStatement ps = conn.prepareStatement(sql)) {
                     ps.setString(1, entity.getMessage());
                     ps.setLong(2, entity.getCaseId());
-                    ps.setTimestamp(3, Timestamp.from(entity.getTimestamp()));
 
                     try (ResultSet rs = ps.executeQuery()) {
                         if (rs.next()) {
                             Note savedNote = new Note(
                                     rs.getLong("id"),
                                     entity.getMessage(),
-                                    entity.getTimestamp(),
                                     entity.getCaseId()
                             );
                             savedNotes.add(savedNote);
@@ -107,27 +101,29 @@ public class NoteRepository extends AbstractRepository<Note>{
                 }
             }
             return savedNotes;
-        } catch (RepositoryAccessException e) {
-            throw new RepositoryAccessException(e.getMessage(), e);
+        } catch (RepositoryAccessException | SQLException e) {
+            throw new RepositoryAccessException(e);
         } finally {
             LOCK.unlock();
         }
     }
 
 
-    public List<Note> findAllByCaseId(Long caseId) throws SQLException {
+    public List<Note> findAllByCaseId(Long caseId) {
         LOCK.lock();
         List<Note> notes = new ArrayList<>();
 
-        String sql = "SELECT text, case_id, date_created FROM note WHERE case_id = ?";
+        String sql = "SELECT id, text, case_id, date_created FROM note WHERE case_id = ?";
         try (Connection conn = DatabaseConnectionManager.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)){
 
             ps.setLong(1, caseId);
 
-            try(ResultSet rs = ps.executeQuery();){
+            try(ResultSet rs = ps.executeQuery()){
                 while (rs.next()) {
-                    notes.add(new Note(rs.getLong("id"), rs.getString("text"), rs.getTimestamp("date_created").toInstant(), rs.getLong("case_id")));
+                    Note n = new Note(rs.getLong("id"), rs.getString("text"), rs.getLong("case_id"));
+                    n.setTimestamp(rs.getTimestamp("date_created").toInstant());
+                    notes.add(n);
                 }
 
                 if (notes.isEmpty()) {
@@ -136,8 +132,8 @@ public class NoteRepository extends AbstractRepository<Note>{
                     return notes;
                 }
             }
-        }catch(RepositoryAccessException e){
-            throw new RepositoryAccessException(e.getMessage(), e);
+        }catch(RepositoryAccessException | SQLException e){
+            throw new RepositoryAccessException(e);
         }finally {
             LOCK.unlock();
         }

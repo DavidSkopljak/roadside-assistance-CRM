@@ -3,7 +3,6 @@ package com.davidskopljak.skopljakzavrsni.controller;
 import com.davidskopljak.skopljakzavrsni.exceptions.AccountLoginException;
 import com.davidskopljak.skopljakzavrsni.helpers.MiscHelpers;
 import com.davidskopljak.skopljakzavrsni.repository.OperatorRepository;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.PasswordField;
@@ -26,7 +25,7 @@ public class LoginController {
 
     // NOTE: nek se zna da sam pokusao ovdje maknuti @FXML jer je metoda ali se aplikacija ne pali ako ga tu ne stavim ¯\_(ツ)_/¯
     @FXML
-    private void handleLogin(ActionEvent event) {
+    private void handleLogin() {
         String username = usernameTextField.getText().trim();
         String password = passwordPasswordField.getText();
 
@@ -44,20 +43,16 @@ public class LoginController {
             }
 
             String currentHash = null;
-            String firstName = null;
-            String lastName = null;
 
             try (BufferedReader reader = new BufferedReader(new FileReader(existingUsersPath.toFile()))) {
                 String storedUsername;
                 while ((storedUsername = reader.readLine()) != null) {
                     String storedHash = reader.readLine();
-                    String storedFirstName = reader.readLine();
-                    String storedLastName = reader.readLine();
+                    String _ = reader.readLine();
+                    String _ = reader.readLine();
 
                     if (storedUsername.equalsIgnoreCase(username)) {
                         currentHash = storedHash;
-                        firstName = storedFirstName;
-                        lastName = storedLastName;
                         break;
                     }
                 }
@@ -74,8 +69,6 @@ public class LoginController {
 
             if (currentHash.equals(base64Hash)) {
                 MiscHelpers.showAlert("Login successful!", Alert.AlertType.INFORMATION);
-
-                System.out.println("Logged in user: " + username + ", First Name: " + firstName + ", Last Name: " + lastName);
 
                 usernameTextField.clear();
                 passwordPasswordField.clear();
@@ -95,8 +88,7 @@ public class LoginController {
         }
     }
 
-    @FXML
-    public void handleOpenRegister(ActionEvent event) {
+    public void handleOpenRegister() {
         MiscHelpers.loadScene("register.fxml", "Register", CRMApplication.getPrimaryStage());
     }
 }

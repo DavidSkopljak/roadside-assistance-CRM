@@ -21,9 +21,9 @@ public class WorkshopRepository extends AbstractRepository<Workshop> {
     public Workshop findById(Long id) throws SQLException {
         LOCK.lock();
 
-        String vehicleQuery = "SELECT workshop.id, workshop.name, workshop.locationId, workshop.vehicle_model FROM workshop " +
-                "INNER JOIN vehicle_model ON vehicle_model.id = workshop.vehicle_model_id" +
-                "WHERE id = ?";
+        String vehicleQuery = "SELECT workshop.id, workshop.name, workshop.location_id, workshop.vehicle_model_id FROM workshop " +
+                "INNER JOIN vehicle_model ON vehicle_model.id = workshop.vehicle_model_id " +
+                "WHERE workshop.id = ?";
         try (Connection conn = DatabaseConnectionManager.getInstance().getConnection();
              final PreparedStatement vq = conn.prepareStatement(vehicleQuery);){
             vq.setLong(1, id);
@@ -34,7 +34,7 @@ public class WorkshopRepository extends AbstractRepository<Workshop> {
                 String name = rs.getString("name");
                 Long locationId = rs.getLong("location_id");
                 Location location = queryLocationById(locationId);
-                VehicleModel vehicleModel = VehicleModel.valueOf(rs.getString("vehicle_model_id"));
+                VehicleModel vehicleModel = RepositoryHelper.queryVehicleModelById(rs.getLong("vehicle_model_id"), conn);
 
                 return new Workshop(workshopId, name, location, vehicleModel);
             }else{

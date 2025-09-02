@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane fx:id="rootAnchorPane" id="anchorPane" prefHeight="597.0" prefWidth="1191.0" xmlns="http://javafx.com/javafx/24" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.davidskopljak.skopljakzavrsni.controller.CaseNotesController">
+    <ScrollPane layoutY="29.0" prefHeight="568.0" prefWidth="1191.0">
+        <content>
+            <VBox fx:id="notesVbox" prefHeight="568.0" prefWidth="1191.0" />
+        </content>
+    </ScrollPane>
+</AnchorPane>

@@ -12,7 +12,6 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListCell;
@@ -41,118 +40,154 @@ public class ServiceController{
     @FXML
     private ComboBox<Driver> driverComboBox;
 
+    @FXML
+    private Button confirmButton;
+
     private Stage stage;
     private Service activeService;
-    private ServiceMenuController serviceMenuController;
-    private ServicesListController servicesListController;
     private Long caseId;
 
     public void initialize() {
-        injectServiceMenuController();
         initializeBaseData();
-        initializeActiveService();
     }
 
     private void initializeActiveService() {
-        if (activeService == null) return;
+        if (activeService != null) {
+            driverComboBox.getItems().stream()
+                    .filter(d -> d.getId().equals(activeService.getAssignedDriver().getId()))
+                    .findFirst()
+                    .ifPresent(d -> driverComboBox.getSelectionModel().select(d));
 
-        if (activeService.getAssignedDriver() != null) {
-            driverComboBox.getSelectionModel().select(activeService.getAssignedDriver());
+            serviceTypeComboBox.getItems().stream()
+                    .filter(t -> t.equals(activeService.getServiceType()))
+                    .findFirst()
+                    .ifPresent(t -> serviceTypeComboBox.getSelectionModel().select(t));
+
+            workshopComboBox.getItems().stream()
+                    .filter(w -> w.getId().equals(activeService.getWorkshop().getId()))
+                    .findFirst()
+                    .ifPresent(w -> workshopComboBox.getSelectionModel().select(w));
+            refreshEditableState();
         }
-        if (activeService.getServiceType() != null) {
-            serviceTypeComboBox.getSelectionModel().select(activeService.getServiceType());
-        }
-        if (activeService.getWorkshop() != null) {
-            workshopComboBox.getSelectionModel().select(activeService.getWorkshop());
-        }
+
+        // this is here instead of in initialize() because the menu can't refresh it's service state properly if the active service isn't set yet
+        injectServiceMenuController();
     }
 
     private void initializeBaseData() {
-        try (Connection conn = DatabaseConnectionManager.getInstance().getConnection();){
+        loadServiceTypes();
+        loadDrivers();
+        loadWorkshops();
+    }
+
+    private void loadServiceTypes() {
+        try (Connection conn = DatabaseConnectionManager.getInstance().getConnection()) {
             var serviceTypes = RepositoryHelper.queryAllServiceTypes(conn);
             ObservableList<ServiceType> typeList = FXCollections.observableArrayList(serviceTypes);
             serviceTypeComboBox.setItems(typeList);
-        }catch(RepositoryAccessException e){
-            throw new RepositoryAccessException("Failed to load service types from database: " + e.getMessage());
-        }catch(SQLException e){
-            throw new RepositoryAccessException("Failed to connect to database: " + e.getMessage());
+        } catch (RepositoryAccessException e) {
+            throw new RepositoryAccessException("Failed to load service types from database: " + e.getMessage(), e);
+        } catch (SQLException e) {
+            throw new RepositoryAccessException("Failed to connect to database: " + e.getMessage(), e);
         }
+    }
 
-        try{
+    private void loadDrivers() {
+        try {
             DriverRepository driverRepository = new DriverRepository();
             var drivers = driverRepository.findAll();
             ObservableList<Driver> driverList = FXCollections.observableArrayList(drivers);
             driverComboBox.setItems(driverList);
 
-            Function<Driver, String> formatDriver = d -> d == null ? "" : d.getFirstName() + " " + d.getLastName();
+            setupDriverComboBox(driverComboBox);
+            setupWorkshopComboBox(workshopComboBox);
 
-            driverComboBox.setCellFactory(cb -> new ListCell<>() {
-                @Override
-                protected void updateItem(Driver d, boolean empty) {
-                    super.updateItem(d, empty);
-                    setText(empty ? "" : formatDriver.apply(d));
-                }
-            });
-            driverComboBox.setButtonCell(new ListCell<>() {
-                @Override
-                protected void updateItem(Driver d, boolean empty) {
-                    super.updateItem(d, empty);
-                    setText(empty ? "" : formatDriver.apply(d));
-                }
-            });
-
-            Function<Workshop, String> formatWorkshop = w -> w == null ? "" : w.getName() ;
-
-            workshopComboBox.setCellFactory(cb -> new ListCell<>() {
-                @Override
-                protected void updateItem(Workshop w, boolean empty) {
-                    super.updateItem(w, empty);
-                    setText(empty ? "" : formatWorkshop.apply(w));
-                }
-            });
-            workshopComboBox.setButtonCell(new ListCell<>() {
-                @Override
-                protected void updateItem(Workshop w, boolean empty) {
-                    super.updateItem(w, empty);
-                    setText(empty ? "" : formatWorkshop.apply(w));
-                }
-            });
-
-
-        }catch (SQLException e){
-            throw new RepositoryAccessException("Failed to load drivers from database: " + e.getMessage());
+        } catch (SQLException e) {
+            throw new RepositoryAccessException("Failed to load drivers from database: " + e.getMessage(), e);
         }
+    }
 
-        try{
+    private void loadWorkshops() {
+        try {
             WorkshopRepository workshopRepository = new WorkshopRepository();
             var workshops = workshopRepository.findAll();
             ObservableList<Workshop> workshopList = FXCollections.observableArrayList(workshops);
             workshopComboBox.setItems(workshopList);
-        }catch(SQLException e){
-            throw new RepositoryAccessException("Failed to load workshops from database: " + e.getMessage());
+        } catch (SQLException e) {
+            throw new RepositoryAccessException("Failed to load workshops from database: " + e.getMessage(), e);
         }
+    }
 
+    private void setupDriverComboBox(ComboBox<Driver> comboBox) {
+        Function<Driver, String> formatDriver = d -> d == null ? "" : d.getFirstName() + " " + d.getLastName();
+
+        comboBox.setCellFactory(_ -> new ListCell<>() {
+            @Override
+            protected void updateItem(Driver d, boolean empty) {
+                super.updateItem(d, empty);
+                setText(empty ? "" : formatDriver.apply(d));
+            }
+        });
+
+        comboBox.setButtonCell(new ListCell<>() {
+            @Override
+            protected void updateItem(Driver d, boolean empty) {
+                super.updateItem(d, empty);
+                setText(empty ? "" : formatDriver.apply(d));
+            }
+        });
+    }
+
+    private void setupWorkshopComboBox(ComboBox<Workshop> comboBox) {
+        Function<Workshop, String> formatWorkshop = w -> w == null ? "" : w.getName();
+
+        comboBox.setCellFactory(_ -> new ListCell<>() {
+            @Override
+            protected void updateItem(Workshop w, boolean empty) {
+                super.updateItem(w, empty);
+                setText(empty ? "" : formatWorkshop.apply(w));
+            }
+        });
+
+        comboBox.setButtonCell(new ListCell<>() {
+            @Override
+            protected void updateItem(Workshop w, boolean empty) {
+                super.updateItem(w, empty);
+                setText(empty ? "" : formatWorkshop.apply(w));
+            }
+        });
     }
 
     private void injectServiceMenuController() {
         try {
             FXMLLoader loader = new FXMLLoader(CRMApplication.class.getResource("service-menu.fxml"));
             Parent menuRoot = loader.load();
-            this.serviceMenuController = loader.getController();
-            this.serviceMenuController.setServiceController(this);
+            ServiceMenuController serviceMenuController = loader.getController();
+            serviceMenuController.setServiceController(this);
+            serviceMenuController.setCaseId(this.caseId);
             rootAnchorPane.getChildren().addFirst(menuRoot);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void setServicesListController(ServicesListController servicesListController) {
-        this.servicesListController = servicesListController;
+    public void refreshEditableState() {
+        if (activeService == null) return;
+
+        boolean editable = activeService.getState() == ServiceState.ASSIGNED
+                || activeService.getState() == ServiceState.IN_PROGRESS;
+
+        workshopComboBox.setDisable(!editable);
+        serviceTypeComboBox.setDisable(!editable);
+        driverComboBox.setDisable(!editable);
+        driverNoteTextField.setDisable(!editable);
+        confirmButton.setDisable(!editable);
     }
 
     public void setActiveService(Service service) {
         this.activeService = service;
         initializeActiveService();
+        refreshEditableState();
     }
 
     public Service getActiveService() {
@@ -163,41 +198,56 @@ public class ServiceController{
         this.caseId = caseId;
     }
 
-    public Long getCaseId() {
-        return this.caseId;
-    }
 
-    public void setServiceInfo(){
-        if(this.activeService == null){
-            if(workshopComboBox.getSelectionModel().isEmpty()){
-                throw new IllegalStateException("Workshop must be selected");
-            }
+    public void setServiceInfo() {
+        if (this.activeService == null) {
+            validateNewServiceInputs();
 
-            if(serviceTypeComboBox.getSelectionModel().isEmpty()){
-                throw new IllegalStateException("Service type must be selected");
-            }
-
-            if(driverComboBox.getSelectionModel().isEmpty() && driverComboBox.getSelectionModel().getSelectedItem().getState() == DriverState.AVAILABLE){
-                throw new IllegalStateException("Available driver must be selected");
-            }
             this.activeService = new Service(
                     caseId,
                     driverComboBox.getValue(),
                     serviceTypeComboBox.getValue(),
+                    workshopComboBox.getValue(),
                     ServiceState.ASSIGNED,
-                    driverNoteTextField.getText().isEmpty() ? "" : driverNoteTextField.getText()
+                    getDriverNotes()
             );
-        }
-        else{
-            if(workshopComboBox.getValue() != activeService.getWorkshop()
-                    || driverComboBox.getValue() != activeService.getAssignedDriver()
-                    || serviceTypeComboBox.getValue() != activeService.getServiceType()){
-                throw new IllegalStateException("Service information cannot be changed after service has been assigned");
-            }else{
-                activeService.setDriverNotes(driverNoteTextField.getText().isEmpty() ? "" : driverNoteTextField.getText());
-            }
+
+        } else {
+            validateExistingService();
+            activeService.setDriverNotes(getDriverNotes());
         }
     }
+
+    private void validateNewServiceInputs() {
+        if (workshopComboBox.getSelectionModel().isEmpty()) {
+            throw new IllegalStateException("Workshop must be selected");
+        }
+
+        if (serviceTypeComboBox.getSelectionModel().isEmpty()) {
+            throw new IllegalStateException("Service type must be selected");
+        }
+
+        if (driverComboBox.getSelectionModel().isEmpty() ||
+                !DriverState.AVAILABLE.equals(driverComboBox.getSelectionModel().getSelectedItem().getState())) {
+            throw new IllegalStateException("Available driver must be selected");
+        }
+    }
+
+    private void validateExistingService() {
+        boolean changed = !workshopComboBox.getValue().getId().equals(activeService.getWorkshop().getId())
+                || !driverComboBox.getValue().getId().equals(activeService.getAssignedDriver().getId())
+                || !serviceTypeComboBox.getValue().equals(activeService.getServiceType());
+
+        if (changed) {
+            throw new IllegalStateException("Service information cannot be changed after service has been assigned");
+        }
+    }
+
+
+    private String getDriverNotes() {
+        return driverNoteTextField.getText().isEmpty() ? "" : driverNoteTextField.getText();
+    }
+
 
     public void setStage(Stage stage) {
         this.stage = stage;

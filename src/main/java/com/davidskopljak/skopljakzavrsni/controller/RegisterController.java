@@ -15,6 +15,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.Base64;
 import java.util.List;
@@ -86,8 +87,9 @@ public class RegisterController {
             firstNameTextField.clear();
             lastNameTextField.clear();
 
-        } catch (Exception e) {
-            MiscHelpers.showAlert("Could not save user: " + e.getMessage());
+        } catch (AccountCreationExcepiton | NoSuchAlgorithmException e) {
+            CRMApplication.log.error("Failed to create new account: ", e);
+            MiscHelpers.showAlert("Failed not create new account: " + e.getMessage());
         }
     }
 
@@ -103,12 +105,10 @@ public class RegisterController {
             CRMApplication.logIn(new Operator(operatorId, username, firstName, lastName));
             MiscHelpers.loadScene("main-view.fxml", "Cases overview", CRMApplication.getPrimaryStage());
         } catch (IOException | SQLException e) {
-            System.out.println(e.getMessage());
-            throw new AccountCreationExcepiton("Failed to create new account.");
+            throw new AccountCreationExcepiton(e);
         }
     }
 
-    @FXML
     public void handleOpenLogin(ActionEvent event) {
         MiscHelpers.loadScene("login.fxml", "Log in", CRMApplication.getPrimaryStage());
     }

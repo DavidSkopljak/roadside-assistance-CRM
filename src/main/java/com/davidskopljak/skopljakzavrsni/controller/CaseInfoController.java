@@ -1,9 +1,7 @@
 package com.davidskopljak.skopljakzavrsni.controller;
 
 import com.davidskopljak.skopljakzavrsni.entity.*;
-import com.davidskopljak.skopljakzavrsni.enums.VehicleDamageCause;
-import com.davidskopljak.skopljakzavrsni.enums.VehicleDamageType;
-import com.davidskopljak.skopljakzavrsni.enums.VehicleModel;
+import com.davidskopljak.skopljakzavrsni.enums.*;
 import com.davidskopljak.skopljakzavrsni.exceptions.InvalidCaseInfoException;
 import com.davidskopljak.skopljakzavrsni.exceptions.RepositoryAccessException;
 import com.davidskopljak.skopljakzavrsni.helpers.MiscHelpers;
@@ -16,17 +14,13 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
@@ -53,6 +47,8 @@ public class CaseInfoController implements CaseController {
     private ComboBox<VehicleDamageCause> damageCauseComboBox;
     @FXML
     private AnchorPane rootAnchorPane;
+    @FXML
+    private Button confirmButton;
 
     String firstName;
     String lastName;
@@ -78,15 +74,15 @@ public class CaseInfoController implements CaseController {
             rootAnchorPane.getChildren().add(0, menuRoot);
 
         } catch (IOException e) {
-            e.printStackTrace();
+            CRMApplication.log.error(e.getMessage());
         }
+
         injectCaseMenuControllerWindowReference();
 
         if(caseWindowController.getActiveCase() != null){
             initializeActiveCase();
-        } else{
-            caseWindowController.setActiveCase(new Case());
         }
+        refreshEditableState();
     }
 
     public void injectCaseMenuControllerWindowReference() {
@@ -109,7 +105,7 @@ public class CaseInfoController implements CaseController {
                 ObservableList<VehicleDamageCause> causeList = FXCollections.observableArrayList(damageCauses);
                 damageCauseComboBox.setItems(causeList);
         }catch(RepositoryAccessException e){
-            throw new RepositoryAccessException("Failed to load vehicle models, damage types or damage causes from database: " + e.getMessage());
+            CRMApplication.log.error("Failed to load vehicle models, damage types or damage causes from database.", e);
         }
     }
 
@@ -190,89 +186,87 @@ public class CaseInfoController implements CaseController {
         damageType = damageTypeComboBox.getValue();
         damageCause = damageCauseComboBox.getValue();
 
-        System.out.println("setting case info: " + firstName + lastName + contactNumber + licensePlate + damageDescription + vehicleModel + vinText + firstRegLocalDate + damageType + damageCause);
-
         try {
             validateCaseInfo();
         } catch (InvalidCaseInfoException e) {
-            CRMApplication.log.error(e.getMessage());
-            MiscHelpers.showAlert("Invalid case information. Please check the case details.", Alert.AlertType.WARNING);
+            MiscHelpers.showAlert("Invalid case information: " + e.getMessage(), Alert.AlertType.WARNING);
             return;
         }
 
-        Case newCase = caseWindowController.getActiveCase();
-        if (newCase == null) {
-            newCase = new Case();
+        Case.Builder builder = caseWindowController.getActiveCaseBuilder();
+        if(builder == null){
+            builder = new Case.Builder();
         }
 
-        Client client;
-        if (newCase.getClient() != null) {
-            client = new Client(
-                    newCase.getClient().getId(),
-                    firstName,
-                    lastName,
-                    contactNumber
-            );
+        Case activeCase = caseWindowController.getActiveCase();
+        if(activeCase != null){
+            builder.id(activeCase.getId())
+                    .client(new Client(activeCase.getClient().getId(), firstName, lastName, contactNumber))
+                    .clientVehicle(new Vehicle(activeCase.getClientVehicle().getId(), licensePlate, vehicleModel, vinText))
+                    .firstOperator(activeCase.getFirstOperator())
+                    .createdDateTime(activeCase.getCreatedDateTime());
+
         } else {
-            client = new Client(firstName, lastName, contactNumber);
+            builder.client(new Client(firstName, lastName, contactNumber))
+                    .clientVehicle(new Vehicle(licensePlate, vehicleModel, vinText));
         }
 
-        Vehicle clientVehicle;
-        if (newCase.getClientVehicle() != null) {
-            clientVehicle = new Vehicle(
-                    newCase.getClientVehicle().getId(),
-                    licensePlate,
-                    vehicleModel,
-                    vinText
-            );
-        } else {
-            clientVehicle = new Vehicle(licensePlate, vehicleModel, vinText);
-        }
-        Operator firstOperator = newCase.getFirstOperator() != null ?
-                newCase.getFirstOperator() : CRMApplication.getActiveOperator();
-        Operator lastOperator = CRMApplication.getActiveOperator();
-
-        LocalDateTime createdTime = newCase.getCreatedDateTime() != null ?
-                newCase.getCreatedDateTime() :
-                LocalDateTime.now().truncatedTo(java.time.temporal.ChronoUnit.SECONDS);
-
-        newCase.setClient(client)
-                .setClientVehicle(clientVehicle)
-                .setClientVehicleFirstRegistrationDate(firstRegLocalDate)
-                .setDamageCause(damageCause)
-                .setDamageType(damageType)
-                .setFirstOperator(firstOperator)
-                .setLastEditedOperator(lastOperator)
-                .setDamageDescription(damageDescription)
-                .setCreatedDateTime(createdTime);
-
-        caseWindowController.setActiveCase(newCase);
+        builder.damageCause(damageCause)
+                .damageType(damageType)
+                .firstOperator(CRMApplication.getActiveOperator())
+                .lastEditedOperator(CRMApplication.getActiveOperator())
+                .damageDescription(damageDescription)
+                .clientVehicleFirstRegistrationDate(firstRegLocalDate);
     }
 
 
     public void validateCaseInfo() throws InvalidCaseInfoException {
         if (Boolean.FALSE.equals(Validators.isNotNull(Arrays.asList(vehicleModel, firstRegLocalDate, damageType, damageCause)))) {
+            CRMApplication.log.error("Some required fields are null.");
             throw new InvalidCaseInfoException("Some required fields are null.");
         }
 
         if (Boolean.FALSE.equals(Validators.isValidString(List.of(firstName, lastName)))) {
+            CRMApplication.log.error("Invalid client information.");
             throw new InvalidCaseInfoException("Invalid client information.");
         }
 
         if (Boolean.FALSE.equals(Validators.isValidString(damageDescription))) {
+            CRMApplication.log.error("Invalid vehicle damage description.");
             throw new InvalidCaseInfoException("Invalid vehicle damage description.");
         }
 
         if (Boolean.FALSE.equals(Validators.isValidHRPhoneNumber(contactNumber))) {
+            CRMApplication.log.error("Invalid phone number.");
             throw new InvalidCaseInfoException("Invalid phone number.");
         }
 
         if (Boolean.FALSE.equals(Validators.isValidVIN(vinText))) {
+            CRMApplication.log.error("Invalid VIN.");
             throw new InvalidCaseInfoException("Invalid VIN.");
         }
 
         if (Boolean.FALSE.equals(Validators.isValidHRLicensePlateNumber(licensePlate))) {
+            CRMApplication.log.error("Invalid license plate number.");
             throw new InvalidCaseInfoException("Invalid license plate number.");
         }
+    }
+
+    public void refreshEditableState() {
+        Case activeCase = caseWindowController.getActiveCase();
+        if (activeCase == null || activeCase.getId() == null) return;
+        boolean editable = activeCase.getState() == CaseState.ACTIVE;
+
+        firstNameTextField.setDisable(!editable);
+        lastNameTextField.setDisable(!editable);
+        contactNumberTextField.setDisable(!editable);
+        licensePlateTextField.setDisable(!editable);
+        vinTextField.setDisable(!editable);
+        damageDescriptionTextField.setDisable(!editable);
+        firstRegDateDatePicker.setDisable(!editable);
+        modelComboBox.setDisable(!editable);
+        damageTypeComboBox.setDisable(!editable);
+        damageCauseComboBox.setDisable(!editable);
+        confirmButton.setDisable(!editable);
     }
 }

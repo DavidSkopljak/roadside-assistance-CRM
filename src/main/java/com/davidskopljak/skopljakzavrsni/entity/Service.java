@@ -17,21 +17,31 @@ public non-sealed class Service extends Entity implements Trackable<ServiceState
     private Long caseId;
     private String driverNotes;
 
-    public Service(Long id, Long caseId, Driver assignedDriver, ServiceType serviceType, ServiceState serviceState, String driverNotes){
+    public Service(Long id, Long caseId, Driver assignedDriver, ServiceType serviceType, Workshop workshop, ServiceState serviceState, String driverNotes){
         super(id);
         this.caseId = caseId;
         this.assignedDriver = assignedDriver;
         this.serviceType = serviceType;
         this.serviceState = serviceState;
         this.driverNotes = driverNotes;
+        if(this.serviceType == ServiceType.TOWING){
+            this.workshop = workshop;
+        }else{
+            throw new IllegalArgumentException("Service type must be towing for workshop to be set");
+        }
     }
 
-    public Service(Long caseId, Driver assignedDriver, ServiceType serviceType, ServiceState serviceState, String driverNotes) {
+    public Service(Long caseId, Driver assignedDriver, ServiceType serviceType, Workshop workshop, ServiceState serviceState, String driverNotes) {
         this.caseId = caseId;
         this.assignedDriver = assignedDriver;
         this.serviceType = serviceType;
         this.serviceState = serviceState;
         this.driverNotes = driverNotes;
+        if(this.serviceType == ServiceType.TOWING){
+            this.workshop = workshop;
+        }else{
+            throw new IllegalArgumentException("Service type must be towing for workshop to be set");
+        }
     }
 
     public Driver getAssignedDriver() {

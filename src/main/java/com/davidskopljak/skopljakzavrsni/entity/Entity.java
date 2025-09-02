@@ -1,12 +1,12 @@
 package com.davidskopljak.skopljakzavrsni.entity;
 
 public abstract class Entity {
-    private Long id;
+    private Long id = null;
 
     protected Entity(Long id) {
         this.id = id;
     }
-    protected Entity() {this.id = null;}//temp id - means object was not saved to db yet
+    protected Entity() {this.id = null;}
 
     public Long getId() {
         return id;

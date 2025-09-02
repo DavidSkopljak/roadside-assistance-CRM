@@ -68,7 +68,6 @@ public class OperatorRepository extends AbstractRepository<Operator> {
             ps.setString(2, entity.getFirstName());
             ps.setString(3, entity.getLastName());
 
-            System.out.println("Saving operator with username " + entity.getUsername() + " and first name " + entity.getFirstName() + " and last name " + entity.getLastName() + " to database.");
             try(ResultSet rs = ps.executeQuery();){
                 if (rs.next()) {
                     return rs.getLong("id");

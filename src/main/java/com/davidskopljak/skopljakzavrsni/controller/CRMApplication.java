@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import java.io.IOException;
 
 
-public class CRMApplication extends Application {
+    public class CRMApplication extends Application {
     public static final Logger log = LoggerFactory.getLogger(CRMApplication.class);
     private static Stage PRIMARY_STAGE;
     private static Operator ACTIVE_OPERATOR;
@@ -20,7 +20,7 @@ public class CRMApplication extends Application {
         try{
             CRMApplication.setPrimaryStage(stage);
             FXMLLoader fxmlLoader = new FXMLLoader(CRMApplication.class.getResource("login.fxml"));
-            Scene scene = new Scene(fxmlLoader.load(), 1080, 600);
+            Scene scene = new Scene(fxmlLoader.load());
             stage.setTitle("CRM Application");
             stage.setScene(scene);
             stage.setResizable(false);

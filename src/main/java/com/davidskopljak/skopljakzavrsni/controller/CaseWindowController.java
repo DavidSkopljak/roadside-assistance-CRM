@@ -12,13 +12,14 @@ import java.io.IOException;
 public class CaseWindowController {
     private final Stage stage;
     private Case activeCase;
+    private Case.Builder activeCaseBuilder = new Case.Builder();
 
     public CaseWindowController() {
         this.stage = new Stage();
         this.stage.setTitle("Case Window");
         this.activeCase = null;
 
-        loadScene("case.fxml", "Case info", CaseInfoController.class );
+        loadScene("case-info.fxml", "Case info", CaseInfoController.class );
     }
 
     public CaseWindowController(Case activeCase) {
@@ -26,12 +27,11 @@ public class CaseWindowController {
         this.stage = new Stage();
         this.stage.setTitle("Case Window");
 
-        loadScene("case.fxml", "Case info", CaseInfoController.class);
-        System.out.println("Case window controller created with case: " + activeCase.getId() + " - " + activeCase.getClient().getFirstName() + " " + activeCase.getClient().getLastName() + activeCase.getLocation().getAddress() + ", " + activeCase.getClientVehicle().getId());
+        loadScene("case-info.fxml", "Case info", CaseInfoController.class);
         stage.show();
     }
 
-    public <T> void loadScene(String sceneUrl, String title, Class<T> controllerClass) {
+    public <T extends CaseController> void loadScene(String sceneUrl, String title, Class<T> controllerClass) {
         try {
             FXMLLoader loader = new FXMLLoader(CRMApplication.class.getResource(sceneUrl));
             Parent root = loader.load();
@@ -41,7 +41,6 @@ public class CaseWindowController {
             if (controller instanceof CaseController child) {
                 child.setCaseWindowController(this);
             }
-
             stage.setTitle(title);
             stage.setScene(new Scene(root));
             stage.show();
@@ -52,6 +51,9 @@ public class CaseWindowController {
 
     public Case getActiveCase() {
         return activeCase;
+    }
+    public Case.Builder getActiveCaseBuilder() {
+        return activeCaseBuilder;
     }
     public void setActiveCase(Case activeCase) {
         this.activeCase = activeCase;

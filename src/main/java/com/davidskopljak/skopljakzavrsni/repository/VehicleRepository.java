@@ -34,7 +34,6 @@ public class VehicleRepository extends AbstractRepository<Vehicle> {
                 String vin = rs.getString("vin");
 
                 VehicleModel vehicleModel = RepositoryHelper.queryVehicleModelById(vehicleModelId, conn);
-                System.out.println("Found vehicle with id " + vehicleId + " with license plate " + licensePlate + " and vin " + vin + " and model " + vehicleModel.toString() + ".");
                 return new Vehicle(vehicleId, licensePlate, vehicleModel, vin);
             }else{
                 throw new EmptyResultSetException("Vehicle with id " + id + " not found");
@@ -149,7 +148,6 @@ public class VehicleRepository extends AbstractRepository<Vehicle> {
             ps.setLong(3, modelId);
             ps.setLong(4, entity.getId());
 
-            System.out.println("Updating vehicle with sql: " + ps.toString() );
             ps.executeUpdate();
         } finally {
             LOCK.unlock();

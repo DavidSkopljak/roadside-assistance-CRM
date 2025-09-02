@@ -55,9 +55,9 @@
                 FXMLLoader loader = new FXMLLoader(CRMApplication.class.getResource("case-menu.fxml"));
                 Parent menuRoot = loader.load();
                 caseMenuController = loader.getController();
-                rootAnchorPane.getChildren().add(0, menuRoot); // Add at index 0 to put it at the top
+                rootAnchorPane.getChildren().add(0, menuRoot);
             } catch (IOException e) {
-                e.printStackTrace();
+                CRMApplication.log.error("Failed to inject case menu inside CaseLocationController", e);
             }
             injectCaseMenuControllerWindowReference();
         }
@@ -76,10 +76,9 @@
 
             mapView.initializedProperty().addListener((_, _, isNowInitialized) -> {
                 if (Boolean.TRUE.equals(isNowInitialized)) {
-                    Location location = caseWindowController.getActiveCase().getLocation();
-                    if(location != null){
-                        updateFieldsAndMap(location);
-                    }else{
+                    if(caseWindowController.getActiveCase() != null && caseWindowController.getActiveCase().getLocation() != null){
+                        updateFieldsAndMap(caseWindowController.getActiveCase().getLocation());
+                    } else {
                         mapView.setCenter(DEFAULT_MAPVIEW_LOCATION);
                         mapView.setZoom(13);
                     }
@@ -118,15 +117,8 @@
         }
 
         public void onUseAddressClicked() {
-            System.out.println("inside onUseAddressCliecked");
-
-            String address = addressTextField.getText();
-            String city = cityTextField.getText();
-            String country = countryTextField.getText();
-            String postalCode = postalCodeTextField.getText();
-
             try {
-                Location location = Location.getLocationFromAddress(country, city, postalCode, address);
+                Location location = Location.getLocationFromAddress(addressTextField.getText(), cityTextField.getText(), countryTextField.getText(), postalCodeTextField.getText());
                 updateFieldsAndMap(location);
             } catch (Exception e) {
                 MiscHelpers.showAlert("Could not resolve location from address. " + e.getMessage(), Alert.AlertType.ERROR);
@@ -134,12 +126,8 @@
         }
 
         public void onUseCoordinatesClicked() {
-            System.out.println("inside onUseCoordinatesClicked");
             try {
-                BigDecimal latitude = new BigDecimal(latitudeTextField.getText());
-                BigDecimal longitude = new BigDecimal(longitudeTextField.getText());
-
-                Location location = Location.getLocationFromCoordinates(latitude, longitude);
+                Location location = Location.getLocationFromCoordinates(new BigDecimal(latitudeTextField.getText()), new BigDecimal(longitudeTextField.getText()));
                 updateFieldsAndMap(location);
             } catch (Exception e) {
                 MiscHelpers.showAlert("Could not resolve location from longitude. " + e.getMessage(), Alert.AlertType.ERROR);
@@ -148,9 +136,7 @@
 
 
         private void updateFieldsAndMap(Location location) {
-            System.out.println("inside updateFieldsAndMap");
             if (location == null) return;
-            System.out.println("Location is not null");
             setText(countryTextField, location.getCountry());
             setText(cityTextField, location.getCity());
             setText(addressTextField, location.getAddress());
@@ -190,37 +176,32 @@
             try {
                 validateCaseLocation();
 
+                Case.Builder builder = caseWindowController.getActiveCaseBuilder();
+                if(builder == null){
+                    builder = new Case.Builder();
+                }
+
                 Case activeCase = caseWindowController.getActiveCase();
-                if (activeCase == null) {
-                    activeCase = new Case();
-                }
+                if(activeCase != null){
+                    builder.id(activeCase.getId())
+                            .location(new Location(
+                                    activeCase.getLocation().getId(),
+                                    address,
+                                    city,
+                                    country,
+                                    postalCode,
+                                    new BigDecimal(latitude),
+                                    new BigDecimal(longitude)));
 
-                Location existingLocation = activeCase.getLocation();
-                Location location;
-
-                if (existingLocation != null) {
-                    location = new Location(
-                            existingLocation.getId(),
-                            address,
-                            city,
-                            country,
-                            postalCode,
-                            new BigDecimal(latitude),
-                            new BigDecimal(longitude)
-                    );
                 } else {
-                    location = new Location(
-                            address,
-                            city,
-                            country,
-                            postalCode,
-                            new BigDecimal(latitude),
-                            new BigDecimal(longitude)
-                    );
+                    builder.location(new Location(
+                                    address,
+                                    city,
+                                    country,
+                                    postalCode,
+                                    new BigDecimal(latitude),
+                                    new BigDecimal(longitude)));
                 }
-
-                activeCase.setLocation(location);
-                caseWindowController.setActiveCase(activeCase);
 
             } catch(InvalidCaseLocationException e) {
                 CRMApplication.log.error(e.getMessage());

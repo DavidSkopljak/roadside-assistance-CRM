@@ -9,17 +9,16 @@ import java.io.IOException;
 
 public class ServicesListMenuController {
     private ServicesListController servicesListController;
-    private Long caseId;
 
     public void handleNewService() {
         try {
             FXMLLoader loader = new FXMLLoader(CRMApplication.class.getResource("service.fxml"));
             Parent root = loader.load();
             ServiceController serviceController = loader.getController();
-            if (this.caseId != null) {
-                serviceController.setCaseId(this.caseId);
+            Long caseId = this.servicesListController.getCaseWindowController().getActiveCase().getId();
+            if (caseId != null) {
+                serviceController.setCaseId(caseId);
             }
-            serviceController.setServicesListController(this.servicesListController);
             serviceController.setActiveService(null);
             Stage stage = new Stage();
             serviceController.setStage(stage);
@@ -32,13 +31,15 @@ public class ServicesListMenuController {
         }
     }
 
-    public void handleBackToCase() {}
+    public void handleBackToCase() {
+        Stage stage = this.servicesListController.getCaseWindowController().getStage();
+        stage.setTitle("Case Window");
 
-    public void setServicesListController(ServicesListController controller) {
-        this.servicesListController = controller;
+        this.servicesListController.getCaseWindowController().loadScene("case-info.fxml", "Case info", CaseInfoController.class);
+        stage.show();
     }
 
-    public void setCaseId(Long caseId) {
-        this.caseId = caseId;
+    public void setServicesListController(ServicesListController servicesListController) {
+        this.servicesListController = servicesListController;
     }
 }

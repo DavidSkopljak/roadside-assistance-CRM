@@ -30,9 +30,8 @@ public class MiscHelpers {
         try {
             URL fxmlUrl = CRMApplication.class.getResource(fxmlFile);
             if (fxmlUrl == null) {
-                String msg = "FXML file not found at: " + fxmlFile;
-                System.err.println(msg);
-                throw new AccountLoginException(msg);
+                CRMApplication.log.error("FXML file not found at: {} ", fxmlFile);
+                throw new AccountLoginException("FXML file not found");
             }
 
             FXMLLoader fxmlLoader = new FXMLLoader(fxmlUrl);
@@ -41,17 +40,8 @@ public class MiscHelpers {
             stage.setScene(new Scene(root));
             stage.show();
 
-        } catch (IOException e) {
-            System.err.println("IOException while loading FXML: " + fxmlFile);
-            e.printStackTrace();
-            throw new AccountLoginException("Failed to load FXML: " + fxmlFile + " - " + e.getMessage());
-        } catch (AccountLoginException e) {
-            // Already printed error, rethrow
-            throw e;
-        } catch (Exception e) {
-            System.err.println("Unexpected exception while loading scene: " + fxmlFile);
-            e.printStackTrace();
-            throw new AccountLoginException("Unexpected error loading FXML: " + fxmlFile + " - " + e.getMessage());
+        } catch (IOException | AccountLoginException e) {
+            CRMApplication.log.error("IOException while loading FXML: {}", fxmlFile, e);
         }
     }
 

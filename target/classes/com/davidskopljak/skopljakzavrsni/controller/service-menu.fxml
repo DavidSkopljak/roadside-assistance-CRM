@@ -18,13 +18,16 @@
         </Menu>
         <Menu mnemonicParsing="false" text="Resolve service">
             <items>
-                <MenuItem mnemonicParsing="false" onAction="#handleResolveService" text="Resolve" />
+                <MenuItem fx:id="resolveServiceButton" mnemonicParsing="false" onAction="#handleResolveService" text="Resolve" />
             </items>
             <items>
-                <MenuItem mnemonicParsing="false" onAction="#handleCancelService" text="Cancel" />
+                <MenuItem fx:id="cancelServiceButton" mnemonicParsing="false" onAction="#handleCancelService" text="Cancel" />
             </items>
             <items>
-                <MenuItem mnemonicParsing="false" onAction="#handleExitService" text="Exit" />
+                <MenuItem fx:id="reactivateServiceButton" mnemonicParsing="false" onAction="#handleReactivateService" text="Reactivate" />
+            </items>
+            <items>
+                <MenuItem fx:id="exitServiceButton" mnemonicParsing="false" onAction="#handleExitService" text="Exit" />
             </items>
         </Menu>
     </menus>

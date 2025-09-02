@@ -12,7 +12,7 @@ import java.util.Properties;
 
 public class DatabaseConnectionManager {
     private static DatabaseConnectionManager INSTANCE;
-    private static HikariDataSource dataSource;
+    private static HikariDataSource DATASOURCE = null;
 
     private DatabaseConnectionManager() {
         try(FileReader propsFileReader = new FileReader("database.properties")) {
@@ -28,12 +28,12 @@ public class DatabaseConnectionManager {
 
             setDataSource(new HikariDataSource(config));
         } catch (IOException e) {
-            throw new RepositoryAccessException("Podaci za spajanje s bazom nisu dostupni", e);
+            throw new RepositoryAccessException("Database credentials file is unavailable: ", e);
         }
     }
 
     private static void setDataSource(HikariDataSource dataSource) {
-        DatabaseConnectionManager.dataSource = dataSource;
+        DatabaseConnectionManager.DATASOURCE = dataSource;
     }
 
     public static synchronized DatabaseConnectionManager getInstance() {
@@ -44,12 +44,12 @@ public class DatabaseConnectionManager {
     }
 
     public Connection getConnection() throws SQLException {
-        return dataSource.getConnection();
+        return DATASOURCE.getConnection();
     }
 
     public void close() {
-        if (dataSource != null) {
-            dataSource.close();
+        if (DATASOURCE != null) {
+            DATASOURCE.close();
         }
     }
 }

@@ -24,10 +24,13 @@
 
         <Menu mnemonicParsing="false" text="Resolve case">
             <items>
-                <MenuItem mnemonicParsing="false" onAction="#handleResolveCase" text="Resolve" />
+                <MenuItem fx:id="reactivateCaseMenuItem" mnemonicParsing="false" onAction="#handleReactivateCase" text="Reactivate" />
             </items>
             <items>
-                <MenuItem mnemonicParsing="false" onAction="#handleCancelCase" text="Cancel" />
+                <MenuItem fx:id="resolveCaseMenuItem" mnemonicParsing="false" onAction="#handleResolveCase" text="Resolve" />
+            </items>
+            <items>
+                <MenuItem fx:id="cancelCaseMenuItem" mnemonicParsing="false" onAction="#handleCancelCase" text="Cancel" />
             </items>
             <items>
                 <MenuItem mnemonicParsing="false" onAction="#handleExitCase" text="Exit" />
@@ -35,8 +38,13 @@
         </Menu>
         <Menu id="viewServicesMenu" mnemonicParsing="false" text="Services">
             <items>
-                <MenuItem mnemonicParsing="false" onAction="#handleViewServices" text="View services" />
+                <MenuItem fx:id="viewServicesMenuItem" mnemonicParsing="false" onAction="#handleViewServices" text="View services" />
             </items>
         </Menu>
+      <Menu id="viewCaseNotesMenu" mnemonicParsing="false" text="Notes">
+         <items>
+            <MenuItem fx:id="viewCaseNotesMenuItem" mnemonicParsing="false" onAction="#handleViewCaseNotes" text="View case notes" />
+         </items>
+      </Menu>
     </menus>
 </MenuBar>

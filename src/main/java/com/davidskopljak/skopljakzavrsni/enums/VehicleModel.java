@@ -1,6 +1,5 @@
 package com.davidskopljak.skopljakzavrsni.enums;
 
-//VW, Mercedes, Renault, ...
 public enum VehicleModel {
     TOYOTA,
     VOLKSWAGEN,

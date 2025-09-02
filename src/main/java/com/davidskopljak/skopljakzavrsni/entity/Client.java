@@ -1,6 +1,5 @@
 package com.davidskopljak.skopljakzavrsni.entity;
 
-//client calling in from the road
 public class Client extends Person {
     private String contactNumber;
 

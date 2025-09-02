@@ -60,9 +60,9 @@ public class CaseRepository extends AbstractRepository<Case> {
     }
 
     @Override
-    public Long save(Case entity) throws SQLException {
+    public Long save(Case entity) {
         LOCK.lock();
-        String sql = "INSERT INTO cases (location_id, first_operator_id, last_edited_operator_id, client_vehicle_id, damage_description, case_state_id, damage_type_id, vehicle_damage_cause_id, created_date_time, active_service_id, client_id, vehicle_first_registration_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id;";
+        String sql = "INSERT INTO cases (location_id, first_operator_id, last_edited_operator_id, client_vehicle_id, damage_description, case_state_id, damage_type_id, vehicle_damage_cause_id, active_service_id, client_id, vehicle_first_registration_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id;";
 
         try (Connection conn = DatabaseConnectionManager.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)){
@@ -95,19 +95,17 @@ public class CaseRepository extends AbstractRepository<Case> {
             Long damageCauseId = RepositoryHelper.queryVehicleDamageCauseByCause(entity.getDamageCause(), conn);
             ps.setLong(8, damageCauseId);
 
-            ps.setTimestamp(9, Timestamp.valueOf(entity.getCreatedDateTime()));
-
             if(entity.getActiveService().isPresent()){
                 Long activeServiceId = serviceRepository.save(entity.getActiveService().get());
-                ps.setLong(10, activeServiceId);
+                ps.setLong(9, activeServiceId);
             }else{
-                ps.setNull(10, java.sql.Types.NULL);
+                ps.setNull(9, java.sql.Types.NULL);
             }
 
             Long clientId = clientRepository.save(entity.getClient());
-            ps.setLong(11, clientId);
+            ps.setLong(10, clientId);
 
-            ps.setTimestamp(12, Timestamp.valueOf(entity.getClientVehicleFirstRegistrationDate().atStartOfDay()));
+            ps.setTimestamp(11, Timestamp.valueOf(entity.getClientVehicleFirstRegistrationDate().atStartOfDay()));
 
             try(ResultSet rs = ps.executeQuery();){
                 if (rs.next()) {
@@ -125,7 +123,7 @@ public class CaseRepository extends AbstractRepository<Case> {
     }
 
     @Override
-    public void update(Case entity) throws SQLException {
+    public void update(Case entity) {
         LOCK.lock();
         String sql = "UPDATE cases SET location_id = ?, first_operator_id = ?, last_edited_operator_id = ?, client_vehicle_id = ?, damage_description = ?, case_state_id = ?, damage_type_id = ?, vehicle_damage_cause_id = ?, created_date_time = ?, active_service_id = ?, client_id = ?, vehicle_first_registration_date = ? WHERE id = ?";
         try (Connection conn = DatabaseConnectionManager.getInstance().getConnection();
@@ -174,8 +172,6 @@ public class CaseRepository extends AbstractRepository<Case> {
             ps.setTimestamp(12, Timestamp.valueOf(entity.getClientVehicleFirstRegistrationDate().atStartOfDay()));
 
             ps.setLong(13, entity.getId());
-
-            System.out.println("Updating case with id " + entity.getId() + " with sql: " + ps.toString());
 
             ps.executeUpdate();
         }catch(RepositoryAccessException | SQLException e){
@@ -311,20 +307,19 @@ public class CaseRepository extends AbstractRepository<Case> {
             activeService = Optional.empty();
         }
 
-        Case newCase = new Case();
-
-        newCase.setClient(client)
-                .setClientVehicle(clientVehicle)
-                .setClientVehicleFirstRegistrationDate(clientVeicleFirstRegDate)
-                .setDamageCause(damageCause)
-                .setDamageType(damageType)
-                .setFirstOperator(firstOperator)
-                .setLastEditedOperator(lastEditedOperator)
-                .setLocation(location)
-                .setDamageDescription(damageDescription)
-                .setCreatedDateTime(createdDateTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())
-                .setActiveService(activeService)
-                .setId(caseId);
+        Case newCase = new Case.Builder().client(client)
+                .clientVehicle(clientVehicle)
+                .clientVehicleFirstRegistrationDate(clientVeicleFirstRegDate)
+                .damageCause(damageCause)
+                .damageType(damageType)
+                .firstOperator(firstOperator)
+                .lastEditedOperator(lastEditedOperator)
+                .location(location)
+                .damageDescription(damageDescription)
+                .createdDateTime(createdDateTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())
+                .activeService(activeService)
+                .id(caseId)
+                .build();
 
         newCase.updateState(caseState);
         newCase.addNotes(caseNotes);

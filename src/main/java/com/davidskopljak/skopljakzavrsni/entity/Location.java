@@ -15,7 +15,6 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 
-// needs fields for coordinates, operators note(to further specify location)
 public class Location extends Entity {
     String address;
     String city;
@@ -105,13 +104,11 @@ public class Location extends Entity {
             String encodedQuery = URLEncoder.encode(rawQuery, StandardCharsets.UTF_8);
 
             String fullUrl = "https://nominatim.openstreetmap.org/search?addressdetails=1&q=" + encodedQuery + "&format=jsonv2&limit=1";
-            System.out.println("inside getLocationFromAddress with query: " + fullUrl);
 
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create("https://nominatim.openstreetmap.org/search?addressdetails=1&q=" + encodedQuery + "&format=jsonv2&limit=1"))
+                    .uri(URI.create(fullUrl))
                     .build();
 
-            System.out.println("inside getLocationFromAddress with query: " + "https://nominatim.openstreetmap.org/search?addressdetails=1&q=" + encodedQuery + "&format=jsonv2&limit=1");
 
             HttpResponse<String> response = client.send(request,
                     HttpResponse.BodyHandlers.ofString());
@@ -123,11 +120,10 @@ public class Location extends Entity {
                 throw new LocationNotFoundException("Could not translate address to coordinates. Please check your address and try again.");
             }
 
-            JSONObject jsonObjectdecode = (JSONObject) results.get(0);
+            JSONObject jsonObjectdecode = (JSONObject) results.getFirst();
 
             String lat = (String) jsonObjectdecode.get("lat");
             String lon = (String) jsonObjectdecode.get("lon");
-            System.out.println(lat + " " + lon);
 
             if(lat == null || lat.isEmpty() || lon == null || lon.isEmpty()){
                 throw new LocationNotFoundException("No coordinates retrieved for queried location. Please check your address and try again.");
@@ -185,9 +181,9 @@ public class Location extends Entity {
 
             return new Location(address, town, country, postcode, lat, lon);
         } catch (IOException e) {
-            throw new ApiException("Error translating address data to coordinates: " + e.getMessage());
+            throw new ApiException(e);
         } catch (InterruptedException e) {
-            Thread.currentThread().interrupt(); // Restore interrupted status
+            Thread.currentThread().interrupt();
             throw new ApiException("Thread was interrupted while translating address data to coordinates:" + e.getMessage());
         }
     }

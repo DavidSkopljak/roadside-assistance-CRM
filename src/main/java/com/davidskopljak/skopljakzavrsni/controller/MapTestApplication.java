@@ -27,7 +27,7 @@ public class MapTestApplication extends Application {
         mapView.initialize(Configuration.builder()
                 .showZoomControls(true)
                 .build());
-        mapView.setCenter(new Coordinate(45.8150, 15.9819)); // e.g., Zagreb
+        mapView.setCenter(new Coordinate(45.8150, 15.9819));
         mapView.setZoom(13);
         mapView.addEventHandler(MapViewEvent.MAP_CLICKED, event -> {
             Coordinate coord = event.getCoordinate();

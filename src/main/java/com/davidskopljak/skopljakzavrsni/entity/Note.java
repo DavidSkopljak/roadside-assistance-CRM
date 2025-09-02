@@ -7,16 +7,14 @@ public class Note extends Entity{
     private Instant timestampUTC;
     private Long caseId;
 
-    public Note(Long id, String message, Instant timestamp, Long caseId) {
+    public Note(Long id, String message, Long caseId) {
         super(id);
         this.message = message;
-        this.timestampUTC = timestamp;
         this.caseId = caseId;
     }
 
-    public Note(String message, Instant timestamp, Long caseId) {
+    public Note(String message, Long caseId) {
         this.message = message;
-        this.timestampUTC = timestamp;
         this.caseId = caseId;
     }
 
