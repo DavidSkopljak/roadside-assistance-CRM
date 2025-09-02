@@ -11,7 +11,6 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class CaseRepository extends AbstractRepository<Case> {
@@ -19,7 +18,7 @@ public class CaseRepository extends AbstractRepository<Case> {
     @Override
     public Case findById(Long id) throws SQLException {
         LOCK.lock();
-        String sql = "SELECT cases.id, cases.location_id, cases.first_operator_id, cases.last_edited_operator_id, cases.client_vehicle_id, cases.vehicle_first_registration_date, cases.damage_description, cases.case_state_id, cases.damage_type_id, cases.vehicle_damage_cause_id, cases.created_date_time, cases.active_service_id, cases.client_id FROM cases WHERE id = ?";
+        String sql = "SELECT cases.id, cases.location_id, cases.first_operator_id, cases.last_edited_operator_id, cases.client_vehicle_id, cases.vehicle_first_registration_date, cases.damage_description, cases.case_state_id, cases.damage_type_id, cases.vehicle_damage_cause_id, cases.created_date_time, cases.client_id FROM cases WHERE id = ?";
 
         try (Connection conn = DatabaseConnectionManager.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)){
@@ -41,7 +40,7 @@ public class CaseRepository extends AbstractRepository<Case> {
     public List<Case> findAll() throws SQLException {
         List<Case> cases = new ArrayList<>();
         LOCK.lock();
-        String sql = "SELECT cases.id, cases.location_id, cases.first_operator_id, cases.last_edited_operator_id, cases.client_vehicle_id, cases.damage_description, cases.case_state_id, cases.damage_type_id, cases.vehicle_damage_cause_id, cases.created_date_time, cases.active_service_id, cases.client_id, cases.vehicle_first_registration_date FROM cases WHERE 1 = 1";
+        String sql = "SELECT cases.id, cases.location_id, cases.first_operator_id, cases.last_edited_operator_id, cases.client_vehicle_id, cases.damage_description, cases.case_state_id, cases.damage_type_id, cases.vehicle_damage_cause_id, cases.created_date_time, cases.client_id, cases.vehicle_first_registration_date FROM cases WHERE 1 = 1";
 
         try (Connection conn = DatabaseConnectionManager.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
@@ -62,14 +61,13 @@ public class CaseRepository extends AbstractRepository<Case> {
     @Override
     public Long save(Case entity) {
         LOCK.lock();
-        String sql = "INSERT INTO cases (location_id, first_operator_id, last_edited_operator_id, client_vehicle_id, damage_description, case_state_id, damage_type_id, vehicle_damage_cause_id, active_service_id, client_id, vehicle_first_registration_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id;";
+        String sql = "INSERT INTO cases (location_id, first_operator_id, last_edited_operator_id, client_vehicle_id, damage_description, case_state_id, damage_type_id, vehicle_damage_cause_id, client_id, vehicle_first_registration_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id;";
 
         try (Connection conn = DatabaseConnectionManager.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)){
 
             LocationRepository locationRepository = new LocationRepository();
             VehicleRepository vehicleRepository = new VehicleRepository();
-            ServiceRepository serviceRepository = new ServiceRepository();
             ClientRepository clientRepository = new ClientRepository();
 
             Long locationId = locationRepository.save(entity.getLocation());
@@ -95,17 +93,10 @@ public class CaseRepository extends AbstractRepository<Case> {
             Long damageCauseId = RepositoryHelper.queryVehicleDamageCauseByCause(entity.getDamageCause(), conn);
             ps.setLong(8, damageCauseId);
 
-            if(entity.getActiveService().isPresent()){
-                Long activeServiceId = serviceRepository.save(entity.getActiveService().get());
-                ps.setLong(9, activeServiceId);
-            }else{
-                ps.setNull(9, java.sql.Types.NULL);
-            }
-
             Long clientId = clientRepository.save(entity.getClient());
-            ps.setLong(10, clientId);
+            ps.setLong(9, clientId);
 
-            ps.setTimestamp(11, Timestamp.valueOf(entity.getClientVehicleFirstRegistrationDate().atStartOfDay()));
+            ps.setTimestamp(10, Timestamp.valueOf(entity.getClientVehicleFirstRegistrationDate().atStartOfDay()));
 
             try(ResultSet rs = ps.executeQuery();){
                 if (rs.next()) {
@@ -125,13 +116,12 @@ public class CaseRepository extends AbstractRepository<Case> {
     @Override
     public void update(Case entity) {
         LOCK.lock();
-        String sql = "UPDATE cases SET location_id = ?, first_operator_id = ?, last_edited_operator_id = ?, client_vehicle_id = ?, damage_description = ?, case_state_id = ?, damage_type_id = ?, vehicle_damage_cause_id = ?, created_date_time = ?, active_service_id = ?, client_id = ?, vehicle_first_registration_date = ? WHERE id = ?";
+        String sql = "UPDATE cases SET location_id = ?, first_operator_id = ?, last_edited_operator_id = ?, client_vehicle_id = ?, damage_description = ?, case_state_id = ?, damage_type_id = ?, vehicle_damage_cause_id = ?, created_date_time = ?, client_id = ?, vehicle_first_registration_date = ? WHERE id = ?";
         try (Connection conn = DatabaseConnectionManager.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)){
 
             LocationRepository locationRepository = new LocationRepository();
             VehicleRepository vehicleRepository = new VehicleRepository();
-            ServiceRepository serviceRepository = new ServiceRepository();
             ClientRepository clientRepository = new ClientRepository();
 
             locationRepository.update(entity.getLocation());
@@ -159,19 +149,12 @@ public class CaseRepository extends AbstractRepository<Case> {
 
             ps.setTimestamp(9, Timestamp.valueOf(entity.getCreatedDateTime()));
 
-            if(entity.getActiveService().isPresent()){
-                serviceRepository.update(entity.getActiveService().get());
-                ps.setLong(10, entity.getActiveService().get().getId());
-            }else{
-                ps.setNull(10, java.sql.Types.NULL);
-            }
-
             clientRepository.update(entity.getClient());
-            ps.setLong(11, entity.getClient().getId());
+            ps.setLong(10, entity.getClient().getId());
 
-            ps.setTimestamp(12, Timestamp.valueOf(entity.getClientVehicleFirstRegistrationDate().atStartOfDay()));
+            ps.setTimestamp(11, Timestamp.valueOf(entity.getClientVehicleFirstRegistrationDate().atStartOfDay()));
 
-            ps.setLong(13, entity.getId());
+            ps.setLong(12, entity.getId());
 
             ps.executeUpdate();
         }catch(RepositoryAccessException | SQLException e){
@@ -192,15 +175,14 @@ public class CaseRepository extends AbstractRepository<Case> {
 
         String sql = "INSERT INTO cases (location_id, first_operator_id, last_edited_operator_id, client_vehicle_id, " +
                 "damage_description, case_state_id, damage_type_id, vehicle_damage_cause_id, created_date_time, " +
-                "active_service_id, client_id, vehicle_first_registration_date) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id";
+                "client_id, vehicle_first_registration_date) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id";
 
         List<Case> savedCases = new ArrayList<>();
 
         try (Connection conn = DatabaseConnectionManager.getInstance().getConnection()) {
             LocationRepository locationRepository = new LocationRepository();
             VehicleRepository vehicleRepository = new VehicleRepository();
-            ServiceRepository serviceRepository = new ServiceRepository();
             ClientRepository clientRepository = new ClientRepository();
 
             for (Case entity : cases) {
@@ -229,17 +211,10 @@ public class CaseRepository extends AbstractRepository<Case> {
 
                     ps.setTimestamp(9, Timestamp.valueOf(entity.getCreatedDateTime()));
 
-                    if (entity.getActiveService().isPresent()) {
-                        Long activeServiceId = serviceRepository.save(entity.getActiveService().get());
-                        ps.setLong(10, activeServiceId);
-                    } else {
-                        ps.setNull(10, java.sql.Types.NULL);
-                    }
-
                     Long clientId = clientRepository.save(entity.getClient());
-                    ps.setLong(11, clientId);
+                    ps.setLong(10, clientId);
 
-                    ps.setTimestamp(12, Timestamp.valueOf(entity.getClientVehicleFirstRegistrationDate().atStartOfDay()));
+                    ps.setTimestamp(11, Timestamp.valueOf(entity.getClientVehicleFirstRegistrationDate().atStartOfDay()));
 
                     try (ResultSet rs = ps.executeQuery()) {
                         if (rs.next()) {
@@ -278,16 +253,11 @@ public class CaseRepository extends AbstractRepository<Case> {
         Long damageCauseId = rs.getLong("vehicle_damage_cause_id");
         Timestamp createdDateTime = rs.getTimestamp("created_date_time");
         Long clientId = rs.getLong("client_id");
-        Long activeServiceId = rs.getLong("active_service_id");
-        if(rs.wasNull()){
-            activeServiceId = null;
-        }
 
         LocationRepository locationRepository = new LocationRepository();
         OperatorRepository operatorRepository = new OperatorRepository();
         VehicleRepository vehicleRepository = new VehicleRepository();
         ClientRepository clientRepository = new ClientRepository();
-        ServiceRepository serviceRepository = new ServiceRepository();
         NoteRepository noteRepository = new NoteRepository();
 
         ArrayList<Note> caseNotes = new ArrayList<> (noteRepository.findAllByCaseId(caseId));
@@ -300,13 +270,6 @@ public class CaseRepository extends AbstractRepository<Case> {
         VehicleDamageType damageType = RepositoryHelper.queryVehicleDamageTypeById(damageTypeId, conn);
         VehicleDamageCause damageCause = RepositoryHelper.queryVehicleDamageCauseById(damageCauseId, conn);
 
-        Optional<Service> activeService;
-        if(activeServiceId != null){
-            activeService = Optional.of(serviceRepository.findById(activeServiceId));
-        }else{
-            activeService = Optional.empty();
-        }
-
         Case newCase = new Case.Builder().client(client)
                 .clientVehicle(clientVehicle)
                 .clientVehicleFirstRegistrationDate(clientVeicleFirstRegDate)
@@ -317,7 +280,6 @@ public class CaseRepository extends AbstractRepository<Case> {
                 .location(location)
                 .damageDescription(damageDescription)
                 .createdDateTime(createdDateTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())
-                .activeService(activeService)
                 .id(caseId)
                 .build();
 

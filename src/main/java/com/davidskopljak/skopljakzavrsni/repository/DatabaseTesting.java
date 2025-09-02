@@ -25,10 +25,6 @@ public class DatabaseTesting {
             System.out.println(case1.getClientVehicle().getLicensePlate());
             System.out.println(case1.getState());
             System.out.println(case1.getCreatedDateTime());
-            System.out.println(case1.getActiveService().isPresent());
-            if(case1.getActiveService().isPresent()){
-                System.out.println(case1.getActiveService().get().getAssignedDriver().getFirstName());
-            }
         }
         /*VehicleRepository vehicleRepository = new VehicleRepository();
         try{

@@ -24,6 +24,7 @@ public class CaseWindowController {
 
     public CaseWindowController(Case activeCase) {
         this.activeCase = activeCase;
+        this.activeCaseBuilder = activeCase.getPopulatedBuilder();
         this.stage = new Stage();
         this.stage.setTitle("Case Window");
 

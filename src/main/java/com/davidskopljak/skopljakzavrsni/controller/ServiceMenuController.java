@@ -10,13 +10,11 @@ import java.sql.SQLException;
 
 public class ServiceMenuController {
     @FXML
-    MenuItem resolveServiceButton;
+    MenuItem resolveServiceMenuItem;
     @FXML
-    MenuItem cancelServiceButton;
+    MenuItem cancelServiceMenuItem;
     @FXML
-    MenuItem exitServiceButton;
-    @FXML
-    MenuItem reactivateServiceButton;
+    MenuItem reactivateServiceMenuItem;
 
     private ServiceController serviceController;
 
@@ -25,7 +23,7 @@ public class ServiceMenuController {
             ServiceRepository serviceRepository = new ServiceRepository();
             if(serviceController.getActiveService().getId() != null) {
                 serviceRepository.update(serviceController.getActiveService());
-            }else{
+            }else {
                 Long serviceId = serviceRepository.save(serviceController.getActiveService());
                 serviceController.getActiveService().setId(serviceId);
             }
@@ -82,19 +80,19 @@ public class ServiceMenuController {
 
     public void refreshEditableState(){
         if(serviceController.getActiveService() == null){
-            reactivateServiceButton.setDisable(true);
-            resolveServiceButton.setDisable(true);
-            cancelServiceButton.setDisable(true);
+            reactivateServiceMenuItem.setDisable(true);
+            resolveServiceMenuItem.setDisable(true);
+            cancelServiceMenuItem.setDisable(true);
         } else if(serviceController.getActiveService().getServiceState() == ServiceState.FINISHED
                 || serviceController.getActiveService().getServiceState() == ServiceState.CANCELLED ){
-            reactivateServiceButton.setDisable(false);
-            resolveServiceButton.setDisable(true);
-            cancelServiceButton.setDisable(true);
+            reactivateServiceMenuItem.setDisable(false);
+            resolveServiceMenuItem.setDisable(true);
+            cancelServiceMenuItem.setDisable(true);
         } else if(serviceController.getActiveService().getServiceState() == ServiceState.IN_PROGRESS
             || serviceController.getActiveService().getServiceState() == ServiceState.ASSIGNED){
-            reactivateServiceButton.setDisable(true);
-            resolveServiceButton.setDisable(false);
-            cancelServiceButton.setDisable(false);
+            reactivateServiceMenuItem.setDisable(true);
+            resolveServiceMenuItem.setDisable(false);
+            cancelServiceMenuItem.setDisable(false);
         }
     }
 }

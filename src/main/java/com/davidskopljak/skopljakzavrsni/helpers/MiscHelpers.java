@@ -29,8 +29,10 @@ public class MiscHelpers {
     public static void loadScene(String fxmlFile, String title, Stage stage) {
         try {
             URL fxmlUrl = CRMApplication.class.getResource(fxmlFile);
+            System.out.println("Stage before loadScene: " + stage);
+            System.out.println("FXML to load: " + fxmlUrl);
             if (fxmlUrl == null) {
-                CRMApplication.log.error("FXML file not found at: {} ", fxmlFile);
+                CRMApplication.log.error("FXML file not found at: {} ", fxmlUrl);
                 throw new AccountLoginException("FXML file not found");
             }
 

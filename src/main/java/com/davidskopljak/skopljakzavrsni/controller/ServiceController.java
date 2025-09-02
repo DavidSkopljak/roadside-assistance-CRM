@@ -42,7 +42,6 @@ public class ServiceController{
 
     @FXML
     private Button confirmButton;
-
     private Stage stage;
     private Service activeService;
     private Long caseId;

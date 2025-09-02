@@ -1,8 +1,8 @@
 package com.davidskopljak.skopljakzavrsni.controller;
 
-import com.davidskopljak.skopljakzavrsni.entity.Case;
 import com.davidskopljak.skopljakzavrsni.entity.Service;
 import com.davidskopljak.skopljakzavrsni.exceptions.RepositoryAccessException;
+import com.davidskopljak.skopljakzavrsni.interfaces.CaseController;
 import com.davidskopljak.skopljakzavrsni.repository.ServiceRepository;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -15,8 +15,9 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-public class ServicesListController {
+public class ServicesListController implements CaseController {
     private CaseWindowController caseWindowController;
+    private ServicesListMenuController servicesListMenuController;
 
     @FXML
     private AnchorPane rootAnchorPane;
@@ -37,16 +38,16 @@ public class ServicesListController {
     private TableColumn<Service, String> driverFirstNameTableColumn;
 
     public void initialize() {
-        injectServicesListMenu();
         initializeServicesTableView();
+        injectServicesListMenu();
     }
 
     public void setCaseWindowController(CaseWindowController caseWindowController){
         this.caseWindowController = caseWindowController;
-
         try{
             ServiceRepository serviceRepository = new ServiceRepository();
             servicesTableView.getItems().addAll(serviceRepository.findAllByCaseId(this.caseWindowController.getActiveCase().getId()));
+            servicesListMenuController.refreshEditableState();
         } catch (Exception e) {
             throw new RepositoryAccessException("Failed to load services: " + e);
         }
@@ -56,8 +57,8 @@ public class ServicesListController {
         try {
             FXMLLoader loader = new FXMLLoader(CRMApplication.class.getResource("services-list-menu.fxml"));
             Parent menuRoot = loader.load();
-            ServicesListMenuController controller = loader.getController();
-            controller.setServicesListController(this);
+            servicesListMenuController = loader.getController();
+            servicesListMenuController.setServicesListController(this);
             rootAnchorPane.getChildren().addFirst(menuRoot);
         } catch (IOException e) {
             e.printStackTrace();

@@ -48,6 +48,11 @@ public class CaseMenuController{
             if(caseToSave.getId() == null){
                 Long caseId = caseRepository.save(caseToSave);
                 caseToSave.setId(caseId);
+                //replace this with async refresh func
+                caseWindowController.loadScene("case-info.fxml", "View case info",  CaseInfoController.class);
+            } else {
+                caseRepository.update(caseToSave);
+                //replace this with async refresh func
                 caseWindowController.loadScene("case-info.fxml", "View case info",  CaseInfoController.class);
             }
 
@@ -85,8 +90,6 @@ public class CaseMenuController{
             caseWindowController.getStage().setScene(new Scene(root));
             caseWindowController.getStage().setTitle("View services");
             caseWindowController.getStage().show();
-            ServicesListController servicesListController = loader.getController();
-            servicesListController.setCaseWindowController(this.caseWindowController);
         } catch (IOException e) {
             CRMApplication.log.error("Failed to load services list: ", e);
         }
@@ -117,45 +120,29 @@ public class CaseMenuController{
             cancelCaseMenuItem.setDisable(true);
             reactivateCaseMenuItem.setDisable(true);
             viewCaseNotesMenuItem.setDisable(true);
+            viewServicesMenuItem.setDisable(true);
         } else if(caseWindowController.getActiveCase().getState() == CaseState.RESOLVED
                 || caseWindowController.getActiveCase().getState() == CaseState.CANCELLED ){
             resolveCaseMenuItem.setDisable(true);
             cancelCaseMenuItem.setDisable(true);
             reactivateCaseMenuItem.setDisable(false);
             viewCaseNotesMenuItem.setDisable(false);
+            viewServicesMenuItem.setDisable(false);
         } else if(caseWindowController.getActiveCase().getState() == CaseState.ACTIVE){
             resolveCaseMenuItem.setDisable(false);
             cancelCaseMenuItem.setDisable(false);
             reactivateCaseMenuItem.setDisable(true);
             viewCaseNotesMenuItem.setDisable(false);
+            viewServicesMenuItem.setDisable(false);
         }
     }
 
-    /*private boolean validateCase(){
-        Case activeCase = caseWindowController.getActiveCase();
-        if(activeCase == null){
-            MiscHelpers.showAlert("Case is not selected.", Alert.AlertType.ERROR);
-            return false;
-        } else return activeCase.getClient() != null
-                && activeCase.getLocation() != null
-                && activeCase.getClientVehicle() != null
-                && activeCase.getFirstOperator() != null
-                && activeCase.getLastEditedOperator() != null
-                && activeCase.getState() != null
-                && activeCase.getDamageCause() != null
-                && activeCase.getDamageDescription() != null
-                && activeCase.getDamageType() != null
-                && activeCase.getClientVehicleFirstRegistrationDate() != null;
-    }*/
-
     private boolean validateCase(Case activeCase) {
-        if (activeCase == null) {
-            System.out.println("Active case is null.");
-            MiscHelpers.showAlert("Case is not selected.", Alert.AlertType.ERROR);
-            return false;
-        }
-
         boolean valid = true;
+
+        if (activeCase == null) {
+            valid = false;
+        }
 
         if (activeCase.getClient() == null) {
             System.out.println("Client is null.");

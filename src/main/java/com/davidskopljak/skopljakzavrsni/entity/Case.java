@@ -10,7 +10,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public non-sealed class Case extends Entity implements Trackable<CaseState>, Noteable {
     private  Location location;
@@ -20,7 +19,6 @@ public non-sealed class Case extends Entity implements Trackable<CaseState>, Not
     private  LocalDate clientVehicleFirstRegistrationDate;
     private  List<Note> caseNotes;
     private  String damageDescription;
-    private  Optional<Service> activeService;
     private  CaseState caseState;
     private  VehicleDamageType damageType;
     private  VehicleDamageCause damageCause;
@@ -36,12 +34,28 @@ public non-sealed class Case extends Entity implements Trackable<CaseState>, Not
         this.clientVehicleFirstRegistrationDate = builder.clientVehicleFirstRegistrationDate;
         this.caseNotes = builder.caseNotes;
         this.damageDescription = builder.damageDescription;
-        this.activeService = builder.activeService;
         this.caseState = builder.caseState;
         this.damageType = builder.damageType;
         this.damageCause = builder.damageCause;
         this.createdDateTime = builder.createdDateTime;
         this.client = builder.client;
+    }
+
+    public Case.Builder getPopulatedBuilder() {
+        return new Case.Builder()
+                .id(this.getId())
+                .location(this.getLocation())
+                .firstOperator(this.getFirstOperator())
+                .lastEditedOperator(this.getLastEditedOperator())
+                .clientVehicle(this.getClientVehicle())
+                .clientVehicleFirstRegistrationDate(this.getClientVehicleFirstRegistrationDate())
+                .notes(this.getNotes())
+                .damageDescription(this.getDamageDescription())
+                .caseState(this.getState())
+                .damageType(this.getDamageType())
+                .damageCause(this.getDamageCause())
+                .createdDateTime(this.getCreatedDateTime())
+                .client(this.getClient());
     }
 
     public Location getLocation() {
@@ -64,20 +78,8 @@ public non-sealed class Case extends Entity implements Trackable<CaseState>, Not
         return clientVehicleFirstRegistrationDate;
     }
 
-    public List<Note> getCaseNotes() {
-        return caseNotes;
-    }
-
     public String getDamageDescription() {
         return damageDescription;
-    }
-
-    public Optional<Service> getActiveService() {
-        return activeService;
-    }
-
-    public CaseState getCaseState() {
-        return caseState;
     }
 
     public VehicleDamageType getDamageType() {
@@ -122,10 +124,6 @@ public non-sealed class Case extends Entity implements Trackable<CaseState>, Not
 
     public void setDamageDescription(String damageDescription) {
         this.damageDescription = damageDescription;
-    }
-
-    public void setActiveService(Optional<Service> activeService) {
-        this.activeService = activeService;
     }
 
     public void setCaseState(CaseState caseState) {
@@ -182,7 +180,6 @@ public non-sealed class Case extends Entity implements Trackable<CaseState>, Not
         private LocalDate clientVehicleFirstRegistrationDate;
         private List<Note> caseNotes = new ArrayList<>();
         private String damageDescription;
-        private Optional<Service> activeService = Optional.empty();
         private CaseState caseState;
         private VehicleDamageType damageType;
         private VehicleDamageCause damageCause;
@@ -226,11 +223,6 @@ public non-sealed class Case extends Entity implements Trackable<CaseState>, Not
 
         public Builder damageDescription(String description) {
             this.damageDescription = description;
-            return this;
-        }
-
-        public Builder activeService(Optional<Service> service) {
-            this.activeService = service;
             return this;
         }
 
