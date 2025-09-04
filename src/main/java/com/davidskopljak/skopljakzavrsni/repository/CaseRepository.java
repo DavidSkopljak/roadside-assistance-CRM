@@ -1,5 +1,6 @@
 package com.davidskopljak.skopljakzavrsni.repository;
 
+import com.davidskopljak.skopljakzavrsni.controller.CRMApplication;
 import com.davidskopljak.skopljakzavrsni.entity.*;
 import com.davidskopljak.skopljakzavrsni.enums.*;
 import com.davidskopljak.skopljakzavrsni.exceptions.EmptyResultSetException;
@@ -76,8 +77,7 @@ public class CaseRepository extends AbstractRepository<Case> {
             Long firstOperatorid = entity.getFirstOperator().getId();
             ps.setLong(2, firstOperatorid);
 
-            Long lasteditedOperatorid = firstOperatorid;
-            ps.setLong(3, lasteditedOperatorid);
+            ps.setLong(3, firstOperatorid);
 
             Long clientVehicleId = vehicleRepository.save(entity.getClientVehicle());
             ps.setLong(4, clientVehicleId);
@@ -166,7 +166,72 @@ public class CaseRepository extends AbstractRepository<Case> {
 
     @Override
     public void deleteById(Long id) throws SQLException {
+        if(CRMApplication.getActiveOperator().getUsername().equals("admin")){
+            throw new RepositoryAccessException("Only admin can delete cases");
+        }
 
+        LOCK.lock();
+
+        try (Connection conn = DatabaseConnectionManager.getInstance().getConnection()) {
+            conn.setAutoCommit(false);
+
+            try {
+                String getCaseDataSql = "SELECT client_id, client_vehicle_id, location_id FROM cases WHERE id = ?";
+                Long clientId = null;
+                Long vehicleId = null;
+                Long locationId = null;
+
+                try (PreparedStatement ps = conn.prepareStatement(getCaseDataSql)) {
+                    ps.setLong(1, id);
+                    try (ResultSet rs = ps.executeQuery()) {
+                        if (rs.next()) {
+                            clientId = rs.getLong("client_id");
+                            vehicleId = rs.getLong("client_vehicle_id");
+                            locationId = rs.getLong("location_id");
+                        }
+                    }
+                }
+
+                String deleteCaseSql = "DELETE FROM cases WHERE id = ?";
+                try (PreparedStatement ps = conn.prepareStatement(deleteCaseSql)) {
+                    ps.setLong(1, id);
+                    ps.executeUpdate();
+                }
+
+                if (clientId != null) {
+                    String deleteClientSql = "DELETE FROM client WHERE id = ?";
+                    try (PreparedStatement ps = conn.prepareStatement(deleteClientSql)) {
+                        ps.setLong(1, clientId);
+                        ps.executeUpdate();
+                    }
+                }
+
+                if (vehicleId != null) {
+                    String deleteVehicleSql = "DELETE FROM vehicle WHERE id = ?";
+                    try (PreparedStatement ps = conn.prepareStatement(deleteVehicleSql)) {
+                        ps.setLong(1, vehicleId);
+                        ps.executeUpdate();
+                    }
+                }
+
+                if (locationId != null) {
+                    String deleteLocationSql = "DELETE FROM location WHERE id = ?";
+                    try (PreparedStatement ps = conn.prepareStatement(deleteLocationSql)) {
+                        ps.setLong(1, locationId);
+                        ps.executeUpdate();
+                    }
+                }
+
+                conn.commit();
+
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
+            }
+
+        } finally {
+            LOCK.unlock();
+        }
     }
 
     @Override

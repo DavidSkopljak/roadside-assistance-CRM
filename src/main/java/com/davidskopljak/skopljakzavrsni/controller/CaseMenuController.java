@@ -84,15 +84,7 @@ public class CaseMenuController{
     }
 
     public void handleViewServices() {
-        try {
-            FXMLLoader loader = new FXMLLoader(CRMApplication.class.getResource("services-list.fxml"));
-            Parent root = loader.load();
-            caseWindowController.getStage().setScene(new Scene(root));
-            caseWindowController.getStage().setTitle("View services");
-            caseWindowController.getStage().show();
-        } catch (IOException e) {
-            CRMApplication.log.error("Failed to load services list: ", e);
-        }
+            caseWindowController.loadScene("services-list.fxml", "View services", ServicesListController.class );
     }
 
     public void setCaseWindowController(CaseWindowController controller) {

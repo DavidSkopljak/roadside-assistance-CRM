@@ -40,6 +40,7 @@ public class CaseWindowController {
             T controller =  controllerClass.cast(loader.getController());
 
             if (controller instanceof CaseController child) {
+                System.out.println("Setting CaseWindowController controller for " + sceneUrl);
                 child.setCaseWindowController(this);
             }
             stage.setTitle(title);

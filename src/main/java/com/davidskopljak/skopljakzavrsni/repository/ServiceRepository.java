@@ -21,11 +21,7 @@ public class ServiceRepository extends AbstractRepository<Service> {
         List<Service> services = new ArrayList<>();
         LOCK.lock();
 
-        String sql = """
-        SELECT service.id, service.assigned_driver_id, service.service_type_id,
-               service.service_state_id, service.driver_notes, service.case_id, service.workshop_id
-        FROM service WHERE case_id = ?
-    """;
+        String sql = "SELECT service.id, service.assigned_driver_id, service.service_type_id,service.service_state_id, service.driver_notes, service.case_id, service.workshop_id FROM service WHERE case_id = ?";
 
         try (Connection conn = DatabaseConnectionManager.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {

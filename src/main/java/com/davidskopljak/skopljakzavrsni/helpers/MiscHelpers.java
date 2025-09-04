@@ -47,25 +47,14 @@ public class MiscHelpers {
         }
     }
 
-    public static Stage loadSceneInNewStage(String sceneUrl, String title) {
-        try {
-            FXMLLoader fxmlLoader = new FXMLLoader(CRMApplication.class.getResource(sceneUrl));
-            Parent root = fxmlLoader.load();
-
-            Stage stage = new Stage();
-            stage.setTitle(title);
-            stage.setScene(new Scene(root));
-            stage.show();
-
-            return stage;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
     public static String capitalize(String str) {
         if (str == null || str.isEmpty()) return str;
         return str.substring(0, 1).toUpperCase() + str.substring(1).toLowerCase();
+    }
+
+    public static void runThread(Runnable runnable) {
+        Thread thread = new Thread(runnable);
+        thread.setDaemon(true);
+        thread.start();
     }
 }

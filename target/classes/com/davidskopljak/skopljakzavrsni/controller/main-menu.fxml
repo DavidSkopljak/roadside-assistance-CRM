@@ -5,7 +5,7 @@
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<MenuBar id="menuBar" layoutY="0.0" prefHeight="30.0" prefWidth="1080.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.davidskopljak.skopljakzavrsni.controller.MainMenuController">
+<MenuBar fx:id="menuBar" layoutY="0.0" prefHeight="30.0" prefWidth="1080.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.davidskopljak.skopljakzavrsni.controller.MainMenuController">
     <menus>
         <Menu id="newCaseMenu" mnemonicParsing="false" text="New case">
             <items>

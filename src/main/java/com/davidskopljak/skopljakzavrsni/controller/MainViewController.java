@@ -2,6 +2,7 @@ package com.davidskopljak.skopljakzavrsni.controller;
 
 import com.davidskopljak.skopljakzavrsni.entity.*;
 import com.davidskopljak.skopljakzavrsni.exceptions.RepositoryAccessException;
+import com.davidskopljak.skopljakzavrsni.helpers.MiscHelpers;
 import com.davidskopljak.skopljakzavrsni.repository.CaseRepository;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
@@ -9,6 +10,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
@@ -64,9 +66,10 @@ public class MainViewController {
                 "Last edited operator"
         );
 
-        filterTextArea.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.ENTER) {
-                Thread runner = new Thread(() -> {
+        filterTextArea.addEventFilter(KeyEvent.KEY_PRESSED, ke -> {
+            if (ke.getCode() == KeyCode.ENTER) {
+                ke.consume();
+                MiscHelpers.runThread(() -> {
                     try {
                         CaseRepository caseRepository = new CaseRepository();
                         List<Case> allCases = caseRepository.findAll();
@@ -75,20 +78,17 @@ public class MainViewController {
                         String selectedColumn = filterComboBox.getSelectionModel().getSelectedItem();
                         String filter = filterTextArea.getText().trim().toLowerCase();
 
-                        if(selectedColumn == null){
+                        if (selectedColumn == null) {
                             results = matchAnyColumn(allCases, filter);
                         } else {
                             results = matchColumn(allCases, filter, selectedColumn);
                         }
-
 
                         javafx.application.Platform.runLater(() -> casesTableView.getItems().setAll(results));
                     } catch (Exception e) {
                         CRMApplication.log.error("Search failed", e);
                     }
                 });
-
-                runner.start();
             }
         });
 

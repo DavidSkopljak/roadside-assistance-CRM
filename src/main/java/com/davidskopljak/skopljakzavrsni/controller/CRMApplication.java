@@ -23,7 +23,7 @@ import java.io.IOException;
             Scene scene = new Scene(fxmlLoader.load());
             stage.setTitle("CRM Application");
             stage.setScene(scene);
-            stage.setResizable(false);
+            stage.setResizable(true);
             stage.show();
         }catch(IOException e){
             log.error(e.getMessage());

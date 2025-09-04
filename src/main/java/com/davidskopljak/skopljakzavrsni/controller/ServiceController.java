@@ -101,8 +101,8 @@ public class ServiceController{
             setupDriverComboBox(driverComboBox);
             setupWorkshopComboBox(workshopComboBox);
 
-        } catch (SQLException e) {
-            throw new RepositoryAccessException("Failed to load drivers from database: " + e.getMessage(), e);
+        } catch (RepositoryAccessException e) {
+            CRMApplication.log.error("Failed to load drivers from database", e);
         }
     }
 
@@ -112,7 +112,7 @@ public class ServiceController{
             var workshops = workshopRepository.findAll();
             ObservableList<Workshop> workshopList = FXCollections.observableArrayList(workshops);
             workshopComboBox.setItems(workshopList);
-        } catch (SQLException e) {
+        } catch (RepositoryAccessException e) {
             throw new RepositoryAccessException("Failed to load workshops from database: " + e.getMessage(), e);
         }
     }

@@ -3,6 +3,7 @@ package com.davidskopljak.skopljakzavrsni.controller;
 import com.davidskopljak.skopljakzavrsni.entity.Location;
 import com.davidskopljak.skopljakzavrsni.entity.Workshop;
 import com.davidskopljak.skopljakzavrsni.enums.VehicleModel;
+import com.davidskopljak.skopljakzavrsni.exceptions.InvalidCaseLocationException;
 import com.davidskopljak.skopljakzavrsni.exceptions.InvalidWorkshopInfoException;
 import com.davidskopljak.skopljakzavrsni.exceptions.RepositoryAccessException;
 import com.davidskopljak.skopljakzavrsni.helpers.MiscHelpers;
@@ -244,12 +245,33 @@ public class ManageWorkshopsController {
 
     private void validateWorkshop() throws InvalidWorkshopInfoException {
         String name = nameTextField.getText().trim();
+        String country = countryTextField.getText().trim();
+        String city = cityTextField.getText().trim();
+        String address = addressTextField.getText().trim();
+        String latitude = latitudeTextField.getText().trim();
+        String longitude = longitudeTextField.getText().trim();
+        String postalCode = postalCodeTextField.getText().trim();
         VehicleModel selectedVehicleModel = permittedVehicleModelComboBox.getSelectionModel().getSelectedItem();
-        Location location = (Location)  locationAnchorPane.getUserData();
 
-        if(Boolean.FALSE.equals(Validators.isValidString(name))
-                || selectedVehicleModel == null){
-            throw new InvalidWorkshopInfoException("Invalid workshop info.");
+
+        if (Boolean.FALSE.equals(Validators.isValidString(List.of(country, city, name)))) {
+            throw new InvalidWorkshopInfoException("Country, city or workshop name contains invalid characters.");
+        }
+
+        if(Boolean.FALSE.equals(Validators.isValidAddress(address))){
+            throw new InvalidWorkshopInfoException("Address contains invalid characters.");
+        }
+
+        if (Boolean.FALSE.equals(Validators.isValidInt(postalCode))) {
+            throw new InvalidWorkshopInfoException("Postal code is empty or invalid.");
+        }
+
+        if (Boolean.FALSE.equals(Validators.isValidGeoCoords(latitude + ", " + longitude))) {
+            throw new InvalidWorkshopInfoException("Coordinates must be valid decimal numbers separated by a comma.");
+        }
+
+        if(selectedVehicleModel.equals(null)){
+            throw new InvalidWorkshopInfoException("Please select a vehicle model.");
         }
     }
 
@@ -259,14 +281,19 @@ public class ManageWorkshopsController {
             try{
                 Workshop newWorkshop = new Workshop(
                         nameTextField.getText().trim(),
-                        null, // Location will be set separately via your custom component
+                        new Location(
+                                addressTextField.getText().trim(), cityTextField.getText().trim(), countryTextField.getText().trim(),postalCodeTextField.getText().trim(),new BigDecimal(latitudeTextField.getText().trim()),new BigDecimal(longitudeTextField.getText().trim())
+                        ),
                         permittedVehicleModelComboBox.getSelectionModel().getSelectedItem()
                 );
                 workshopRepository.save(newWorkshop);
                 refreshWorkshopTable();
 
-                nameTextField.clear();
-                permittedVehicleModelComboBox.getSelectionModel().clearSelection();
+                javafx.application.Platform.runLater(() -> {
+                    refreshWorkshopTable(); // updates TableView
+                    nameTextField.clear();
+                    permittedVehicleModelComboBox.getSelectionModel().clearSelection();
+                });
 
             } catch (RepositoryAccessException e){
                 CRMApplication.log.error("Failed to save new workshop: ", e);
@@ -341,6 +368,49 @@ public class ManageWorkshopsController {
 
     private static void setText(TextField field, String value) {
         field.setText(value == null ? "" : value);
+    }
+
+    public void onUseAddressClicked() {
+        try {
+            Location location = Location.getLocationFromAddress(addressTextField.getText(), cityTextField.getText(), countryTextField.getText(), postalCodeTextField.getText());
+            updateFieldsAndMap(location);
+        } catch (Exception e) {
+            MiscHelpers.showAlert("Could not resolve location from address. " + e.getMessage(), Alert.AlertType.ERROR);
+        }
+    }
+
+    public void onUseCoordinatesClicked() {
+        try {
+            Location location = Location.getLocationFromCoordinates(new BigDecimal(latitudeTextField.getText()), new BigDecimal(longitudeTextField.getText()));
+            updateFieldsAndMap(location);
+        } catch (Exception e) {
+            MiscHelpers.showAlert("Could not resolve location from longitude. " + e.getMessage(), Alert.AlertType.ERROR);
+        }
+    }
+
+    private void updateFieldsAndMap(Location location) {
+        if (location == null) return;
+        setText(countryTextField, location.getCountry());
+        setText(cityTextField, location.getCity());
+        setText(addressTextField, location.getAddress());
+        setText(postalCodeTextField, location.getPostalCode());
+        setText(latitudeTextField, location.getLatitude().toString());
+        setText(longitudeTextField, location.getLongitude().toString());
+
+        Coordinate coord = new Coordinate(location.getLatitude().doubleValue(), location.getLongitude().doubleValue());
+
+        if (currentMarker != null) {
+            mapView.removeMarker(currentMarker);
+        }
+
+        currentMarker = Marker.createProvided(Marker.Provided.RED)
+                .setPosition(coord)
+                .setVisible(true);
+
+        mapView.addMarker(currentMarker);
+
+        mapView.setCenter(coord);
+        mapView.setZoom(17);
     }
 
 }

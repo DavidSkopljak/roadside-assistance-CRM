@@ -1,5 +1,6 @@
 package com.davidskopljak.skopljakzavrsni.repository;
 
+import com.davidskopljak.skopljakzavrsni.controller.CRMApplication;
 import com.davidskopljak.skopljakzavrsni.entity.Location;
 import com.davidskopljak.skopljakzavrsni.entity.Workshop;
 import com.davidskopljak.skopljakzavrsni.enums.VehicleModel;
@@ -48,7 +49,7 @@ public class WorkshopRepository extends AbstractRepository<Workshop> {
     }
 
     @Override
-    public List<Workshop> findAll() throws SQLException {
+    public List<Workshop> findAll() {
         List<Workshop> workshops = new ArrayList<>();
         LOCK.lock();
 
@@ -68,7 +69,7 @@ public class WorkshopRepository extends AbstractRepository<Workshop> {
                 workshops.add(new Workshop(workshopId, name, location, vehicleModel));
             }
             return workshops;
-        }catch(RepositoryAccessException e){
+        }catch(RepositoryAccessException | SQLException e){
             throw new RepositoryAccessException(e.getMessage(), e);
         }finally{
             LOCK.unlock();
@@ -76,7 +77,7 @@ public class WorkshopRepository extends AbstractRepository<Workshop> {
     }
 
     @Override
-    public Long save(Workshop entity) throws SQLException {
+    public Long save(Workshop entity) {
         LOCK.lock();
 
         String sql = "INSERT INTO workshop (name, location_id, vehicle_model_id) VALUES (?, ?, ?) RETURNING id";
@@ -99,7 +100,7 @@ public class WorkshopRepository extends AbstractRepository<Workshop> {
                 }
             }
 
-        }catch(RepositoryAccessException e){
+        }catch(RepositoryAccessException | SQLException e){
             throw new RepositoryAccessException(e.getMessage(), e);
         }finally {
             LOCK.unlock();
@@ -107,7 +108,7 @@ public class WorkshopRepository extends AbstractRepository<Workshop> {
     }
 
     @Override
-    public List<Workshop> saveAll(List<Workshop> entities) throws SQLException {
+    public List<Workshop> saveAll(List<Workshop> entities) {
         LOCK.lock();
         String sql = "INSERT INTO workshop (name, location_id, vehicle_model_id) VALUES (?, ?, ?) RETURNING id";
         List<Workshop> saved = new ArrayList<>();
@@ -133,6 +134,8 @@ public class WorkshopRepository extends AbstractRepository<Workshop> {
                     }
                 }
             }
+        } catch(SQLException | RepositoryAccessException e) {
+            throw new RepositoryAccessException("Unable to save all workshops", e);
         } finally {
             LOCK.unlock();
         }
@@ -165,8 +168,23 @@ public class WorkshopRepository extends AbstractRepository<Workshop> {
     }
 
     @Override
-    public void deleteById(Long id) throws SQLException {
+    public void deleteById(Long id) {
+        if(!CRMApplication.getActiveOperator().getUsername().equals("admin")){
+            throw new RepositoryAccessException("Only admin can delete workshops");
+        }
 
+        LOCK.lock();
+
+        String deleteWorkshopSql = "DELETE FROM workshop WHERE id = ?";
+        try (Connection conn = DatabaseConnectionManager.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(deleteWorkshopSql);) {
+            ps.setLong(1, id);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RepositoryAccessException("Something went wrong while trying to delete workshop with id " + id + ". " + e.getMessage(), e);
+        } finally {
+            LOCK.unlock();
+        }
     }
 
     Location queryLocationById(Long locationId) throws SQLException {
