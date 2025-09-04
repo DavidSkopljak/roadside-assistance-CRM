@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane fx:id="rootAnchorPane" prefHeight="600.0" prefWidth="1080.0" xmlns="http://javafx.com/javafx/24" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.davidskopljak.skopljakzavrsni.controller.ManageDriversController">
+
+    <fx:include source="manage-drivers-menu.fxml" />
+
+    <ScrollPane layoutY="30.0" prefHeight="570.0" prefWidth="1080.0">
+        <content>
+            <GridPane prefHeight="570.0" prefWidth="1080.0">
+                <columnConstraints>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                    <ColumnConstraints />
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                </rowConstraints>
+
+                <children>
+                    <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="10.0" GridPane.columnIndex="1">
+                        <children>
+                            <Label text="Existing drivers">
+                                <font>
+                                    <Font name="System Bold" size="19.0" />
+                                </font>
+                            </Label>
+                        </children>
+                        <padding>
+                            <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
+                        </padding>
+                    </VBox>
+
+                    <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="10.0" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+                        <children>
+                            <Label alignment="CENTER" text="New driver">
+                                <font>
+                                    <Font name="System Bold" size="19.0" />
+                                </font>
+                            </Label>
+                        </children>
+                        <padding>
+                            <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
+                        </padding>
+                    </VBox>
+
+                    <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="10.0" GridPane.rowIndex="1">
+                        <children>
+                            <Label text="First name:" />
+                            <TextField fx:id="firstNameTextField" prefHeight="25.0" prefWidth="300.0" />
+                        </children>
+                        <padding>
+                            <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
+                        </padding>
+                    </VBox>
+
+                    <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="10.0" GridPane.rowIndex="2">
+                        <children>
+                            <Label text="Last name:" />
+                            <TextField fx:id="lastNameTextField" prefHeight="25.0" prefWidth="300.0" />
+                        </children>
+                        <padding>
+                            <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
+                        </padding>
+                    </VBox>
+
+                    <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="10.0" GridPane.rowIndex="3">
+                        <children>
+                            <Label text="Contact number:" />
+                            <TextField fx:id="contactNumberTextField" prefHeight="25.0" prefWidth="300.0" />
+                        </children>
+                        <padding>
+                            <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
+                        </padding>
+                    </VBox>
+
+                    <Button fx:id="confirmButton" mnemonicParsing="false" onAction="#handleAddNewDriver" text="Confirm" GridPane.halignment="CENTER" GridPane.rowIndex="6" GridPane.valignment="CENTER" />
+
+                    <HBox alignment="CENTER_LEFT" minHeight="-Infinity" minWidth="-Infinity" prefHeight="65.0" prefWidth="511.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                        <children>
+                            <TextArea fx:id="filterTextArea" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="29.0" prefWidth="347.0">
+                                <HBox.margin>
+                                    <Insets bottom="5.0" left="10.0" top="5.0" />
+                                </HBox.margin>
+                            </TextArea>
+                            <ComboBox fx:id="filterComboBox" prefWidth="150.0">
+                                <HBox.margin>
+                                    <Insets bottom="5.0" left="10.0" top="5.0" />
+                                </HBox.margin>
+                            </ComboBox>
+                        </children>
+                    </HBox>
+
+                    <TableView fx:id="driversTable" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.rowSpan="5">
+                        <columns>
+                            <TableColumn fx:id="idColumn" prefWidth="45.0" text="ID" />
+                            <TableColumn fx:id="firstNameColumn" prefWidth="161.0" text="First name" />
+                            <TableColumn fx:id="lastNameColumn" prefWidth="127.0" text="Last name" />
+                            <TableColumn fx:id="contactNumberColumn" prefWidth="149.0" text="Contact number" />
+                            <TableColumn fx:id="deleteDriverColumn" prefWidth="52.0" />
+                        </columns>
+                    </TableView>
+                </children>
+
+                <padding>
+                    <Insets right="10.0" />
+                </padding>
+            </GridPane>
+        </content>
+    </ScrollPane>
+</AnchorPane>

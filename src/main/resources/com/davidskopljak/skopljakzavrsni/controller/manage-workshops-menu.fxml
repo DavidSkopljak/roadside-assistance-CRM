@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+
+<MenuBar prefHeight="30.0" prefWidth="1080.0" xmlns="http://javafx.com/javafx/24" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.davidskopljak.skopljakzavrsni.controller.ManageDriversMenuController">
+    <menus>
+        <Menu mnemonicParsing="false" text="Exit">
+            <items>
+                <MenuItem mnemonicParsing="false" onAction="#handleExitManageDrivers" text="Exit" />
+            </items>
+        </Menu>
+    </menus>
+</MenuBar>
