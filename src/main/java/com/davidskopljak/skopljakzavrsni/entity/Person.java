@@ -1,6 +1,8 @@
 package com.davidskopljak.skopljakzavrsni.entity;
 
-public abstract class Person extends Entity {
+import java.io.Serializable;
+
+public abstract class Person extends Entity implements Serializable {
     private String firstName;
     private String lastName;
 

@@ -1,6 +1,9 @@
 package com.davidskopljak.skopljakzavrsni.controller;
 
+import com.davidskopljak.skopljakzavrsni.entity.BufferableEntity;
 import com.davidskopljak.skopljakzavrsni.entity.Case;
+import com.davidskopljak.skopljakzavrsni.entity.EntityBuffer;
+import com.davidskopljak.skopljakzavrsni.enums.BufferedChangeType;
 import com.davidskopljak.skopljakzavrsni.enums.CaseState;
 import com.davidskopljak.skopljakzavrsni.exceptions.EmptyResultSetException;
 import com.davidskopljak.skopljakzavrsni.exceptions.RepositoryAccessException;
@@ -35,6 +38,7 @@ public class CaseMenuController{
 
     public void handleSaveCase() {
         try{
+            EntityBuffer<Long, Case> caseBuffer = CRMApplication.getCaseBuffer();
             CaseRepository caseRepository = new CaseRepository();
             Case caseToSave = caseWindowController.getActiveCaseBuilder().build();
             caseToSave.updateState(CaseState.ACTIVE);
@@ -46,12 +50,14 @@ public class CaseMenuController{
             }
 
             if(caseToSave.getId() == null){
-                Long caseId = caseRepository.save(caseToSave);
-                caseToSave.setId(caseId);
+                caseBuffer.writeEntity(new BufferableEntity<>(null, caseToSave, CRMApplication.getActiveOperator(), BufferedChangeType.NEW));
+//                Long caseId = caseRepository.save(caseToSave);
+//                caseToSave.setId(caseId);
                 //replace this with async refresh func
                 caseWindowController.loadScene("case-info.fxml", "View case info",  CaseInfoController.class);
             } else {
-                caseRepository.update(caseToSave);
+//                caseRepository.update(caseToSave);
+                caseBuffer.writeEntity(new BufferableEntity<>(caseToSave.getId(), caseToSave, CRMApplication.getActiveOperator(), BufferedChangeType.UPDATED));
                 //replace this with async refresh func
                 caseWindowController.loadScene("case-info.fxml", "View case info",  CaseInfoController.class);
             }

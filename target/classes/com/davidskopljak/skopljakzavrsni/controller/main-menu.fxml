@@ -12,9 +12,9 @@
                 <MenuItem mnemonicParsing="false" onAction="#handleNewCase" text="Create new case" />
             </items>
         </Menu>
-        <Menu id="filterCasesMenu" mnemonicParsing="false" text="Filter cases">
+        <Menu id="filterCasesMenu" mnemonicParsing="false" text="Save all changes">
             <items>
-                <MenuItem mnemonicParsing="false" text="Delete" />
+                <MenuItem mnemonicParsing="false" onAction="#handleShowDiffs" text="Save" />
             </items>
         </Menu>
     </menus>

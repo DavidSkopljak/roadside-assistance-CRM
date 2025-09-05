@@ -5,10 +5,11 @@ import com.davidskopljak.skopljakzavrsni.enums.ServiceType;
 import com.davidskopljak.skopljakzavrsni.interfaces.Noteable;
 import com.davidskopljak.skopljakzavrsni.interfaces.Trackable;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public non-sealed class Service extends Entity implements Trackable<ServiceState>, Noteable {
+public non-sealed class Service extends Entity implements Trackable<ServiceState>, Noteable, Serializable {
     private Driver assignedDriver;
     private ServiceType serviceType;
     private ServiceState serviceState;

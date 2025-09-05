@@ -1,6 +1,8 @@
 package com.davidskopljak.skopljakzavrsni.entity;
 
-public abstract class Entity {
+import java.io.Serializable;
+
+public abstract class Entity implements Serializable {
     private Long id = null;
 
     protected Entity(Long id) {

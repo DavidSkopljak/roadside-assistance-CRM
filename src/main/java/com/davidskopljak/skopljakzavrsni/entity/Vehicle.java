@@ -2,7 +2,9 @@ package com.davidskopljak.skopljakzavrsni.entity;
 
 import com.davidskopljak.skopljakzavrsni.enums.VehicleModel;
 
-public class Vehicle extends Entity {
+import java.io.Serializable;
+
+public class Vehicle extends Entity implements Serializable {
    private String licensePlate;
    private VehicleModel model;
    private String vin;

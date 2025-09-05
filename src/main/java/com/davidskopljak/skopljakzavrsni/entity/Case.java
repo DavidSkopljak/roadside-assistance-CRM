@@ -6,12 +6,13 @@ import com.davidskopljak.skopljakzavrsni.enums.VehicleDamageType;
 import com.davidskopljak.skopljakzavrsni.interfaces.Noteable;
 import com.davidskopljak.skopljakzavrsni.interfaces.Trackable;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public non-sealed class Case extends Entity implements Trackable<CaseState>, Noteable {
+public non-sealed class Case extends Entity implements Trackable<CaseState>, Noteable, Serializable {
     private  Location location;
     private  Operator firstOperator;
     private  Operator lastEditedOperator;

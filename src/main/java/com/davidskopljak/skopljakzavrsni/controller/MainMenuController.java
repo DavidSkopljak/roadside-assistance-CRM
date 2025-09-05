@@ -54,4 +54,8 @@ public class MainMenuController {
         MiscHelpers.loadScene("manage-operators.fxml", "Manage operators", CRMApplication.getPrimaryStage());
     }
 
+    public void handleShowDiffs(){
+        MiscHelpers.loadScene("case-diff.fxml", "Show diffs", CRMApplication.getPrimaryStage());
+    }
+
 }

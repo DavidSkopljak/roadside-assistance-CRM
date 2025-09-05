@@ -1,8 +1,9 @@
 package com.davidskopljak.skopljakzavrsni.entity;
 
+import java.io.Serializable;
 import java.time.Instant;
 
-public class Note extends Entity{
+public class Note extends Entity implements Serializable {
     private String message;
     private Instant timestampUTC;
     private Long caseId;

@@ -1,5 +1,7 @@
 package com.davidskopljak.skopljakzavrsni.controller;
 
+import com.davidskopljak.skopljakzavrsni.entity.Case;
+import com.davidskopljak.skopljakzavrsni.entity.EntityBuffer;
 import com.davidskopljak.skopljakzavrsni.entity.Operator;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -7,6 +9,8 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+
+import java.io.File;
 import java.io.IOException;
 
 
@@ -14,6 +18,7 @@ import java.io.IOException;
     public static final Logger log = LoggerFactory.getLogger(CRMApplication.class);
     private static Stage PRIMARY_STAGE;
     private static Operator ACTIVE_OPERATOR;
+    private static EntityBuffer<Long, Case> CASE_BUFFER = new EntityBuffer<>(new File("cases.dat"));
 
     @Override
     public void start(Stage stage){
@@ -41,4 +46,5 @@ import java.io.IOException;
     public static Stage getPrimaryStage() {return PRIMARY_STAGE;}
     private static void setPrimaryStage(Stage primaryStage) {CRMApplication.PRIMARY_STAGE = primaryStage;}
     public static Operator getActiveOperator() {return ACTIVE_OPERATOR;}
+    public static EntityBuffer<Long, Case> getCaseBuffer() {return CASE_BUFFER;}
 }

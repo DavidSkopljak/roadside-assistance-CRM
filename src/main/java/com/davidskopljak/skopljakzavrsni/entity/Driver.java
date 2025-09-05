@@ -3,7 +3,9 @@ package com.davidskopljak.skopljakzavrsni.entity;
 import com.davidskopljak.skopljakzavrsni.enums.DriverState;
 import com.davidskopljak.skopljakzavrsni.interfaces.Trackable;
 
-public class Driver extends Person implements Trackable<DriverState> {
+import java.io.Serializable;
+
+public class Driver extends Person implements Trackable<DriverState>, Serializable {
     private String contactNumber;
     private DriverState driverState;
 

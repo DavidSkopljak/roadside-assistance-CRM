@@ -1,6 +1,8 @@
 package com.davidskopljak.skopljakzavrsni.entity;
 
-public class Operator extends Person{
+import java.io.Serializable;
+
+public class Operator extends Person implements Serializable {
     private final String username;
     public Operator(Long id, String username,  String firstName, String lastName) {
         super(id, firstName, lastName);

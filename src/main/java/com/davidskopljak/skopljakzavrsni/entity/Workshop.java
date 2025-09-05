@@ -2,7 +2,9 @@ package com.davidskopljak.skopljakzavrsni.entity;
 
 import com.davidskopljak.skopljakzavrsni.enums.VehicleModel;
 
-public record Workshop(Long id, String name, Location location, VehicleModel permittedVehicleModel) {
+import java.io.Serializable;
+
+public record Workshop(Long id, String name, Location location, VehicleModel permittedVehicleModel) implements Serializable {
     public Workshop(Long id, Workshop workshop){
         this(id, workshop.getName(), workshop.getLocation(), workshop.getPermittedVehicleModel());
     }

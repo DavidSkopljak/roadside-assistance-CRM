@@ -1,6 +1,8 @@
 package com.davidskopljak.skopljakzavrsni.entity;
 
-public class Client extends Person {
+import java.io.Serializable;
+
+public class Client extends Person implements Serializable {
     private String contactNumber;
 
     public Client(Long id, String firstName, String lastName, String contactNumber) {

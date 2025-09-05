@@ -7,6 +7,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URLEncoder;
@@ -15,7 +16,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 
-public class Location extends Entity {
+public class Location extends Entity implements Serializable {
     String address;
     String city;
     String country;
