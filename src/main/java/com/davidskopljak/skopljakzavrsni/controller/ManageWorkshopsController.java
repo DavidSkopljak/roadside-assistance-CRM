@@ -89,23 +89,22 @@ public class ManageWorkshopsController {
     private TextField postalCodeTextField;
 
 
-
     private final Image deleteImage = new Image(getClass().getResourceAsStream("/images/x-transparent.png"));
     private static final Coordinate DEFAULT_MAPVIEW_LOCATION = new Coordinate(45.8150, 15.9819);
     private Marker currentMarker;
 
     private final MapView mapView = new MapView();
 
-    public void handleAddNewWorkshop(){
-        try{
+    public void handleAddNewWorkshop() {
+        try {
             validateWorkshop();
             saveNewWorkshop();
-        } catch(InvalidWorkshopInfoException e){
+        } catch (InvalidWorkshopInfoException e) {
             CRMApplication.log.error("Failed to add new workshop: ", e);
         }
     }
 
-    public void initialize(){
+    public void initialize() {
         filterTextArea.addEventFilter(KeyEvent.KEY_PRESSED, ke -> {
             if (ke.getCode() == KeyCode.ENTER) {
                 ke.consume();
@@ -145,13 +144,13 @@ public class ManageWorkshopsController {
         loadVehicleModels();
     }
 
-    private List<Workshop> matchAnyColumn(List<Workshop> allWorkshops, String filter){
+    private List<Workshop> matchAnyColumn(List<Workshop> allWorkshops, String filter) {
         List<Workshop> results = new ArrayList<>();
-        for(Workshop w : allWorkshops){
+        for (Workshop w : allWorkshops) {
             if (String.valueOf(w.getId()).contains(filter)
                     || w.getName().toLowerCase().contains(filter)
                     || (w.getPermittedVehicleModel() != null && w.getPermittedVehicleModel().toString().toLowerCase().contains(filter))
-                    || (w.getLocation() != null && w.getLocation().toString().toLowerCase().contains(filter))){
+                    || (w.getLocation() != null && w.getLocation().toString().toLowerCase().contains(filter))) {
                 results.add(w);
             }
         }
@@ -165,7 +164,8 @@ public class ManageWorkshopsController {
         switch (column) {
             case "ID" -> columnExtractor = w -> String.valueOf(w.getId());
             case "Name" -> columnExtractor = Workshop::getName;
-            case "Vehicle Model" -> columnExtractor = w -> w.getPermittedVehicleModel() != null ? w.getPermittedVehicleModel().toString() : "";
+            case "Vehicle Model" ->
+                    columnExtractor = w -> w.getPermittedVehicleModel() != null ? w.getPermittedVehicleModel().toString() : "";
             case "Location" -> columnExtractor = w -> w.getLocation() != null ? w.getLocation().toString() : "";
             default -> columnExtractor = w -> "";
         }
@@ -220,7 +220,7 @@ public class ManageWorkshopsController {
 
     private void loadVehicleModels() {
         MiscHelpers.runThread(() -> {
-            try (Connection conn = DatabaseConnectionManager.getInstance().getConnection()){
+            try (Connection conn = DatabaseConnectionManager.getInstance().getConnection()) {
                 List<VehicleModel> vehicleModels = RepositoryHelper.queryAllVehicleModels(conn);
                 javafx.application.Platform.runLater(() ->
                         permittedVehicleModelComboBox.getItems().setAll(vehicleModels));
@@ -258,7 +258,7 @@ public class ManageWorkshopsController {
             throw new InvalidWorkshopInfoException("Country, city or workshop name contains invalid characters.");
         }
 
-        if(Boolean.FALSE.equals(Validators.isValidAddress(address))){
+        if (Boolean.FALSE.equals(Validators.isValidAddress(address))) {
             throw new InvalidWorkshopInfoException("Address contains invalid characters.");
         }
 
@@ -270,19 +270,19 @@ public class ManageWorkshopsController {
             throw new InvalidWorkshopInfoException("Coordinates must be valid decimal numbers separated by a comma.");
         }
 
-        if(selectedVehicleModel.equals(null)){
+        if (selectedVehicleModel.equals(null)) {
             throw new InvalidWorkshopInfoException("Please select a vehicle model.");
         }
     }
 
-    private void saveNewWorkshop(){
+    private void saveNewWorkshop() {
         MiscHelpers.runThread(() -> {
             WorkshopRepository workshopRepository = new WorkshopRepository();
-            try{
+            try {
                 Workshop newWorkshop = new Workshop(
                         nameTextField.getText().trim(),
                         new Location(
-                                addressTextField.getText().trim(), cityTextField.getText().trim(), countryTextField.getText().trim(),postalCodeTextField.getText().trim(),new BigDecimal(latitudeTextField.getText().trim()),new BigDecimal(longitudeTextField.getText().trim())
+                                addressTextField.getText().trim(), cityTextField.getText().trim(), countryTextField.getText().trim(), postalCodeTextField.getText().trim(), new BigDecimal(latitudeTextField.getText().trim()), new BigDecimal(longitudeTextField.getText().trim())
                         ),
                         permittedVehicleModelComboBox.getSelectionModel().getSelectedItem()
                 );
@@ -295,13 +295,13 @@ public class ManageWorkshopsController {
                     permittedVehicleModelComboBox.getSelectionModel().clearSelection();
                 });
 
-            } catch (RepositoryAccessException e){
+            } catch (RepositoryAccessException e) {
                 CRMApplication.log.error("Failed to save new workshop: ", e);
             }
         });
     }
 
-    private void handleDeleteWorkshop(Workshop workshop){
+    private void handleDeleteWorkshop(Workshop workshop) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Confirm Deletion");
         alert.setHeaderText("Are you sure you want to delete this workshop?");
@@ -311,10 +311,10 @@ public class ManageWorkshopsController {
             if (response == ButtonType.OK) {
                 MiscHelpers.runThread(() -> {
                     WorkshopRepository workshopRepository = new WorkshopRepository();
-                    try{
+                    try {
                         workshopRepository.deleteById(workshop.getId());
                         refreshWorkshopTable();
-                    } catch(RepositoryAccessException e){
+                    } catch (RepositoryAccessException e) {
                         CRMApplication.log.error("Failed to delete workshop", e);
                         MiscHelpers.showAlert("Failed to delete workshop: " + e.getMessage(), Alert.AlertType.ERROR);
                     }
@@ -323,7 +323,7 @@ public class ManageWorkshopsController {
         });
     }
 
-    private void initializeMapView(){
+    private void initializeMapView() {
         mapView.setMapType(MapType.OSM);
         mapView.initialize(Configuration.builder()
                 .showZoomControls(true)
@@ -331,8 +331,8 @@ public class ManageWorkshopsController {
 
         mapView.initializedProperty().addListener((_, _, isNowInitialized) -> {
             if (Boolean.TRUE.equals(isNowInitialized)) {
-                    mapView.setCenter(DEFAULT_MAPVIEW_LOCATION);
-                    mapView.setZoom(13);
+                mapView.setCenter(DEFAULT_MAPVIEW_LOCATION);
+                mapView.setZoom(13);
             }
             mapView.addEventHandler(MapViewEvent.MAP_CLICKED, event -> {
                 Coordinate coord = event.getCoordinate();
@@ -412,5 +412,4 @@ public class ManageWorkshopsController {
         mapView.setCenter(coord);
         mapView.setZoom(17);
     }
-
 }

@@ -113,24 +113,12 @@ public class CaseDiffController {
         }
     }
 
-    private void displayCaseDiff(BufferableEntity<Long, Case> selectedData) {
+    private void displayCaseDiff(BufferableEntity<Long, Case> bufferableEntity) {
         originalFieldDiffs.clear();
         modifiedFieldDiffs.clear();
 
         try {
-            Case bufferedCase = selectedData.getEntity();
-            Case originalCase = null;
-
-            try {
-                if (bufferedCase.getId() != null) {
-                    CaseRepository caseRepository = new CaseRepository();
-                    originalCase = caseRepository.findById(bufferedCase.getId());
-                }
-            } catch (SQLException e){
-                CRMApplication.log.error("error reading case " + bufferedCase.getId(), e);
-            }
-
-            List<FieldDiff> diffs = generateAllFieldDiffs(originalCase, bufferedCase);
+            List<FieldDiff> diffs = generateAllFieldDiffs(bufferableEntity);
 
             for (FieldDiff diff : diffs) {
                 originalFieldDiffs.add(diff);
@@ -142,69 +130,84 @@ public class CaseDiffController {
         }
     }
 
-    private List<FieldDiff> generateAllFieldDiffs(Case originalCase, Case bufferedCase) {
+    private List<FieldDiff> generateAllFieldDiffs(BufferableEntity<Long, Case> bufferableEntity) {
         List<FieldDiff> diffs = new ArrayList<>();
 
-        if (originalCase != null) {
-            // Case
-            diffs.add(new FieldDiff("ID", originalCase.getId(), bufferedCase.getId()));
-            diffs.add(new FieldDiff("Damage Description", originalCase.getDamageDescription(), bufferedCase.getDamageDescription()));
-            diffs.add(new FieldDiff("Case State", originalCase.getState(), bufferedCase.getState()));
-            diffs.add(new FieldDiff("Damage Type", originalCase.getDamageType(), bufferedCase.getDamageType()));
-            diffs.add(new FieldDiff("Damage Cause", originalCase.getDamageCause(), bufferedCase.getDamageCause()));
-            diffs.add(new FieldDiff("Created Date", originalCase.getCreatedDateTime(), bufferedCase.getCreatedDateTime()));
-            diffs.add(new FieldDiff("Vehicle Registration Date", originalCase.getClientVehicleFirstRegistrationDate(), bufferedCase.getClientVehicleFirstRegistrationDate()));
+        Case bufferedCase = bufferableEntity.getEntity();
+        Case originalCase = null;
 
-            Location origLoc = originalCase.getLocation();
-            if(origLoc != null){
-                Location bufLoc = bufferedCase.getLocation();
-                diffs.add(new FieldDiff("Location ID", origLoc != null ? origLoc.getId() : null, bufLoc != null ? bufLoc.getId() : null));
-                diffs.add(new FieldDiff("Location Address", origLoc.getAddress(), bufLoc.getAddress()));
-                diffs.add(new FieldDiff("Location City", origLoc.getCity(), bufLoc.getCity()));
-                diffs.add(new FieldDiff("Location Country", origLoc.getCountry(), bufLoc.getCountry()));
-                diffs.add(new FieldDiff("Location Postal Code", origLoc.getPostalCode(), bufLoc.getPostalCode()));
-                diffs.add(new FieldDiff("Location Latitude", origLoc.getLatitude(), bufLoc.getLatitude()));
-                diffs.add(new FieldDiff("Location Longitude", origLoc.getLongitude(), bufLoc.getLongitude()));
+        if (bufferableEntity.getType() != BufferedChangeType.NEW && bufferedCase.getId() != null) {
+            try {
+                CaseRepository caseRepository = new CaseRepository();
+                originalCase = caseRepository.findById(bufferedCase.getId());
+            } catch (SQLException e) {
+                CRMApplication.log.error("error reading case " + bufferedCase.getId(), e);
             }
-
-            // Client
-            Client origClient = originalCase.getClient();
-            Client bufClient = bufferedCase.getClient();
-            if(origClient != null && bufClient != null){
-                diffs.add(new FieldDiff("Client ID",origClient.getId(),bufClient != null ? bufClient.getId() : null));
-                diffs.add(new FieldDiff("Client First Name", origClient.getFirstName(), bufClient.getFirstName()));
-                diffs.add(new FieldDiff("Client Last Name", origClient.getLastName(), bufClient.getLastName()));
-                diffs.add(new FieldDiff("Client Contact", origClient.getContactNumber(), bufClient.getContactNumber()));
-            }
-            // Vehicle
-            Vehicle origVeh = originalCase.getClientVehicle();
-            Vehicle bufVeh = bufferedCase.getClientVehicle();
-            diffs.add(new FieldDiff("Vehicle ID", origVeh != null ? origVeh.getId() : null, bufVeh != null ? bufVeh.getId() : null));
-            diffs.add(new FieldDiff("Vehicle License Plate", origVeh.getLicensePlate(), bufVeh.getLicensePlate()));
-            diffs.add(new FieldDiff("Vehicle Model", origVeh.getModel(), bufVeh.getModel()));
-            diffs.add(new FieldDiff("Vehicle VIN", origVeh.getVin(), bufVeh.getVin()));
-
-            // First Operator
-            Operator origFirstOp = originalCase.getFirstOperator();
-            Operator bufFirstOp = bufferedCase.getFirstOperator();
-            diffs.add(new FieldDiff("First Operator ID", origFirstOp != null ? origFirstOp.getId() : null, bufFirstOp != null ? bufFirstOp.getId() : null));
-            diffs.add(new FieldDiff("First Operator Username", origFirstOp.getUsername(), bufFirstOp.getUsername()));
-            diffs.add(new FieldDiff("First Operator First Name", origFirstOp.getFirstName(), bufFirstOp.getFirstName()));
-            diffs.add(new FieldDiff("First Operator Last Name", origFirstOp.getLastName(), bufFirstOp.getLastName()));
-
-            // Last Operator
-            Operator origLastOp = originalCase.getLastEditedOperator();
-            Operator bufLastOp = bufferedCase.getLastEditedOperator();
-            diffs.add(new FieldDiff("Last Edit Operator ID", origLastOp != null ? origLastOp.getId() : null, bufLastOp != null ? bufLastOp.getId() : null));
-            diffs.add(new FieldDiff("Last Edit Operator Username", origLastOp.getUsername(), bufLastOp.getUsername()));
-            diffs.add(new FieldDiff("Last Edit Operator First Name", origLastOp.getFirstName(), bufLastOp.getFirstName()));
-            diffs.add(new FieldDiff("Last Edit Operator Last Name", origLastOp.getLastName(), bufLastOp.getLastName()));
-
-            // Notes
-            List<Note> origNotes = originalCase.getNotes();
-            List<Note> bufNotes = bufferedCase.getNotes();
-            diffs.add(new FieldDiff("Notes Count", origNotes != null ? origNotes.size() : null, bufNotes != null ? bufNotes.size() : null));
         }
+
+        diffs.add(new FieldDiff("ID",
+                originalCase != null ? originalCase.getId() : null,
+                bufferedCase.getId()));
+        diffs.add(new FieldDiff("Damage Description",
+                originalCase != null ? originalCase.getDamageDescription() : null,
+                bufferedCase.getDamageDescription()));
+        diffs.add(new FieldDiff("Case State",
+                originalCase != null ? originalCase.getState() : null,
+                bufferedCase.getState()));
+        diffs.add(new FieldDiff("Damage Type",
+                originalCase != null ? originalCase.getDamageType() : null,
+                bufferedCase.getDamageType()));
+        diffs.add(new FieldDiff("Damage Cause",
+                originalCase != null ? originalCase.getDamageCause() : null,
+                bufferedCase.getDamageCause()));
+        diffs.add(new FieldDiff("Created Date",
+                originalCase != null ? originalCase.getCreatedDateTime() : null,
+                bufferedCase.getCreatedDateTime()));
+        diffs.add(new FieldDiff("Vehicle Registration Date",
+                originalCase != null ? originalCase.getClientVehicleFirstRegistrationDate() : null,
+                bufferedCase.getClientVehicleFirstRegistrationDate()));
+
+        Location origLoc = originalCase != null ? originalCase.getLocation() : null;
+        Location bufLoc = bufferedCase.getLocation();
+        diffs.add(new FieldDiff("Location ID", origLoc != null ? origLoc.getId() : null, bufLoc != null ? bufLoc.getId() : null));
+        diffs.add(new FieldDiff("Location Address", origLoc != null ? origLoc.getAddress() : null, bufLoc != null ? bufLoc.getAddress() : null));
+        diffs.add(new FieldDiff("Location City", origLoc != null ? origLoc.getCity() : null, bufLoc != null ? bufLoc.getCity() : null));
+        diffs.add(new FieldDiff("Location Country", origLoc != null ? origLoc.getCountry() : null, bufLoc != null ? bufLoc.getCountry() : null));
+        diffs.add(new FieldDiff("Location Postal Code", origLoc != null ? origLoc.getPostalCode() : null, bufLoc != null ? bufLoc.getPostalCode() : null));
+        diffs.add(new FieldDiff("Location Latitude", origLoc != null ? origLoc.getLatitude() : null, bufLoc != null ? bufLoc.getLatitude() : null));
+        diffs.add(new FieldDiff("Location Longitude", origLoc != null ? origLoc.getLongitude() : null, bufLoc != null ? bufLoc.getLongitude() : null));
+
+        Client origClient = originalCase != null ? originalCase.getClient() : null;
+        Client bufClient = bufferedCase.getClient();
+        diffs.add(new FieldDiff("Client ID", origClient != null ? origClient.getId() : null, bufClient != null ? bufClient.getId() : null));
+        diffs.add(new FieldDiff("Client First Name", origClient != null ? origClient.getFirstName() : null, bufClient != null ? bufClient.getFirstName() : null));
+        diffs.add(new FieldDiff("Client Last Name", origClient != null ? origClient.getLastName() : null, bufClient != null ? bufClient.getLastName() : null));
+        diffs.add(new FieldDiff("Client Contact", origClient != null ? origClient.getContactNumber() : null, bufClient != null ? bufClient.getContactNumber() : null));
+
+        Vehicle origVeh = originalCase != null ? originalCase.getClientVehicle() : null;
+        Vehicle bufVeh = bufferedCase.getClientVehicle();
+        diffs.add(new FieldDiff("Vehicle ID", origVeh != null ? origVeh.getId() : null, bufVeh != null ? bufVeh.getId() : null));
+        diffs.add(new FieldDiff("Vehicle License Plate", origVeh != null ? origVeh.getLicensePlate() : null, bufVeh != null ? bufVeh.getLicensePlate() : null));
+        diffs.add(new FieldDiff("Vehicle Model", origVeh != null ? origVeh.getModel() : null, bufVeh != null ? bufVeh.getModel() : null));
+        diffs.add(new FieldDiff("Vehicle VIN", origVeh != null ? origVeh.getVin() : null, bufVeh != null ? bufVeh.getVin() : null));
+
+        Operator origFirstOp = originalCase != null ? originalCase.getFirstOperator() : null;
+        Operator bufFirstOp = bufferedCase.getFirstOperator();
+        diffs.add(new FieldDiff("First Operator ID", origFirstOp != null ? origFirstOp.getId() : null, bufFirstOp != null ? bufFirstOp.getId() : null));
+        diffs.add(new FieldDiff("First Operator Username", origFirstOp != null ? origFirstOp.getUsername() : null, bufFirstOp != null ? bufFirstOp.getUsername() : null));
+        diffs.add(new FieldDiff("First Operator First Name", origFirstOp != null ? origFirstOp.getFirstName() : null, bufFirstOp != null ? bufFirstOp.getFirstName() : null));
+        diffs.add(new FieldDiff("First Operator Last Name", origFirstOp != null ? origFirstOp.getLastName() : null, bufFirstOp != null ? bufFirstOp.getLastName() : null));
+
+        Operator origLastOp = originalCase != null ? originalCase.getLastEditedOperator() : null;
+        Operator bufLastOp = bufferedCase.getLastEditedOperator();
+        diffs.add(new FieldDiff("Last Edit Operator ID", origLastOp != null ? origLastOp.getId() : null, bufLastOp != null ? bufLastOp.getId() : null));
+        diffs.add(new FieldDiff("Last Edit Operator Username", origLastOp != null ? origLastOp.getUsername() : null, bufLastOp != null ? bufLastOp.getUsername() : null));
+        diffs.add(new FieldDiff("Last Edit Operator First Name", origLastOp != null ? origLastOp.getFirstName() : null, bufLastOp != null ? bufLastOp.getFirstName() : null));
+        diffs.add(new FieldDiff("Last Edit Operator Last Name", origLastOp != null ? origLastOp.getLastName() : null, bufLastOp != null ? bufLastOp.getLastName() : null));
+
+        List<Note> origNotes = originalCase != null ? originalCase.getNotes() : null;
+        List<Note> bufNotes = bufferedCase.getNotes();
+        diffs.add(new FieldDiff("Notes Count", origNotes != null ? origNotes.size() : null, bufNotes != null ? bufNotes.size() : null));
 
         return diffs;
     }

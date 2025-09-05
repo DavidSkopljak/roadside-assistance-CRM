@@ -8,12 +8,12 @@ import com.davidskopljak.skopljakzavrsni.enums.CaseState;
 import com.davidskopljak.skopljakzavrsni.exceptions.EmptyResultSetException;
 import com.davidskopljak.skopljakzavrsni.exceptions.RepositoryAccessException;
 import com.davidskopljak.skopljakzavrsni.helpers.MiscHelpers;
-import com.davidskopljak.skopljakzavrsni.repository.CaseRepository;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.MenuItem;
 
 import java.io.IOException;
@@ -32,41 +32,46 @@ public class CaseMenuController{
     @FXML
     MenuItem viewCaseNotesMenuItem;
 
-    public void handleViewCaseInfo(){caseWindowController.loadScene("case-info.fxml", "View case info",  CaseInfoController.class);}
+    private String title = "View case info";
+    private String caseInfoPath = "case-info.fxml";
+    
+    public void handleViewCaseInfo(){caseWindowController.loadScene(caseInfoPath, title,  CaseInfoController.class);}
 
     public void handleViewLocationInfo() {caseWindowController.loadScene("case-location.fxml", "View location info",  CaseLocationController.class);}
 
     public void handleSaveCase() {
-        try{
-            EntityBuffer<Long, Case> caseBuffer = CRMApplication.getCaseBuffer();
-            CaseRepository caseRepository = new CaseRepository();
-            Case caseToSave = caseWindowController.getActiveCaseBuilder().build();
-            caseToSave.updateState(CaseState.ACTIVE);
+        Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmAlert.setTitle("Confirm Save");
+        confirmAlert.setHeaderText("Save Case");
+        confirmAlert.setContentText("Are you sure you want to save this case?");
 
+        confirmAlert.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                try{
+                    EntityBuffer<Long, Case> caseBuffer = CRMApplication.getCaseBuffer();
+                    Case caseToSave = caseWindowController.getActiveCaseBuilder().build();
+                    caseToSave.updateState(CaseState.ACTIVE);
 
-            if(!validateCase(caseToSave)){
-               MiscHelpers.showAlert("Case is not valid.", Alert.AlertType.ERROR);
-               return;
+                    if(!validateCase(caseToSave)){
+                        MiscHelpers.showAlert("Case is not valid.", Alert.AlertType.ERROR);
+                        return;
+                    }
+
+                    if(caseToSave.getId() == null){
+                        caseBuffer.writeEntity(new BufferableEntity<>(null, caseToSave, CRMApplication.getActiveOperator(), BufferedChangeType.NEW));
+                        caseWindowController.loadScene(caseInfoPath, title,  CaseInfoController.class);
+                    } else {
+                        caseBuffer.writeEntity(new BufferableEntity<>(caseToSave.getId(), caseToSave, CRMApplication.getActiveOperator(), BufferedChangeType.UPDATED));
+                        caseWindowController.loadScene(caseInfoPath, title,  CaseInfoController.class);
+                    }
+
+                    caseWindowController.setActiveCase(caseToSave);
+                }catch(RepositoryAccessException | EmptyResultSetException e){
+                    CRMApplication.log.error("Failed to save or update case: ", e);
+                    MiscHelpers.showAlert("Failed to save case. Please try again.", Alert.AlertType.ERROR);
+                }
             }
-
-            if(caseToSave.getId() == null){
-                caseBuffer.writeEntity(new BufferableEntity<>(null, caseToSave, CRMApplication.getActiveOperator(), BufferedChangeType.NEW));
-//                Long caseId = caseRepository.save(caseToSave);
-//                caseToSave.setId(caseId);
-                //replace this with async refresh func
-                caseWindowController.loadScene("case-info.fxml", "View case info",  CaseInfoController.class);
-            } else {
-//                caseRepository.update(caseToSave);
-                caseBuffer.writeEntity(new BufferableEntity<>(caseToSave.getId(), caseToSave, CRMApplication.getActiveOperator(), BufferedChangeType.UPDATED));
-                //replace this with async refresh func
-                caseWindowController.loadScene("case-info.fxml", "View case info",  CaseInfoController.class);
-            }
-
-            caseWindowController.setActiveCase(caseToSave);
-        }catch(RepositoryAccessException | EmptyResultSetException e){
-            CRMApplication.log.error("Failed to save or update case: ", e);
-            MiscHelpers.showAlert("Failed to save or update case: " + e.getMessage(), Alert.AlertType.ERROR);
-        }
+        });
     }
 
     public void handleCancelCase() {
@@ -140,46 +145,37 @@ public class CaseMenuController{
 
         if (activeCase == null) {
             valid = false;
+            return valid;
         }
 
         if (activeCase.getClient() == null) {
-            System.out.println("Client is null.");
             valid = false;
         }
         if (activeCase.getLocation() == null) {
-            System.out.println("Location is null.");
             valid = false;
         }
         if (activeCase.getClientVehicle() == null) {
-            System.out.println("Client vehicle is null.");
             valid = false;
         }
         if (activeCase.getFirstOperator() == null) {
-            System.out.println("First operator is null.");
             valid = false;
         }
         if (activeCase.getLastEditedOperator() == null) {
-            System.out.println("Last edited operator is null.");
             valid = false;
         }
         if (activeCase.getState() == null) {
-            System.out.println("Case state is null.");
             valid = false;
         }
         if (activeCase.getDamageCause() == null) {
-            System.out.println("Damage cause is null.");
             valid = false;
         }
         if (activeCase.getDamageDescription() == null) {
-            System.out.println("Damage description is null.");
             valid = false;
         }
         if (activeCase.getDamageType() == null) {
-            System.out.println("Damage type is null.");
             valid = false;
         }
         if (activeCase.getClientVehicleFirstRegistrationDate() == null) {
-            System.out.println("Client vehicle first registration date is null.");
             valid = false;
         }
 
