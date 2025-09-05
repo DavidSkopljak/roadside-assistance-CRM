@@ -2,6 +2,7 @@ package com.davidskopljak.skopljakzavrsni.controller;
 
 import com.davidskopljak.skopljakzavrsni.entity.*;
 import com.davidskopljak.skopljakzavrsni.enums.BufferedChangeType;
+import com.davidskopljak.skopljakzavrsni.exceptions.RepositoryAccessException;
 import com.davidskopljak.skopljakzavrsni.repository.CaseRepository;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -12,6 +13,8 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
 import java.lang.reflect.Method;
+import java.sql.Ref;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -123,11 +126,8 @@ public class CaseDiffController {
                     CaseRepository caseRepository = new CaseRepository();
                     originalCase = caseRepository.findById(bufferedCase.getId());
                 }
-            } catch (Exception e) {
-                if (e.getMessage().contains("recovery mode") ||
-                        e.getMessage().contains("connection") ||
-                        e.getCause() != null && e.getCause().getMessage().contains("FATAL")) {
-                }
+            } catch (SQLException e){
+                CRMApplication.log.error("error reading case " + bufferedCase.getId(), e);
             }
 
             List<FieldDiff> diffs = generateAllFieldDiffs(originalCase, bufferedCase);
@@ -171,7 +171,7 @@ public class CaseDiffController {
             Client origClient = originalCase.getClient();
             Client bufClient = bufferedCase.getClient();
             if(origClient != null && bufClient != null){
-                diffs.add(new FieldDiff("Client ID",origClient.getId(bufClient != null ? bufClient.getId() : null)));
+                diffs.add(new FieldDiff("Client ID",origClient.getId(),bufClient != null ? bufClient.getId() : null));
                 diffs.add(new FieldDiff("Client First Name", origClient.getFirstName(), bufClient.getFirstName()));
                 diffs.add(new FieldDiff("Client Last Name", origClient.getLastName(), bufClient.getLastName()));
                 diffs.add(new FieldDiff("Client Contact", origClient.getContactNumber(), bufClient.getContactNumber()));

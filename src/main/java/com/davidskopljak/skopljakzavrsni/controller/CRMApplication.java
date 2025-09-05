@@ -18,7 +18,8 @@ import java.io.IOException;
     public static final Logger log = LoggerFactory.getLogger(CRMApplication.class);
     private static Stage PRIMARY_STAGE;
     private static Operator ACTIVE_OPERATOR;
-    private static EntityBuffer<Long, Case> CASE_BUFFER = new EntityBuffer<>(new File("cases.dat"));
+    private static String caseBufferFilePath = "cases.dat";
+    private static EntityBuffer<Long, Case> CASE_BUFFER = new EntityBuffer<>(new File(caseBufferFilePath));
 
     @Override
     public void start(Stage stage){
@@ -47,4 +48,5 @@ import java.io.IOException;
     private static void setPrimaryStage(Stage primaryStage) {CRMApplication.PRIMARY_STAGE = primaryStage;}
     public static Operator getActiveOperator() {return ACTIVE_OPERATOR;}
     public static EntityBuffer<Long, Case> getCaseBuffer() {return CASE_BUFFER;}
+    public static String getCaseBufferFilePath() {return caseBufferFilePath;}
 }
